@@ -16,3 +16,16 @@ services:
       - "5000:5000"
     depends_on:
       - db
+  scrapy:
+    build:
+      context: scrapy
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    command: scrapy
+    volumes:
+      - .:/app
+    ports:
+      - "6000:6000"
