@@ -16,9 +16,9 @@ services:
       - "5000:5000"
     depends_on:
       - db
-  scrapy:
+  scraper:
     build:
-      context: scrapy
+      context: scraper
       dockerfile: Dockerfile
     environment:
       - POSTGRES_DB=postgres
