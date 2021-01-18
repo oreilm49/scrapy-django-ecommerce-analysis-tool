@@ -38,6 +38,9 @@ class Website(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The website name"))
     domain = models.CharField(verbose_name=_("Domain"), max_length=MAX_LENGTH, help_text=_("The website domain name"))
 
+    def __str__(self):
+        return self.name
+
 
 class Url(BaseModel):
     url = models.CharField(verbose_name=_("Url"), max_length=MAX_LENGTH, help_text=_("The page url"))
@@ -45,11 +48,17 @@ class Url(BaseModel):
     website = models.ForeignKey(to="cms.Website", on_delete=CASCADE)
     last_scanned = models.DateTimeField(verbose_name=_("Last scanned"))
 
+    def __str__(self):
+        return self.url
+
 
 class Category(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH)
     parent = models.ForeignKey(to="cms.Category", verbose_name=_("Parent"), related_name="sub_categories", on_delete=PROTECT)
     alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True))
+
+    def __str__(self):
+        return self.name
 
 
 class Selector(BaseModel):
@@ -57,9 +66,15 @@ class Selector(BaseModel):
     selector_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=SELECTOR_TYPES)
     css_selector = models.CharField(verbose_name=_("CSS Selector"), max_length=MAX_LENGTH, help_text=_("The CSS selector used to find page data."))
 
+    def __str__(self):
+        return self.name
+
 
 class Unit(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The unit name"))
+
+    def __str__(self):
+        return self.name
 
 
 class PageDataItem(BaseModel):
@@ -70,14 +85,23 @@ class PageDataItem(BaseModel):
     alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True)
     website = models.ForeignKey(to=Website, verbose_name=_("Website"), on_delete=SET_NULL, null=True, blank=True, help_text=_("The website this data is specific to: for example, price may vary from website to website. If data isn't website specific, leave blank."))
 
+    def __str__(self):
+        return self.name
+
 
 class Product(BaseModel):
     model = models.CharField(verbose_name=_("Model"), max_length=MAX_LENGTH, unique=True)
     category = models.ForeignKey(to=Category, verbose_name=_("Category"), on_delete=SET_NULL, blank=True, null=True)
     alternate_models = ArrayField(verbose_name=_("Alternate models"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True)
 
+    def __str__(self):
+        return self.model
+
 
 class ProductAttribute(BaseModel):
     product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE)
     data_type = models.ForeignKey(to=PageDataItem, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"))
     value = models.CharField(verbose_name=_("Value"), max_length=MAX_LENGTH, help_text=_("The value for this attribute"))
+
+    def __str__(self):
+        return f"{self.product.model} > {self.data_type}"
