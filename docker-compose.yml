@@ -24,6 +24,7 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - DJANGO_SETTINGS_MODULE=cms.settings
     command: scrapy
     volumes:
       - .:/app
