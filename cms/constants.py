@@ -14,12 +14,14 @@ PRICE = _("price")
 TABLE = _("table")
 IMAGE = _("image")
 LINK = _("link")
+PAGINATION = _("pagination")
 
 SELECTOR_TYPES = (
     (PRICE, _("Price")),
     (TABLE, _("Table")),
     (IMAGE, _("Image")),
     (LINK, _("Link")),
+    (PAGINATION, _("Pagination")),
 )
 
 INTEGER = _("int")
