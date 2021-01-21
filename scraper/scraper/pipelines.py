@@ -1,13 +1,14 @@
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-
-
-# useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
+from django.db.models import Q
+from cms.models import Product, ProductAttribute
+from scraper.scraper.items import ProductItem, ProductAttributeItem
 
 
 class ScraperPipeline:
     def process_item(self, item, spider):
+        if isinstance(item, ProductItem):
+            if not Product.objects.filter(Q(model=item['model']) | Q(alternate_models=item['model'])).exists():
+                item.save()
+                return item
+        if isinstance(item, ProductAttributeItem):
+            pass
         return item
