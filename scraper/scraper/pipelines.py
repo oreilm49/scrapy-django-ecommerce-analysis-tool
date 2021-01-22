@@ -1,14 +1,24 @@
 from django.db.models import Q
 from cms.models import Product, ProductAttribute
-from scraper.scraper.items import ProductItem, ProductAttributeItem
+from scraper.scraper.items import ProductPageItem
 
 
 class ScraperPipeline:
+
     def process_item(self, item, spider):
-        if isinstance(item, ProductItem):
-            if not Product.objects.filter(Q(model=item['model']) | Q(alternate_models=item['model'])).exists():
-                item.save()
-                return item
-        if isinstance(item, ProductAttributeItem):
-            pass
-        return item
+        if isinstance(item, ProductPageItem):
+            product_check: Queryset = Product.objects.filter(category=item['category'])\
+                .filter(Q(model=item['model']) | Q(alternate_models__contains=[item['model']]))
+            if not product_check.exists():
+                product: Product = Product.objects.create(model=item['model'], category=item['category'])
+                product.save()
+            else:
+                product: Product = product_check.first()
+
+            for attribute in item['attributes']:
+                product_attribute: ProductAttribute = ProductAttribute.objects.create(
+                    product=product,
+                    data_type_id=attribute['data_type_id'],
+                    value=attribute['value']
+                )
+                product_attribute.save()
