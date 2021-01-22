@@ -63,10 +63,11 @@ class Category(BaseModel):
 
 
 class Selector(BaseModel):
-    name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH)
     selector_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=SELECTOR_TYPES)
     css_selector = models.CharField(verbose_name=_("CSS Selector"), max_length=MAX_LENGTH, help_text=_("The CSS selector used to find page data."))
     website = models.ForeignKey(to="cms.Website", on_delete=CASCADE, related_name="selectors")
+    regex = models.CharField(verbose_name=_("Regular Expression"), max_length=MAX_LENGTH, help_text=_("A regular expression used to extract data"))
+    parent = models.ForeignKey(to="cms.Selector", verbose_name=_("Parent"), related_name="sub_selectors", on_delete=SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -81,11 +82,11 @@ class Unit(BaseModel):
 
 class PageDataItem(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The data item name"))
-    regex = models.CharField(verbose_name=_("Regular Expression"), max_length=MAX_LENGTH, help_text=_("A regular expression used to extract data"))
     data_type = models.CharField(verbose_name=_("Data Type"), max_length=MAX_LENGTH, choices=DATA_TYPES, help_text=_("The data item name"))
-    unit = models.ForeignKey(to=Unit, verbose_name=_("Unit"), help_text=_("The unit of measurement for this data item"), on_delete=SET_NULL, null=True, blank=True)
     alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True)
-    website = models.ForeignKey(to=Website, verbose_name=_("Website"), on_delete=SET_NULL, null=True, blank=True, help_text=_("The website this data is specific to: for example, price may vary from website to website. If data isn't website specific, leave blank."))
+    website = models.ForeignKey(to=Website, related_name="page_data_items", verbose_name=_("Website"), on_delete=SET_NULL, null=True, blank=True, help_text=_("The website this data is specific to: for example, price may vary from website to website. If data isn't website specific, leave blank."))
+    selector = models.OneToOneField(to=Selector, verbose_name=_("Selector"), on_delete=SET_NULL, null=True, blank=True, help_text=_("The selector object used to extract page data."))
+    unit = models.ForeignKey(to=Unit, verbose_name=_("Unit"), help_text=_("The unit of measurement for this attribute"), on_delete=SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.name
