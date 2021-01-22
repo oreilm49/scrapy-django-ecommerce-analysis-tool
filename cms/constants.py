@@ -10,18 +10,22 @@ URL_TYPES = (
     (PRODUCT, _("Product")),
 )
 
-PRICE = _("price")
-TABLE = _("table")
-IMAGE = _("image")
-LINK = _("link")
-PAGINATION = _("pagination")
+TEXT = "text"
+TABLE = "table"
+IMAGE = "image"
+LINK = "link"
+PAGINATION = "pagination"
+TABLE_VALUE_COLUMN = "table_value_column"
+TABLE_LABEL_COLUMN = "table_label_column"
 
 SELECTOR_TYPES = (
-    (PRICE, _("Price")),
+    (TEXT, _("Text")),
     (TABLE, _("Table")),
     (IMAGE, _("Image")),
     (LINK, _("Link")),
     (PAGINATION, _("Pagination")),
+    (TABLE_VALUE_COLUMN, _("Table Value Column")),
+    (TABLE_LABEL_COLUMN, _("Table Label Column")),
 )
 
 INTEGER = _("int")
