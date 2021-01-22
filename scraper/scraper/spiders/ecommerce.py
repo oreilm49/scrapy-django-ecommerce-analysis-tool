@@ -1,8 +1,12 @@
+from typing import Dict, Union
+
 import scrapy
 
-from cms.constants import CATEGORY, PAGINATION, LINK
-from cms.models import Website, Url, Category
+from cms.constants import CATEGORY, PAGINATION, LINK, TEXT, FLOAT, TABLE, IMAGE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN
+from cms.models import Website, Url, Category, Selector, PageDataItem
+
 from scraper.scraper.exceptions import WebsiteNotProvidedInArguments
+from scraper.scraper.items import ProductPageItem
 
 
 class EcommerceSpider(scrapy.Spider):
@@ -30,4 +34,23 @@ class EcommerceSpider(scrapy.Spider):
             yield response.follow(href, self.parse_product, cb_kwargs={'category': category})
 
     def parse_product(self, response, category: Category = None, **kwargs):
-        pass
+        page_item = ProductPageItem()
+        page_item['attributes'] = []
+        page_item['category'] = category
+        attribute: Dict[str, Union[PageDataItem, str]] = {}
+        for data_item in self.website.page_data_items.all():
+            data_item: PageDataItem
+            selector: Selector = data_item.selector
+            if selector.selector_type == TABLE:
+                for table_row in response.css(selector.css_selector):
+                    attribute.copy()
+                    attribute['data_type_id'] = data_item.pk
+                    attribute['value'] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).extract_first().strip()
+                    attribute['label'] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).extract_first().strip()
+                    page_item['attributes'].append(attribute)
+            elif selector.selector_type in [TEXT, LINK, IMAGE]:
+                attribute.copy()
+                attribute['data_type_id'] = data_item.pk
+                attribute['value'] = response.css(selector.css_selector).extract_first().strip()
+                page_item['attributes'].append(attribute)
+        yield page_item
