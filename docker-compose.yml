@@ -19,7 +19,7 @@ services:
   scraper:
     build:
       context: scraper
-      dockerfile: scraper/scraper/Dockerfile
+      dockerfile: Dockerfile
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
