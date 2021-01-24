@@ -55,7 +55,7 @@ class Url(BaseModel):
 
 class Category(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH)
-    parent = models.ForeignKey(to="cms.Category", verbose_name=_("Parent"), related_name="sub_categories", on_delete=PROTECT)
+    parent = models.ForeignKey(to="cms.Category", verbose_name=_("Parent"), related_name="sub_categories", on_delete=PROTECT, null=True, blank=True, default=None)
     alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True))
 
     def __str__(self):

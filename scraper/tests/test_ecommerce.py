@@ -1,8 +1,9 @@
 from collections import Iterator
-
+import os
 import scrapy
 from betamax import Betamax
 from betamax.fixtures.unittest import BetamaxTestCase
+from django.test import TestCase
 from model_mommy import mommy
 from requests import Response
 from scrapy.http import HtmlResponse
@@ -13,15 +14,16 @@ from scraper.spiders.ecommerce import EcommerceSpider
 
 
 with Betamax.configure() as config:
-    config.cassette_library_dir = 'cassettes'
+    config.cassette_library_dir = os.path.join(os.path.dirname(__file__), 'cassettes')
     config.preserve_exact_body_bytes = True
 
 
-class TestEcommerce(BetamaxTestCase):
+class TestEcommerce(BetamaxTestCase, TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
+        print(Website.objects.all())
         cls.website: Website = mommy.make(Website, name="harvey norman", domain="harveynorman.ie")
         cls.category: Category = mommy.make(Category, name="Washing Machines")
         cls.url: Url = mommy.make(Url, url="https://www.harveynorman.ie/home-appliances/appliances/washing-machines/", url_type=CATEGORY, website=cls.website, category=cls.category)
