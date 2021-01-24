@@ -25,6 +25,9 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - DJANGO_SETTINGS_MODULE=cms.settings
+      - HTTPCACHE_ENABLED=True
+      - HTTPCACHE_EXPIRATION_SECS=604800
+      - DEBUG=True
     command: scrapy
     volumes:
       - .:/app
