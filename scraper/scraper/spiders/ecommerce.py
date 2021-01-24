@@ -44,13 +44,13 @@ class EcommerceSpider(scrapy.Spider):
             if selector.selector_type == TABLE:
                 for table_row in response.css(selector.css_selector):
                     attribute.copy()
-                    attribute['data_type_id'] = data_item.pk
+                    attribute['data_type'] = data_item
                     attribute['value'] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).extract_first().strip()
                     attribute['label'] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).extract_first().strip()
                     page_item['attributes'].append(attribute)
             elif selector.selector_type in [TEXT, LINK, IMAGE]:
                 attribute.copy()
-                attribute['data_type_id'] = data_item.pk
+                attribute['data_type'] = data_item
                 attribute['value'] = response.css(selector.css_selector).extract_first().strip()
                 page_item['attributes'].append(attribute)
         yield page_item
