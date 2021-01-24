@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Union, Iterator
 
 import scrapy
 
@@ -19,19 +19,24 @@ class EcommerceSpider(scrapy.Spider):
         if not website:
             raise WebsiteNotProvidedInArguments
         self.website: Website = Website.objects.get(name=website)
-        self.allowed_domains = [website.domain]
+        self.allowed_domains = [self.website.domain]
 
     def start_requests(self):
         for url in self.website.urls.filter(url_type=CATEGORY):
             url: Url
             yield scrapy.Request(url.url, callback=self.parse, cb_kwargs={'category': url.category})
 
-    def parse(self, response, category: Category = None, **kwargs):
+    def parse_pagination(self, response, category: Category = None, **kwargs) -> Iterator[scrapy.Request]:
         for href in response.css(self.website.selectors.filter(selector_type=PAGINATION).first().css_selector):
-            yield response.follow(href, self.parse, cb_kwargs={'category': category})
+            yield response.follow(href, self.parse_products, cb_kwargs={'category': category})
 
+    def parse_products(self, response, category: Category = None, **kwargs) -> Iterator[scrapy.Request]:
         for href in response.css(self.website.selectors.filter(selector_type=LINK, name="product").first().css_selector):
             yield response.follow(href, self.parse_product, cb_kwargs={'category': category})
+
+    def parse(self, response, category: Category = None, **kwargs):
+        self.parse_pagination(response, category, **kwargs)
+        self.parse_products(response, category, **kwargs)
 
     def parse_product(self, response, category: Category = None, **kwargs):
         page_item = ProductPageItem()
