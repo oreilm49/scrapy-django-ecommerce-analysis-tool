@@ -18,7 +18,7 @@ class EcommerceSpider(scrapy.Spider):
         super().__init__(**kwargs)
         if not website:
             raise WebsiteNotProvidedInArguments
-        self.website = website
+        self.website: Website = Website.objects.get(name=website)
         self.allowed_domains = [website.domain]
 
     def start_requests(self):
