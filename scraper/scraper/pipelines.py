@@ -18,7 +18,7 @@ class ScraperPipeline:
             for attribute in item['attributes']:
                 product_attribute: ProductAttribute = ProductAttribute.objects.create(
                     product=product,
-                    data_type_id=attribute['data_type_id'],
+                    data_type=attribute['data_type'],
                     value=attribute['value']
                 )
                 product_attribute.save()
