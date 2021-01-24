@@ -25,7 +25,7 @@ class TestEcommerce(BetamaxTestCase):
         mommy.make(Url, url="https://www.harveynorman.ie/home-appliances/appliances/washing-machines/", url_type=CATEGORY, website=cls.website, category=cls.category)
 
     def test_init_spider(self):
-        spider: EcommerceSpider = EcommerceSpider(website=self.website)
+        spider: EcommerceSpider = EcommerceSpider(website=self.website.name)
         self.assertEqual(spider.website, self.website)
         self.assertEqual(spider.allowed_domains, [self.website.domain])
 
