@@ -1,5 +1,6 @@
 import sys
 import os
+import django
 
 BOT_NAME = 'scraper'
 
@@ -82,4 +83,5 @@ HTTPCACHE_IGNORE_HTTP_CODES = []
 HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # Django integration
-sys.path.append('/app/cms')
+sys.path.append('/app')
+django.setup()
