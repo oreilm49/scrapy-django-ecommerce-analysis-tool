@@ -39,3 +39,17 @@ DATA_TYPES = (
     (STRING, _("String")),
     (BOOLEAN, _("Boolean"))
 )
+
+ONCE = 'once'
+HOURLY = 'hourly'
+DAILY = 'daily'
+WEEKLY = 'weekly'
+MONTHLY = 'monthly'
+
+TRACKING_FREQUENCIES = (
+    (ONCE, _('Once')),
+    (HOURLY, _('Hourly')),
+    (DAILY, _('Daily')),
+    (WEEKLY, _('Weekly')),
+    (MONTHLY, _('Monthly')),
+)
