@@ -82,7 +82,6 @@ class TestEcommerce(BetamaxTestCase, TestCase):
         scrapy_response: HtmlResponse = HtmlResponse(body=response.content, url=self.product_url)
         spider: EcommerceSpider = EcommerceSpider(website="harvey norman")
         product_item: ProductPageItem = next(spider.parse_product(scrapy_response, category=self.url.category))
-        self.assertIsNotNone(product_item.get('price'))
         self.assertIsNotNone(product_item.get('model'))
         self.assertIsNotNone(product_item.get('category'))
         self.assertIsInstance(product_item['attributes'], list)
