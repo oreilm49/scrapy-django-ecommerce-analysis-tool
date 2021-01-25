@@ -38,7 +38,7 @@ class EcommerceSpider(scrapy.Spider):
         self.parse_pagination(response, category, **kwargs)
         self.parse_products(response, category, **kwargs)
 
-    def parse_product(self, response, category: Category = None, **kwargs):
+    def parse_product(self, response, category: Category = None, **kwargs) -> Iterator[ProductPageItem]:
         page_item = ProductPageItem()
         page_item['attributes'] = []
         page_item['category'] = category
