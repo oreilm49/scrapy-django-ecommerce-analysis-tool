@@ -8,8 +8,9 @@ from model_mommy import mommy
 from requests import Response
 from scrapy.http import HtmlResponse
 
-from cms.models import Website, Url, Category
-from cms.constants import CATEGORY
+from cms.models import Website, Url, Category, PageDataItem, Selector
+from cms.constants import CATEGORY, STRING, TABLE, TABLE_LABEL_COLUMN, TABLE_VALUE_COLUMN, FLOAT, TEXT
+from items import ProductPageItem
 from scraper.spiders.ecommerce import EcommerceSpider
 
 
@@ -27,6 +28,18 @@ class TestEcommerce(BetamaxTestCase, TestCase):
         cls.website: Website = mommy.make(Website, name="harvey norman", domain="harveynorman.ie")
         cls.category: Category = mommy.make(Category, name="Washing Machines")
         cls.url: Url = mommy.make(Url, url="https://www.harveynorman.ie/home-appliances/appliances/washing-machines/", url_type=CATEGORY, website=cls.website, category=cls.category)
+        cls.product_url: str = cls.url.url + "/whirlpool-8kg-freestanding-washing-machine-ffb8448wvuk.html"
+        # Set up selectors
+        table_selector: Selector = mommy.make(Selector, selector_type=TABLE, css_selector="#content_features table.table-product-features tr", website=self.website)
+        mommy.make(Selector, selector_type=TABLE_LABEL_COLUMN, css_selector="th", website=cls.website, parent=table_selector)
+        mommy.make(Selector, selector_type=TABLE_VALUE_COLUMN, css_selector="td", website=cls.website, parent=table_selector)
+        mommy.make(PageDataItem, name="table", data_type=STRING, website=cls.website, selector=table_selector)
+        mommy.make(PageDataItem, name="price", data_type=FLOAT, website=cls.website, selector=mommy.make(
+            Selector, selector_type=TEXT, css_selector=".price-num", website=cls.website
+        ))
+        mommy.make(PageDataItem, name="model", data_type=STRING, website=cls.website, selector=mommy.make(
+            Selector, selector_type=TEXT, css_selector=".product-id.meta", website=cls.website
+        ))
 
     def test_init_spider(self):
         spider: EcommerceSpider = EcommerceSpider(website=self.website.name)
@@ -65,4 +78,16 @@ class TestEcommerce(BetamaxTestCase, TestCase):
         self.assertEqual(product.cb_kwargs, {'category': self.url.category})
 
     def test_parse_product(self):
-        pass
+        response: Response = self.session.get(self.product_url)
+        scrapy_response: HtmlResponse = HtmlResponse(body=response.content, url=self.product_url)
+        spider: EcommerceSpider = EcommerceSpider(website="harvey norman")
+        product_item: ProductPageItem = next(spider.parse_product(scrapy_response, category=self.url.category))
+        self.assertIsNotNone(product_item.get('price'))
+        self.assertIsNotNone(product_item.get('model'))
+        self.assertIsNotNone(product_item.get('category'))
+        self.assertIsInstance(product_item['attributes'], list)
+        self.assertTrue(len(product_item['attributes']) > 0)
+        attribute: dict = product_item['attributes'][0]
+        self.assertIsInstance(attribute, dict)
+        self.assertIsInstance(attribute['data_type'], PageDataItem)
+        self.assertIsInstance(attribute['value'], str)
