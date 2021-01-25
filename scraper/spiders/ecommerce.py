@@ -53,8 +53,6 @@ class EcommerceSpider(scrapy.Spider):
                     attribute['value'] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).extract_first().strip()
                     attribute['label'] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).extract_first().strip()
                     page_item['attributes'].append(attribute)
-            elif selector.selector_type == TEXT and page_item.fields.get(data_item.name) is not None:
-                page_item[data_item.name] = response.css(selector.css_selector).extract_first().strip()
             elif selector.selector_type in [TEXT, LINK, IMAGE]:
                 attribute.copy()
                 attribute['data_type'] = data_item
