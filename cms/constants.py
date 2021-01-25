@@ -2,8 +2,8 @@ from django.utils.translation import gettext as _
 
 MAX_LENGTH = 100
 
-CATEGORY = _("category")
-PRODUCT = _("product")
+CATEGORY = "category"
+PRODUCT = "product"
 
 URL_TYPES = (
     (CATEGORY, _("Category")),
@@ -28,10 +28,10 @@ SELECTOR_TYPES = (
     (TABLE_LABEL_COLUMN, _("Table Label Column")),
 )
 
-INTEGER = _("int")
-FLOAT = _("float")
-STRING = _("str")
-BOOLEAN = _("bool")
+INTEGER = "int"
+FLOAT = "float"
+STRING = "str"
+BOOLEAN = "bool"
 
 DATA_TYPES = (
     (INTEGER, _("Integer")),
