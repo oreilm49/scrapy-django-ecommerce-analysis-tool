@@ -6,7 +6,7 @@ from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet
 from django.utils.translation import gettext as _
 from django_extensions.db.fields import ModificationDateTimeField, CreationDateTimeField
 
-from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, DATA_TYPES
+from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, DATA_TYPES, TRACKING_FREQUENCIES, ONCE
 
 
 class BaseQuerySet(QuerySet):
@@ -87,6 +87,7 @@ class PageDataItem(BaseModel):
     website = models.ForeignKey(to=Website, related_name="page_data_items", verbose_name=_("Website"), on_delete=SET_NULL, null=True, blank=True, help_text=_("The website this data is specific to: for example, price may vary from website to website. If data isn't website specific, leave blank."))
     selector = models.OneToOneField(to=Selector, verbose_name=_("Selector"), on_delete=SET_NULL, null=True, blank=True, help_text=_("The selector object used to extract page data."))
     unit = models.ForeignKey(to=Unit, verbose_name=_("Unit"), help_text=_("The unit of measurement for this attribute"), on_delete=SET_NULL, null=True, blank=True)
+    repeat = models.CharField(verbose_name=_("Repeat"), max_length=MAX_LENGTH, default=ONCE, choices=TRACKING_FREQUENCIES, help_text=_("The frequency with which this data item should be tracked."))
 
     def __str__(self):
         return self.name
