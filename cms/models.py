@@ -46,7 +46,7 @@ class Url(BaseModel):
     url = models.CharField(verbose_name=_("Url"), max_length=MAX_LENGTH, help_text=_("The page url"), unique=True)
     url_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=URL_TYPES)
     website = models.ForeignKey(to="cms.Website", on_delete=CASCADE, related_name="urls")
-    last_scanned = models.DateTimeField(verbose_name=_("Last scanned"))
+    last_scanned = models.DateTimeField(verbose_name=_("Last scanned"), null=True, blank=True)
     category = models.ForeignKey(to="cms.Category", on_delete=SET_NULL, null=True, blank=True, related_name="urls")
 
     def __str__(self):
@@ -56,7 +56,7 @@ class Url(BaseModel):
 class Category(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, unique=True)
     parent = models.ForeignKey(to="cms.Category", verbose_name=_("Parent"), related_name="sub_categories", on_delete=PROTECT, null=True, blank=True, default=None)
-    alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True))
+    alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), null=True, blank=True)
 
     def __str__(self):
         return self.name
