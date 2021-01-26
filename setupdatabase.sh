@@ -7,5 +7,4 @@ set -e
 ./manage.py createsuperuser --username=admin --email=me@mor.dev --noinput
 ./manage.py set_fake_passwords
 ./manage.py runscript --traceback load_cms
-./manage.py set_fake_passwords
 exit 0
