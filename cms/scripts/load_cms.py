@@ -1,3 +1,4 @@
+from django.db import transaction
 from model_mommy import mommy
 
 from cms.constants import CATEGORY, TABLE_LABEL_COLUMN, TABLE_VALUE_COLUMN, TABLE, STRING, FLOAT, TEXT
@@ -20,3 +21,8 @@ def set_up_websites():
     mommy.make(PageDataItem, name="model", data_type=STRING, website=harvey_norman, selector=mommy.make(
         Selector, selector_type=TEXT, css_selector=".product-id.meta", website=harvey_norman
     ))
+
+
+@transaction.atomic()
+def run():
+    set_up_websites()
