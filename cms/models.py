@@ -70,7 +70,7 @@ class Selector(BaseModel):
     parent = models.ForeignKey(to="cms.Selector", verbose_name=_("Parent"), related_name="sub_selectors", on_delete=SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.website} - {self.selector_type}"
 
 
 class Unit(BaseModel):
