@@ -1,8 +1,8 @@
-from typing import Dict, Union, Iterator
+from typing import Dict, Union, Iterator, Optional
 
 import scrapy
 
-from cms.constants import CATEGORY, PAGINATION, LINK, TEXT, FLOAT, TABLE, IMAGE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN
+from cms.constants import CATEGORY, PAGINATION, LINK, TEXT, TABLE, IMAGE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN
 from cms.models import Website, Url, Category, Selector, PageDataItem
 
 from scraper.exceptions import WebsiteNotProvidedInArguments
@@ -26,36 +26,45 @@ class EcommerceSpider(scrapy.Spider):
             url: Url
             yield scrapy.Request(url.url, callback=self.parse, cb_kwargs={'category': url.category})
 
-    def parse_pagination(self, response, category: Category = None, **kwargs) -> Iterator[scrapy.Request]:
-        for href in response.css(self.website.selectors.filter(selector_type=PAGINATION).first().css_selector):
-            yield response.follow(href, self.parse_products, cb_kwargs={'category': category})
+    def parse(self, response, category: Category = None, **kwargs) -> Iterator[scrapy.Request]:
+        element: scrapy.selector.unified.Selector
+        for element in response.css(self.website.selectors.filter(selector_type=PAGINATION).first().css_selector):
+            href: Optional[str] = element.attrib.get('href')
+            if href:
+                yield response.follow(href, self.parse, cb_kwargs={'category': category})
 
-    def parse_products(self, response, category: Category = None, **kwargs) -> Iterator[scrapy.Request]:
-        for href in response.css(self.website.selectors.filter(selector_type=LINK, name="product").first().css_selector):
-            yield response.follow(href, self.parse_product, cb_kwargs={'category': category})
-
-    def parse(self, response, category: Category = None, **kwargs):
-        self.parse_pagination(response, category, **kwargs)
-        self.parse_products(response, category, **kwargs)
+        for element in response.css(self.website.selectors.filter(selector_type=LINK).first().css_selector):
+            href: Optional[str] = element.attrib.get('href')
+            if href:
+                yield response.follow(href, self.parse_product, cb_kwargs={'category': category})
 
     def parse_product(self, response, category: Category = None, **kwargs) -> Iterator[ProductPageItem]:
-        page_item = ProductPageItem()
-        page_item['attributes'] = []
-        page_item['category'] = category
-        attribute: Dict[str, Union[PageDataItem, str]] = {}
-        for data_item in self.website.page_data_items.all():
-            data_item: PageDataItem
-            selector: Selector = data_item.selector
-            if selector.selector_type == TABLE:
-                for table_row in response.css(selector.css_selector):
-                    attribute.copy()
-                    attribute['data_type'] = data_item
-                    attribute['value'] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).extract_first().strip()
-                    attribute['label'] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).extract_first().strip()
-                    page_item['attributes'].append(attribute)
-            elif selector.selector_type in [TEXT, LINK, IMAGE]:
-                attribute.copy()
-                attribute['data_type'] = data_item
-                attribute['value'] = response.css(selector.css_selector).extract_first().strip()
-                page_item['attributes'].append(attribute)
-        yield page_item
+        model: Optional[str] = response.css(self.website.page_data_items.get(name="model").selector.css_selector).get()
+        if model:
+            page_item = ProductPageItem()
+            page_item['model'] = model
+            page_item['attributes'] = []
+            page_item['category'] = category
+            attribute: Dict[str, Union[PageDataItem, str]] = {}
+            for data_item in self.website.page_data_items.exclude(name="model").all():
+                data_item: PageDataItem
+                selector: Selector = data_item.selector
+                if selector.selector_type == TABLE:
+                    for table_row in response.css(selector.css_selector):
+                        table_row: scrapy.selector.unified.Selector
+                        value: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).get()
+                        label: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).get()
+                        if value and label:
+                            attribute.copy()
+                            attribute['data_type'] = data_item
+                            attribute['value'] = value.strip()
+                            attribute['label'] = label.strip()
+                            page_item['attributes'].append(attribute)
+                elif selector.selector_type in [TEXT, LINK, IMAGE]:
+                    value: Optional[str] = response.css(selector.css_selector).get()
+                    if value:
+                        attribute.copy()
+                        attribute['data_type'] = data_item
+                        attribute['value'] = value.strip()
+                        page_item['attributes'].append(attribute)
+            yield page_item
