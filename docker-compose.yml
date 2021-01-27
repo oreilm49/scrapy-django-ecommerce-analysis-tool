@@ -12,6 +12,7 @@ services:
     command: python manage.py runserver 0.0.0.0:5000
     volumes:
       - .:/app
+      - db-data:/var/lib/postgresql/data/
     ports:
       - "5000:5000"
     depends_on:
@@ -31,5 +32,13 @@ services:
     command: scrapy
     volumes:
       - .:/app
+      - cms-media:/app/cms/media
     ports:
       - "6000:6000"
+    depends_on:
+      - db
+
+volumes:
+  db-data:
+  cms-media:
+  redis-data:
