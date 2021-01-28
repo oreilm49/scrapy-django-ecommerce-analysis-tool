@@ -2,8 +2,9 @@ from typing import Dict, Union, Iterator, Optional
 
 import scrapy
 
-from cms.constants import CATEGORY, PAGINATION, LINK, TEXT, TABLE, IMAGE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN
-from cms.models import Website, Url, Category, Selector, PageDataItem
+from cms.constants import CATEGORY, PAGINATION, LINK, TEXT, TABLE, IMAGE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, \
+    PRICE
+from cms.models import Website, Url, Category, Selector
 
 from scraper.exceptions import WebsiteNotProvidedInArguments
 from scraper.items import ProductPageItem
@@ -39,32 +40,34 @@ class EcommerceSpider(scrapy.Spider):
                 yield response.follow(href, self.parse_product, cb_kwargs={'category': category})
 
     def parse_product(self, response, category: Category = None, **kwargs) -> Iterator[ProductPageItem]:
-        model: Optional[str] = response.css(self.website.page_data_items.get(name="model").selector.css_selector).get()
-        if model:
-            page_item = ProductPageItem()
-            page_item['model'] = model
-            page_item['attributes'] = []
-            page_item['category'] = category
-            attribute: Dict[str, Union[PageDataItem, str]] = {}
-            for data_item in self.website.page_data_items.exclude(name="model").all():
-                data_item: PageDataItem
-                selector: Selector = data_item.selector
-                if selector.selector_type == TABLE:
-                    for table_row in response.css(selector.css_selector):
-                        table_row: scrapy.selector.unified.Selector
-                        value: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).get()
-                        label: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).get()
-                        if value and label:
+        for model_selector in self.website.selectors.filter(selector_type=MODEL):
+            model_selector: Selector
+            model: Optional[str] = response.css(model_selector.css_selector).get()
+            if model:
+                page_item = ProductPageItem()
+                page_item['model'] = model
+                page_item['attributes'] = []
+                page_item['website_attributes'] = []
+                page_item['category'] = category
+                attribute: Dict[str, str] = {}
+                for selector in self.website.selectors.exclude(selector_type=MODEL).all():
+                    selector: Selector
+                    if selector.selector_type == TABLE:
+                        for table_row in response.css(selector.css_selector):
+                            table_row: scrapy.selector.unified.Selector
+                            value: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).get()
+                            label: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).get()
+                            if value and label:
+                                attribute.copy()
+                                attribute['value'] = value.strip()
+                                attribute['label'] = label.strip()
+                                page_item['attributes'].append(attribute)
+                    elif selector.selector_type in [PRICE, LINK]:
+                        value: Optional[str] = response.css(selector.css_selector).get()
+                        if value:
                             attribute.copy()
-                            attribute['data_type'] = data_item
                             attribute['value'] = value.strip()
-                            attribute['label'] = label.strip()
-                            page_item['attributes'].append(attribute)
-                elif selector.selector_type in [TEXT, LINK, IMAGE]:
-                    value: Optional[str] = response.css(selector.css_selector).get()
-                    if value:
-                        attribute.copy()
-                        attribute['data_type'] = data_item
-                        attribute['value'] = value.strip()
-                        page_item['attributes'].append(attribute)
-            yield page_item
+                            attribute['selector'] = selector
+                            page_item['website_attributes'].append(attribute)
+                yield page_item
+                break
