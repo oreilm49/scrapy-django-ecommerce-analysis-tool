@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from cms.models import Website, Url, Category, Selector, Unit, PageDataItem, Product, ProductAttribute
+from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute
 
 
 @admin.register(Website)
@@ -33,15 +33,8 @@ class SelectorAdmin(admin.ModelAdmin):
 
 @admin.register(Unit)
 class UnitAdmin(admin.ModelAdmin):
-    list_display = 'id', 'name',
-    list_editable = 'name',
-
-
-@admin.register(PageDataItem)
-class PageDataItemAdmin(admin.ModelAdmin):
-    list_display = 'id', 'name', 'data_type', 'alternate_names', 'website', 'selector', 'unit', 'repeat',
-    list_editable = 'name', 'data_type', 'alternate_names', 'website', 'selector', 'unit', 'repeat',
-    list_filter = 'data_type', 'website', 'unit',
+    list_display = 'id', 'name', 'alternate_names', 'data_type', 'repeat',
+    list_editable = 'name', 'alternate_names', 'data_type', 'repeat',
 
 
 @admin.register(Product)
@@ -53,6 +46,13 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductAttribute)
 class ProductAttributeAdmin(admin.ModelAdmin):
-    list_display = 'id', 'data_type', 'value', 'product',
-    list_editable = 'data_type', 'value', 'product',
-    list_filter = 'product', 'product__category', 'data_type',
+    list_display = 'id', 'unit', 'value', 'product',
+    list_editable = 'unit', 'value', 'product',
+    list_filter = 'product', 'product__category', 'unit',
+
+
+@admin.register(WebsiteProductAttribute)
+class WebsiteProductAttributeAdmin(admin.ModelAdmin):
+    list_display = 'id', 'website', 'unit', 'value', 'product',
+    list_editable = 'website', 'unit', 'value', 'product',
+    list_filter = 'website', 'product', 'product__category', 'unit',

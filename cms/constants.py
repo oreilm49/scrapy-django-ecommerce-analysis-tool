@@ -10,6 +10,8 @@ URL_TYPES = (
     (PRODUCT, _("Product")),
 )
 
+MODEL = "model"
+PRICE = "price"
 TEXT = "text"
 TABLE = "table"
 IMAGE = "image"
@@ -19,6 +21,8 @@ TABLE_VALUE_COLUMN = "table_value_column"
 TABLE_LABEL_COLUMN = "table_label_column"
 
 SELECTOR_TYPES = (
+    (MODEL, _("Model")),
+    (PRICE, _("Price")),
     (TEXT, _("Text")),
     (TABLE, _("Table")),
     (IMAGE, _("Image")),

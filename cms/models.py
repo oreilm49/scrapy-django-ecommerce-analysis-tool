@@ -75,19 +75,9 @@ class Selector(BaseModel):
 
 class Unit(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The unit name"), unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class PageDataItem(BaseModel):
-    name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The data item name"))
-    data_type = models.CharField(verbose_name=_("Data Type"), max_length=MAX_LENGTH, choices=DATA_TYPES, help_text=_("The data item name"))
     alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True)
-    website = models.ForeignKey(to=Website, related_name="page_data_items", verbose_name=_("Website"), on_delete=SET_NULL, null=True, blank=True, help_text=_("The website this data is specific to: for example, price may vary from website to website. If data isn't website specific, leave blank."))
-    selector = models.OneToOneField(to=Selector, verbose_name=_("Selector"), on_delete=SET_NULL, null=True, blank=True, help_text=_("The selector object used to extract page data."))
-    unit = models.ForeignKey(to=Unit, verbose_name=_("Unit"), help_text=_("The unit of measurement for this attribute"), on_delete=SET_NULL, null=True, blank=True)
-    repeat = models.CharField(verbose_name=_("Repeat"), max_length=MAX_LENGTH, default=ONCE, choices=TRACKING_FREQUENCIES, help_text=_("The frequency with which this data item should be tracked."))
+    data_type = models.CharField(verbose_name=_("Data Type"), max_length=MAX_LENGTH, choices=DATA_TYPES, help_text=_("The data type of the unit"))
+    repeat = models.CharField(verbose_name=_("Repeat"), max_length=MAX_LENGTH, default=ONCE, choices=TRACKING_FREQUENCIES, help_text=_("The frequency with which this unit should be tracked."))
 
     def __str__(self):
         return self.name
@@ -103,12 +93,22 @@ class Product(BaseModel):
 
 
 class ProductAttribute(BaseModel):
-    product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE)
-    data_type = models.ForeignKey(to=PageDataItem, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"))
+    product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="attributes")
+    unit = models.ForeignKey(to=Unit, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="product_attributes")
     value = models.CharField(verbose_name=_("Value"), max_length=MAX_LENGTH, help_text=_("The value for this attribute"))
 
     def __str__(self):
-        return f"{self.product.model} > {self.data_type}"
+        return f"{self.product.model} > {self.unit}"
 
     class Meta:
-        unique_together = ['product', 'data_type']
+        unique_together = ['product', 'unit']
+
+
+class WebsiteProductAttribute(BaseModel):
+    website = models.ForeignKey(to=Website, verbose_name=_("Website"), on_delete=CASCADE, related_name="product_attributes")
+    product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="website_attributes")
+    unit = models.ForeignKey(to=Unit, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="website_product_attributes")
+    value = models.CharField(verbose_name=_("Value"), max_length=MAX_LENGTH, help_text=_("The value for this attribute"))
+
+    def __str__(self):
+        return f"{self.website} > {self.product} > {self.unit}"
