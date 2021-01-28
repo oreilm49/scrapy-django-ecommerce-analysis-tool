@@ -34,9 +34,20 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class Unit(BaseModel):
+    name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The unit name"), unique=True)
+    alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True)
+    data_type = models.CharField(verbose_name=_("Data Type"), max_length=MAX_LENGTH, choices=DATA_TYPES, help_text=_("The data type of the unit"), blank=True, null=True)
+    repeat = models.CharField(verbose_name=_("Repeat"), max_length=MAX_LENGTH, default=ONCE, choices=TRACKING_FREQUENCIES, help_text=_("The frequency with which this unit should be tracked."), blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Website(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The website name"), unique=True)
     domain = models.CharField(verbose_name=_("Domain"), max_length=MAX_LENGTH, help_text=_("The website domain name"), unique=True)
+    currency = models.ForeignKey(to=Unit, verbose_name=_("Currency"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The currency this website trades in."), related_name="websites")
 
     def __str__(self):
         return self.name
@@ -73,16 +84,6 @@ class Selector(BaseModel):
         return f"{self.website} - {self.selector_type}"
 
 
-class Unit(BaseModel):
-    name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The unit name"), unique=True)
-    alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True)
-    data_type = models.CharField(verbose_name=_("Data Type"), max_length=MAX_LENGTH, choices=DATA_TYPES, help_text=_("The data type of the unit"))
-    repeat = models.CharField(verbose_name=_("Repeat"), max_length=MAX_LENGTH, default=ONCE, choices=TRACKING_FREQUENCIES, help_text=_("The frequency with which this unit should be tracked."))
-
-    def __str__(self):
-        return self.name
-
-
 class Product(BaseModel):
     model = models.CharField(verbose_name=_("Model"), max_length=MAX_LENGTH, unique=True)
     category = models.ForeignKey(to=Category, verbose_name=_("Category"), on_delete=SET_NULL, blank=True, null=True)
@@ -107,7 +108,7 @@ class ProductAttribute(BaseModel):
 class WebsiteProductAttribute(BaseModel):
     website = models.ForeignKey(to=Website, verbose_name=_("Website"), on_delete=CASCADE, related_name="product_attributes")
     product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="website_attributes")
-    unit = models.ForeignKey(to=Unit, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="website_product_attributes")
+    unit = models.ForeignKey(to=Unit, verbose_name=_("Unit"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="website_product_attributes")
     value = models.CharField(verbose_name=_("Value"), max_length=MAX_LENGTH, help_text=_("The value for this attribute"))
 
     def __str__(self):
