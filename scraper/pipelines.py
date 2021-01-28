@@ -1,7 +1,7 @@
 from django.db.models import Q
 
-from cms.constants import ONCE
-from cms.models import Product, ProductAttribute
+from cms.constants import PRICE, IMAGE
+from cms.models import Product, ProductAttribute, Unit, WebsiteProductAttribute, Selector
 from scraper.items import ProductPageItem
 
 
@@ -9,8 +9,11 @@ class ScraperPipeline:
 
     def process_item(self, item, spider):
         if isinstance(item, ProductPageItem):
-            product_check = Product.objects.filter(category=item['category'])\
-                .filter(Q(model=item['model']) | Q(alternate_models__contains=[item['model']]))
+            product_check = Product.objects.filter(
+                Q(model=item['model']) |
+                Q(alternate_models__contains=[item['model']]),
+                category=item['category']
+            )
             if not product_check.exists():
                 product: Product = Product.objects.create(model=item['model'], category=item['category'])
                 product.save()
@@ -18,15 +21,29 @@ class ScraperPipeline:
                 product: Product = product_check.first()
 
             for attribute in item['attributes']:
-                unrepeatable_check: bool = ProductAttribute.objects.filter(
-                    product=product,
-                    data_type__id=attribute['data_type'].pk,
-                    data_type__repeat=ONCE
+                attribute_exists: bool = ProductAttribute.objects.filter(
+                    Q(unit__name=attribute['label']) |
+                    Q(unit__alternate_names__contains=[attribute['label']]),
+                    product=product
                 ).exists()
-                if not unrepeatable_check:
+                if not attribute_exists:
+                    unit, _ = Unit.objects.get_or_create(name=attribute['label'])
                     product_attribute: ProductAttribute = ProductAttribute.objects.create(
                         product=product,
-                        data_type=attribute['data_type'],
-                        value=attribute['value']
+                        unit=unit,
+                        value=attribute['value'],
                     )
                     product_attribute.save()
+
+            for website_attribute in item['website_attributes']:
+                selector: Selector = website_attribute['selector']
+                if selector.selector_type == IMAGE:
+                    pass
+                elif selector.selector_type == PRICE:
+                    price_attribute: WebsiteProductAttribute = WebsiteProductAttribute.objects.create(
+                        website=selector.website,
+                        product=product,
+                        unit=selector.website.currency,
+                        value=website_attribute['value']
+                    )
+                    price_attribute.save()
