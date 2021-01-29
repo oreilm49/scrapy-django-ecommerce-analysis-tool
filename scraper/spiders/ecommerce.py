@@ -49,7 +49,6 @@ class EcommerceSpider(scrapy.Spider):
                 page_item['attributes'] = []
                 page_item['website_attributes'] = []
                 page_item['category'] = category
-                attribute: Dict[str, str] = {}
                 for selector in self.website.selectors.exclude(selector_type=MODEL).all():
                     selector: Selector
                     if selector.selector_type == TABLE:
@@ -58,16 +57,10 @@ class EcommerceSpider(scrapy.Spider):
                             value: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).get()
                             label: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).get()
                             if value and label:
-                                attribute.copy()
-                                attribute['value'] = value.strip()
-                                attribute['label'] = label.strip()
-                                page_item['attributes'].append(attribute)
+                                page_item['attributes'].append({'value': value.strip().lower(), 'label': label.strip().lower()})
                     elif selector.selector_type in [PRICE, LINK]:
                         value: Optional[str] = response.css(selector.css_selector).get()
                         if value:
-                            attribute.copy()
-                            attribute['value'] = value.strip()
-                            attribute['selector'] = selector
-                            page_item['website_attributes'].append(attribute)
+                            page_item['website_attributes'].append({'value': value.strip().lower(), 'selector': selector})
                 yield page_item
                 break
