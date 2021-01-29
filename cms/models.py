@@ -93,23 +93,32 @@ class Product(BaseModel):
         return self.model
 
 
-class ProductAttribute(BaseModel):
-    product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="attributes")
-    unit = models.ForeignKey(to=Unit, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="product_attributes")
-    value = models.CharField(verbose_name=_("Value"), max_length=MAX_LENGTH, help_text=_("The value for this attribute"))
+class AttributeType(BaseModel):
+    name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, unique=True)
+    alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), null=True, blank=True)
+    unit = models.ForeignKey(to=Unit, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="attribute_types")
 
     def __str__(self):
-        return f"{self.product.model} > {self.unit}"
+        return self.name
 
     class Meta:
-        unique_together = ['product', 'unit']
+        unique_together = ['name', 'unit']
 
 
-class WebsiteProductAttribute(BaseModel):
-    website = models.ForeignKey(to=Website, verbose_name=_("Website"), on_delete=CASCADE, related_name="product_attributes")
-    product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="website_attributes")
-    unit = models.ForeignKey(to=Unit, verbose_name=_("Unit"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="website_product_attributes")
+class ProductAttribute(BaseModel):
+    product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="attributes")
+    attribute_type = models.ForeignKey(to=AttributeType, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="product_attributes")
     value = models.CharField(verbose_name=_("Value"), max_length=MAX_LENGTH, help_text=_("The value for this attribute"))
 
     def __str__(self):
-        return f"{self.website} > {self.product} > {self.unit}"
+        return f"{self.product.model} > {self.attribute_type}"
+
+    class Meta:
+        unique_together = ['product', 'attribute_type']
+
+
+class WebsiteProductAttribute(ProductAttribute):
+    website = models.ForeignKey(to=Website, verbose_name=_("Website"), on_delete=CASCADE, related_name="product_attributes")
+
+    def __str__(self):
+        return f"{self.website} > {self.product} > {self.attribute_type}"
