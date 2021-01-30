@@ -2,6 +2,7 @@ Betamax==0.8.1
 Django==3.1.5
 django_extensions==3.1.0
 model-mommy==2.0.0
+pint==0.16.1
 psycopg2-binary==2.8
 Scrapy==2.4.1
 scrapy-djangoitem==1.1.1
