@@ -2,3 +2,4 @@
 /.idea/
 *cassettes
 *.scrapy
+google-cloud-service-account-private-key.json
