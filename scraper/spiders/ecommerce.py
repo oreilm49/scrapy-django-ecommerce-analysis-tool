@@ -46,6 +46,7 @@ class EcommerceSpider(scrapy.Spider):
             if model:
                 page_item = ProductPageItem()
                 page_item['model'] = model
+                page_item['website'] = self.website
                 page_item['attributes'] = []
                 page_item['website_attributes'] = []
                 page_item['category'] = category
