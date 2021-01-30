@@ -99,7 +99,7 @@ class AttributeType(BaseModel):
     unit = models.ForeignKey(to=Unit, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="attribute_types")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} > {self.unit}"
 
     class Meta:
         unique_together = ['name', 'unit']
