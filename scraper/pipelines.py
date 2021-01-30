@@ -48,10 +48,11 @@ class ScraperPipeline:
                 if selector.selector_type == IMAGE:
                     pass
                 elif selector.selector_type == PRICE:
+                    attribute_type: AttributeType = AttributeType.objects.get(name="price", unit=selector.website.currency)
                     price_attribute: WebsiteProductAttribute = WebsiteProductAttribute.objects.create(
                         website=selector.website,
                         product=product,
-                        unit=selector.website.currency,
+                        attribute_type=attribute_type,
                         value=website_attribute['value']
                     )
                     price_attribute.save()
