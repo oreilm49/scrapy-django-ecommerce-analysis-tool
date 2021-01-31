@@ -2,7 +2,7 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet
+from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q
 from django.utils.translation import gettext as _
 from django_extensions.db.fields import ModificationDateTimeField, CreationDateTimeField
 
@@ -84,6 +84,19 @@ class Selector(BaseModel):
         return f"{self.website} - {self.selector_type}"
 
 
+class ProductQuerySet(BaseQuerySet):
+
+    def get_or_create_for_item(self, item: 'ProductPageItem') -> 'Product':
+        product_check = self.filter(
+            Q(model=item['model']) |
+            Q(alternate_models__contains=[item['model']]),
+            category=item['category']
+        )
+        if product_check.exists():
+            return product_check.first()
+        return Product.objects.create(model=item['model'], category=item['category'])
+
+
 class Product(BaseModel):
     model = models.CharField(verbose_name=_("Model"), max_length=MAX_LENGTH, unique=True)
     category = models.ForeignKey(to=Category, verbose_name=_("Category"), on_delete=SET_NULL, blank=True, null=True)
@@ -91,6 +104,17 @@ class Product(BaseModel):
 
     def __str__(self):
         return self.model
+
+    objects = ProductQuerySet.as_manager()
+
+
+class AttributeTypeQuerySet(BaseQuerySet):
+
+    def get_or_create_by_name(self, name: str) -> 'AttributeType':
+        attribute_type_check = self.filter(Q(name=name) | Q(alternate_names__contains=[name]))
+        if attribute_type_check.exists():
+            return attribute_type_check.first()
+        return AttributeType.objects.create(name=name)
 
 
 class AttributeType(BaseModel):
@@ -100,6 +124,8 @@ class AttributeType(BaseModel):
 
     def __str__(self):
         return f"{self.name} > {self.unit}"
+
+    objects = AttributeTypeQuerySet.as_manager()
 
     class Meta:
         unique_together = ['name', 'unit']
