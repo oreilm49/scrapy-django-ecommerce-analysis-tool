@@ -21,19 +21,22 @@ class ScraperPipeline:
             product: Product = self.get_product(item)
             for attribute in item['attributes']:
                 attribute: Dict
-                processed_unit: Optional[UnitValue] = self.get_processed_unit_and_value(attribute['value'])
-                attribute_type: AttributeType = self.get_attribute_type(attribute['label'], unit=processed_unit.unit if processed_unit else None)
+                attribute_type: AttributeType = self.get_attribute_type(attribute['label'])
                 product_attribute_exists: bool = ProductAttribute.objects.filter(attribute_type=attribute_type, product=product).exists()
                 if product_attribute_exists:
                     continue
 
-                value = processed_unit.value if processed_unit else attribute['value']
-                product_attribute: ProductAttribute = ProductAttribute.objects.create(
-                    product=product,
-                    attribute_type=attribute_type,
-                    value=value,
-                )
-                product_attribute.save()
+                processed_unit: Optional[UnitValue] = self.get_processed_unit_and_value(attribute['value'], unit=attribute_type.unit)
+                if processed_unit:
+                    if not attribute_type.unit:
+                        attribute_type.unit = processed_unit.unit
+                        attribute_type.save()
+                    product_attribute: ProductAttribute = ProductAttribute.objects.create(
+                        product=product,
+                        attribute_type=attribute_type,
+                        value=processed_unit.value,
+                    )
+                    product_attribute.save()
 
             for website_attribute in item['website_attributes']:
                 selector: Selector = website_attribute['selector']
