@@ -72,10 +72,10 @@ class ScraperPipeline:
         except Exception as e:
             return None
 
-    def get_attribute_type(self, label: str, unit: Optional[Unit] = None) -> AttributeType:
+    def get_attribute_type(self, label: str) -> AttributeType:
         attribute_type_check = AttributeType.objects.filter(Q(name=label) | Q(alternate_names__contains=[label]))
         if not attribute_type_check.exists():
-            attribute_type, _ = AttributeType.objects.get_or_create(name=label, unit=unit)
+            attribute_type, _ = AttributeType.objects.get_or_create(name=label)
             attribute_type.save()
         else:
             attribute_type: AttributeType = attribute_type_check.first()
