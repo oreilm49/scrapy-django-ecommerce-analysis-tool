@@ -1,42 +1,37 @@
-from typing import Union, Dict, Optional
+from typing import Union, Dict
 
-from django.db.models import Q
-from pint import UnitRegistry, Quantity
+from django.db import transaction
 
 from cms.constants import PRICE, IMAGE
-from cms.data_processing.constants import UnitValue
-from cms.models import Product, ProductAttribute, Unit, WebsiteProductAttribute, Selector, AttributeType
+from cms.data_processing.constants import UnitValue, Value
+from cms.data_processing.units import UnitManager
+from cms.models import Product, ProductAttribute, WebsiteProductAttribute, Selector, AttributeType
 from scraper.items import ProductPageItem
 
 
 class ScraperPipeline:
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.ureg = UnitRegistry()
-        self.ureg.define('decibels = 1 * decibel = db')
-
+    @transaction.atomic
     def process_item(self, item, spider):
         if isinstance(item, ProductPageItem):
-            product: Product = self.get_product(item)
+            product: Product = Product.objects.get_or_create_for_item(item)
             for attribute in item['attributes']:
                 attribute: Dict
-                attribute_type: AttributeType = self.get_attribute_type(attribute['label'])
+                attribute_type: AttributeType = AttributeType.objects.get_or_create_by_name(attribute['label'])
                 product_attribute_exists: bool = ProductAttribute.objects.filter(attribute_type=attribute_type, product=product).exists()
                 if product_attribute_exists:
                     continue
 
-                processed_unit: Optional[UnitValue] = self.get_processed_unit_and_value(attribute['value'], unit=attribute_type.unit)
-                if processed_unit:
-                    if not attribute_type.unit:
-                        attribute_type.unit = processed_unit.unit
-                        attribute_type.save()
-                    product_attribute: ProductAttribute = ProductAttribute.objects.create(
-                        product=product,
-                        attribute_type=attribute_type,
-                        value=processed_unit.value,
-                    )
-                    product_attribute.save()
+                processed_unit: Union[UnitValue, Value] = UnitManager().get_processed_unit_and_value(attribute['value'], unit=attribute_type.unit)
+                if not attribute_type.unit and isinstance(processed_unit, UnitValue):
+                    attribute_type.unit = processed_unit.unit
+                    attribute_type.save()
+                product_attribute: ProductAttribute = ProductAttribute.objects.create(
+                    product=product,
+                    attribute_type=attribute_type,
+                    value=processed_unit.value,
+                )
+                product_attribute.save()
 
             for website_attribute in item['website_attributes']:
                 selector: Selector = website_attribute['selector']
@@ -51,40 +46,3 @@ class ScraperPipeline:
                         value=website_attribute['value']
                     )
                     price_attribute.save()
-
-    def get_product(self, item: ProductPageItem) -> Product:
-        product_check = Product.objects.filter(
-            Q(model=item['model']) |
-            Q(alternate_models__contains=[item['model']]),
-            category=item['category']
-        )
-        if not product_check.exists():
-            product: Product = Product.objects.create(model=item['model'], category=item['category'])
-            product.save()
-        else:
-            product: Product = product_check.first()
-        return product
-
-    def get_processed_unit_and_value(self, value: str, unit: Optional[Unit] = None) -> Optional[UnitValue]:
-        try:
-            quantity: Quantity = self.ureg(value)
-            name: str = str(quantity.units)
-            value: Union[str, int, float] = quantity.magnitude
-            if unit:
-                if unit.name is not name:
-                    quantity: Quantity = quantity.to(unit.name)
-                    value: Union[str, int, float] = quantity.magnitude
-            else:
-                unit, _ = Unit.objects.get_or_create(name=name, data_type=type(value).__qualname__)
-            return UnitValue(unit=unit, value=value)
-        except Exception as e:
-            return None
-
-    def get_attribute_type(self, label: str) -> AttributeType:
-        attribute_type_check = AttributeType.objects.filter(Q(name=label) | Q(alternate_names__contains=[label]))
-        if not attribute_type_check.exists():
-            attribute_type, _ = AttributeType.objects.get_or_create(name=label)
-            attribute_type.save()
-        else:
-            attribute_type: AttributeType = attribute_type_check.first()
-        return attribute_type
