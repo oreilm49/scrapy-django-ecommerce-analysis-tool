@@ -62,12 +62,17 @@ class ScraperPipeline:
             product: Product = product_check.first()
         return product
 
-    def get_processed_unit_and_value(self, value: str) -> Optional[UnitValue]:
+    def get_processed_unit_and_value(self, value: str, unit: Optional[Unit] = None) -> Optional[UnitValue]:
         try:
-            quantity: Quantity = self.ureg(value).to_root_units()
+            quantity: Quantity = self.ureg(value)
             name: str = str(quantity.units)
             value: Union[str, int, float] = quantity.magnitude
-            unit, _ = Unit.objects.get_or_create(name=name, data_type=type(value).__qualname__)
+            if unit:
+                if unit.name is not name:
+                    quantity: Quantity = quantity.to(unit.name)
+                    value: Union[str, int, float] = quantity.magnitude
+            else:
+                unit, _ = Unit.objects.get_or_create(name=name, data_type=type(value).__qualname__)
             return UnitValue(unit=unit, value=value)
         except Exception as e:
             return None
