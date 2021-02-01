@@ -52,6 +52,9 @@ class Website(BaseModel):
     def __str__(self):
         return self.name
 
+    def create_product_attribute(self, product: 'Product', attribute_type: 'AttributeType', value: str) -> 'WebsiteProductAttribute':
+        return WebsiteProductAttribute.objects.create(website=self, product=product, attribute_type=attribute_type, value=value)
+
 
 class Url(BaseModel):
     url = models.CharField(verbose_name=_("Url"), max_length=MAX_LENGTH, help_text=_("The page url"), unique=True)
