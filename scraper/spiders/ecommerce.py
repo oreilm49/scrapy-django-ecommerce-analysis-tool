@@ -2,8 +2,7 @@ from typing import Dict, Union, Iterator, Optional
 
 import scrapy
 
-from cms.constants import CATEGORY, PAGINATION, LINK, TEXT, TABLE, IMAGE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, \
-    PRICE
+from cms.constants import CATEGORY, PAGINATION, LINK, TABLE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, PRICE
 from cms.models import Website, Url, Category, Selector
 
 from scraper.exceptions import WebsiteNotProvidedInArguments
