@@ -19,7 +19,8 @@ def set_up_websites():
     Selector.objects.get_or_create(selector_type=MODEL, css_selector=".product-id.meta::text", website=harvey_norman)
     Selector.objects.get_or_create(selector_type=LINK, css_selector=".product-info a", website=harvey_norman)
     Selector.objects.get_or_create(selector_type=PAGINATION, css_selector="li a.next", website=harvey_norman)
-    Selector.objects.get_or_create(selector_type=IMAGE, css_selector='a[data-fancybox="gallery"] > img.pict::attr(href)', website=harvey_norman)
+    Selector.objects.get_or_create(selector_type=IMAGE, css_selector='.cm-image-previewer.image-magnifier-image::attr(href)', website=harvey_norman)
+
 
 @transaction.atomic()
 def run():
