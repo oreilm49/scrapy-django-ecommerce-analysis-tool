@@ -1,8 +1,8 @@
-from typing import Dict, Union, Iterator, Optional
+from typing import Iterator, Optional
 
 import scrapy
 
-from cms.constants import CATEGORY, PAGINATION, LINK, TABLE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, PRICE
+from cms.constants import CATEGORY, PAGINATION, LINK, TABLE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, PRICE, IMAGE
 from cms.models import Website, Url, Category, Selector
 
 from scraper.exceptions import WebsiteNotProvidedInArguments
@@ -58,7 +58,7 @@ class EcommerceSpider(scrapy.Spider):
                             label: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).get()
                             if value and label:
                                 page_item['attributes'].append({'value': value.strip().lower(), 'label': label.strip().lower()})
-                    elif selector.selector_type in [PRICE, LINK]:
+                    elif selector.selector_type in [PRICE, LINK, IMAGE]:
                         value: Optional[str] = response.css(selector.css_selector).get()
                         if value:
                             page_item['website_attributes'].append({'value': value.strip().lower(), 'selector': selector})
