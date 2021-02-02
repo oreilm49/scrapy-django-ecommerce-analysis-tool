@@ -3,10 +3,12 @@ import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q
+from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django_extensions.db.fields import ModificationDateTimeField, CreationDateTimeField
 
-from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, DATA_TYPES, TRACKING_FREQUENCIES, ONCE
+from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, DATA_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, \
+    MAIN, THUMBNAIL
 
 
 class BaseQuerySet(QuerySet):
@@ -157,3 +159,12 @@ class WebsiteProductAttribute(BaseProductAttribute):
 
     def __str__(self):
         return f"{self.website} > {self.product} > {self.attribute_type}"
+
+
+class ProductImage(BaseModel):
+    product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="images")
+    image_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=IMAGE_TYPES)
+    image = models.FilePathField(verbose_name=_("image"))
+
+    def __str__(self):
+        return f"{self.product} | {self.image}"

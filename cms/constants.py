@@ -57,3 +57,11 @@ TRACKING_FREQUENCIES = (
     (WEEKLY, _('Weekly')),
     (MONTHLY, _('Monthly')),
 )
+
+MAIN = "main"
+THUMBNAIL = "thumbnail"
+
+IMAGE_TYPES = (
+    (MAIN, _("Main")),
+    (THUMBNAIL, _("Thumbnail")),
+)
