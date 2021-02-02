@@ -3,10 +3,10 @@ from typing import Union, Dict
 from django.db import transaction
 from django.db.models import Q
 
-from cms.constants import PRICE, IMAGE
+from cms.constants import PRICE, IMAGE, MAIN, THUMBNAIL
 from cms.data_processing.constants import UnitValue, Value, RangeUnitValue
 from cms.data_processing.units import UnitManager
-from cms.models import Product, ProductAttribute, Selector, AttributeType
+from cms.models import Product, ProductAttribute, Selector, AttributeType, ProductImage
 from scraper.items import ProductPageItem
 
 
@@ -70,4 +70,19 @@ class ProductImagePipeline:
     @transaction.atomic
     def process_item(self, item, spider):
         if isinstance(item, ProductPageItem):
-            return item
+            if item['images']:
+                path: str = item['images'][0]['path']
+                if item['product'].image_main_required:
+                    ProductImage.objects.create(
+                        product=item['product'],
+                        image_type=MAIN,
+                        image=item['images'][0]['path'],
+                    )
+                if item['product'].image_thumb_required:
+                    thumb_path: str = path.replace("full", "thumbs/big")
+                    ProductImage.objects.create(
+                        product=item['product'],
+                        image_type=THUMBNAIL,
+                        image=thumb_path,
+                    )
+        return item
