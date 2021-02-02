@@ -62,7 +62,8 @@ class EcommerceSpider(scrapy.Spider):
                     elif selector.selector_type in [PRICE, LINK, IMAGE]:
                         value: Optional[str] = response.css(selector.css_selector).get()
                         if value and selector.selector_type == IMAGE:
-                            page_item['image_urls'].append(value.strip().lower())
+                            # don't .lower() image urls, filename urls are case sensitive
+                            page_item['image_urls'].append(value.strip())
                         elif value:
                             page_item['website_attributes'].append({'value': value.strip().lower(), 'selector': selector})
                 yield page_item
