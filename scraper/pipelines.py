@@ -10,12 +10,21 @@ from cms.models import Product, ProductAttribute, Selector, AttributeType
 from scraper.items import ProductPageItem
 
 
-class ScraperPipeline:
+class ProductPipeline:
 
     @transaction.atomic
     def process_item(self, item, spider):
         if isinstance(item, ProductPageItem):
-            product: Product = Product.objects.get_or_create_for_item(item)
+            item['product'] = Product.objects.get_or_create_for_item(item)
+        return item
+
+
+class ProductAttributePipeline:
+
+    @transaction.atomic
+    def process_item(self, item, spider):
+        if isinstance(item, ProductPageItem):
+            product: Product = item['product']
             for attribute in item['attributes']:
                 attribute: Dict
                 attribute_type: AttributeType = AttributeType.objects.get_or_create_by_name(attribute['label'])
@@ -39,11 +48,26 @@ class ScraperPipeline:
                     ProductAttribute.objects.create(product=product, attribute_type=attribute_type_high, value=processed_unit.value_high)
                 else:
                     ProductAttribute.objects.create(product=product, attribute_type=attribute_type, value=processed_unit.value)
+        return item
 
+
+class WebsiteProductAttributePipeline:
+
+    @transaction.atomic
+    def process_item(self, item, spider):
+        if isinstance(item, ProductPageItem):
+            product: Product = item['product']
             for website_attribute in item['website_attributes']:
                 selector: Selector = website_attribute['selector']
-                if selector.selector_type == IMAGE:
-                    pass
-                elif selector.selector_type == PRICE:
+                if selector.selector_type == PRICE:
                     price_attribute_type, _ = AttributeType.objects.get_or_create(name="price", unit=item['website'].currency)
                     selector.website.create_product_attribute(product=product, attribute_type=price_attribute_type, value=website_attribute['value'])
+        return item
+
+
+class ProductImagePipeline:
+
+    @transaction.atomic
+    def process_item(self, item, spider):
+        if isinstance(item, ProductPageItem):
+            return item
