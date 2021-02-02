@@ -48,6 +48,7 @@ class EcommerceSpider(scrapy.Spider):
                 page_item['website'] = self.website
                 page_item['attributes'] = []
                 page_item['website_attributes'] = []
+                page_item['image_urls'] = []
                 page_item['category'] = category
                 for selector in self.website.selectors.exclude(selector_type=MODEL).all():
                     selector: Selector
@@ -60,7 +61,9 @@ class EcommerceSpider(scrapy.Spider):
                                 page_item['attributes'].append({'value': value.strip().lower(), 'label': label.strip().lower()})
                     elif selector.selector_type in [PRICE, LINK, IMAGE]:
                         value: Optional[str] = response.css(selector.css_selector).get()
-                        if value:
+                        if value and selector.selector_type == IMAGE:
+                            page_item['image_urls'].append(value.strip().lower())
+                        elif value:
                             page_item['website_attributes'].append({'value': value.strip().lower(), 'selector': selector})
                 yield page_item
                 break
