@@ -112,6 +112,14 @@ class Product(BaseModel):
 
     objects = ProductQuerySet.as_manager()
 
+    @cached_property
+    def image_main_required(self) -> bool:
+        return not self.images.filter(image_type=MAIN).exists()
+
+    @cached_property
+    def image_thumb_required(self) -> bool:
+        return not self.images.filter(image_type=THUMBNAIL).exists()
+
 
 class AttributeTypeQuerySet(BaseQuerySet):
 
