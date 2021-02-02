@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute
+from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
+    ProductImage
 
 
 @admin.register(Website)
@@ -56,3 +57,9 @@ class WebsiteProductAttributeAdmin(admin.ModelAdmin):
     list_display = 'id', 'website', 'attribute_type', 'value', 'product',
     list_editable = 'website', 'attribute_type', 'value', 'product',
     list_filter = 'website', 'product', 'product__category', 'attribute_type',
+
+
+@admin.register(ProductImage)
+class ProductImageAdmin(admin.ModelAdmin):
+    list_display = 'id', 'product', 'image_type', 'image',
+    list_filter = 'image_type', 'product',
