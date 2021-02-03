@@ -24,7 +24,7 @@ services:
     command: python manage.py runserver 0.0.0.0:5000
     volumes:
       - .:/app
-      - db-data:/var/lib/postgresql/data/
+      - cms-media:/app/cms/media
     ports:
       - "5000:5000"
     depends_on:
