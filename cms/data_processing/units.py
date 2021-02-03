@@ -26,7 +26,7 @@ class UnitManager:
         self.ureg.define("@alias hertz = hz")
         self.ureg.define("@alias watt = w")
 
-    def get_processed_unit_and_value(self, value: str, unit: Optional[Unit] = None) -> Union[UnitValue, Value]:
+    def get_processed_unit_and_value(self, value: str, unit: Optional[Unit] = None) -> Union[UnitValue, Value, RangeUnitValue]:
         try:
             if not contains_number(value):
                 return Value(value=value)
