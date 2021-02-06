@@ -1,3 +1,5 @@
+from typing import Generator, Any
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -10,10 +12,10 @@ from cms.models import Product
 class ProductMergeForm(forms.Form):
     duplicates = forms.ModelMultipleChoiceField(queryset=Product.objects.none(), label=_('Select Duplicates'))
 
-    def __init__(self, *args, product: Product = None, **kwargs):
+    def __init__(self, *args, products: Generator[Product, Any, None] = None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.product = product
-        self.fields['duplicates'].queryset = Product.objects.published().exclude(pk=product.pk)
+        self.product = next(products)
+        self.fields['duplicates'].queryset = Product.objects.published().exclude(pk=self.product.pk)
 
     def clean_duplicates(self):
         duplicates = self.cleaned_data['duplicates']
