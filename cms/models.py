@@ -165,7 +165,7 @@ class ProductAttribute(BaseProductAttribute):
 
 
 class WebsiteProductAttribute(BaseProductAttribute):
-    website = models.ForeignKey(to=Website, verbose_name=_("Website"), on_delete=CASCADE, related_name="product_attributes")
+    website = models.ForeignKey(to=Website, verbose_name=_("Website"), on_delete=CASCADE, related_name="productattributes")
 
     def __str__(self):
         return f"{self.website} > {self.product} > {self.attribute_type}"
