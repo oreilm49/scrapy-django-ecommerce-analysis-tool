@@ -1,9 +1,37 @@
 {% extends "site/base.html" %}
 {% load bootstrap4 %}
+{% load i18n %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ form.media.css }}
+{% endblock %}
 
 {% block main_content %}
     <form action="">
+        {% csrf_token %}
+        {% bootstrap_form form.management_form %}
+        <table class="ellipsis-head table table-striped">
+            <thead>
+              <tr>
+                  <th class="narrow-cell">{% trans 'Product' %}</th>
+                  <th class="narrow-cell">{% trans 'Duplicates' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for duplicate_form in form %}
+                <tr>
+                    <th>{{ duplicate_form.product }}</th>
+                    <td>{% bootstrap_form duplicate_form layout='inline' %}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
         {% bootstrap_button _('Save') button_type="submit" button_class='btn-success' %}
-        {% bootstrap_formset form %}
     </form>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ form.media.js }}
 {% endblock %}
