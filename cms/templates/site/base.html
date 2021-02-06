@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+{% load bootstrap4 %}
+
+{% block extrahead %}{% bootstrap_css %}{% endblock %}
+
+{% block content %}
+    {% block main_content %}
+    {% endblock %}
+    {% bootstrap_javascript jquery='full' %}
+{% endblock %}
