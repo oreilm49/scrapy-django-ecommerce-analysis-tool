@@ -90,14 +90,16 @@ class ProductMapView(SuccessMessageMixin, FormView):
     def get_form_class(self) -> formset_factory:
         return formset_factory(ProductMergeForm, extra=self.products.count())
 
+    @property
+    def form_kwargs(self):
+        return dict(
+            products_iterator=self.products.iterator(),
+            products=self.products,
+        )
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update(
-            form_kwargs=dict(
-                products_iterator=self.products.iterator(),
-                products=self.products,
-            ),
-        )
+        kwargs.update(form_kwargs=self.form_kwargs)
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -110,10 +112,13 @@ class ProductMapView(SuccessMessageMixin, FormView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         formset = self.get_form_class()(self.request.POST)
+        formset.form_kwargs = self.form_kwargs
         if formset.is_valid():
             for form in formset:
+                print(form)
                 form.save()
-        return super().post(request, *args, **kwargs)
+            return super().post(request, *args, **kwargs)
+        return super(ProductMapView, self).form_invalid(self.get_form_class())
 
 
 def get_admin_urls(urls):
