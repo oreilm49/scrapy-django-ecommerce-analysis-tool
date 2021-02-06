@@ -22,7 +22,7 @@
             {% for duplicate_form in form %}
                 <tr>
                     <th>{{ duplicate_form.product }}</th>
-                    <td>{% bootstrap_form duplicate_form layout='inline' %}</td>
+                    <td>{% bootstrap_form duplicate_form layout='inline' form_group_class='' %}</td>
                 </tr>
             {% endfor %}
             </tbody>
