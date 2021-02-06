@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.forms import modelformset_factory
+from django.forms import formset_factory
 from django.urls import path
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
@@ -80,12 +80,14 @@ class ProductMapView(SuccessMessageMixin, FormView):
         return Product.objects.published()
 
     def get_form_class(self):
-        return modelformset_factory(Product, form=ProductMergeForm, extra=0, can_delete=True)
+        return formset_factory(ProductMergeForm, extra=self.products.count())
 
     def get_form_kwargs(self):
-        kwargs = super(ProductMapView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update(
-            queryset=self.products,
+            form_kwargs=dict(
+                products=self.products.iterator()
+            ),
         )
         return kwargs
 
