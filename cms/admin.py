@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db import transaction
 from django.forms import formset_factory
-from django.urls import path
+from django.urls import path, reverse
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
@@ -75,6 +76,9 @@ class ProductMapView(SuccessMessageMixin, FormView):
     template_name = 'site/map_products.html'
     success_message = _('Products mapped successfully')
 
+    def get_success_url(self):
+        return reverse('admin:map_products')
+
     @property
     def products(self) -> ProductQuerySet:
         return self.filter_form.search(Product.objects.published())
@@ -83,7 +87,7 @@ class ProductMapView(SuccessMessageMixin, FormView):
     def filter_form(self):
         return ProductFilterForm(self.request.GET or None)
 
-    def get_form_class(self):
+    def get_form_class(self) -> formset_factory:
         return formset_factory(ProductMergeForm, extra=self.products.count())
 
     def get_form_kwargs(self):
@@ -103,11 +107,19 @@ class ProductMapView(SuccessMessageMixin, FormView):
         )
         return context
 
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        formset = self.get_form_class()(self.request.POST)
+        if formset.is_valid():
+            for form in formset:
+                form.save()
+        return super().post(request, *args, **kwargs)
+
 
 def get_admin_urls(urls):
     def get_urls():
         return urls + [
-            path('map_products/', admin.site.admin_view(ProductMapView.as_view())),
+            path('map_products/', admin.site.admin_view(ProductMapView.as_view()), name="map_products"),
         ]
     return get_urls
 
