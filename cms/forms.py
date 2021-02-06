@@ -14,9 +14,10 @@ class ProductMergeForm(forms.Form):
 
     def __init__(self, *args, products_iterator: Generator[Product, Any, None] = None, products: ProductQuerySet = None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.product = next(products_iterator, None)
-        if self.product:
-            self.fields['duplicates'].queryset = products.exclude(pk=self.product.pk)
+        if products_iterator:
+            self.product = next(products_iterator, None)
+            if self.product:
+                self.fields['duplicates'].queryset = products.exclude(pk=self.product.pk)
 
     def clean_duplicates(self):
         duplicates = self.cleaned_data['duplicates']
