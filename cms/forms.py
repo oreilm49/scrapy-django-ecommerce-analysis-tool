@@ -6,7 +6,7 @@ from django.db import transaction
 from django.utils.translation import gettext as _
 
 from cms import constants
-from cms.models import Product
+from cms.models import Product, Category, ProductQuerySet
 
 
 class ProductMergeForm(forms.Form):
@@ -55,3 +55,17 @@ class ProductMergeForm(forms.Form):
                 'css/select2.min.css',
             ),
         }
+
+
+class ProductFilterForm(forms.Form):
+    category = forms.ModelChoiceField(queryset=Category.objects.published(), label=_('Category'))
+    q = forms.CharField(label=_('Search'))
+
+    def search(self, queryset: ProductQuerySet) -> ProductQuerySet:
+        if self.cleaned_data['category']:
+            queryset = queryset.filter(category=self.cleaned_data['category'])
+        if self.cleaned_data['q']:
+            queryset = queryset.filter(model__like=self.cleaned_data['q'])
+        return queryset
+
+
