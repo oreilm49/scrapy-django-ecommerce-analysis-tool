@@ -5,7 +5,7 @@ from django.urls import path
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
-from cms.forms import ProductMergeForm
+from cms.forms import ProductMergeForm, ProductFilterForm
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
     ProductImage, ProductQuerySet
 
@@ -77,7 +77,10 @@ class ProductMapView(SuccessMessageMixin, FormView):
 
     @property
     def products(self) -> ProductQuerySet:
-        return Product.objects.published()
+        products: ProductQuerySet = Product.objects.published()
+        if self.request.GET:
+            return ProductFilterForm(self.request.GET).search(products)
+        return products
 
     def get_form_class(self):
         return formset_factory(ProductMergeForm, extra=self.products.count())
@@ -90,6 +93,13 @@ class ProductMapView(SuccessMessageMixin, FormView):
             ),
         )
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            filter_form=ProductFilterForm()
+        )
+        return context
 
 
 def get_admin_urls(urls):

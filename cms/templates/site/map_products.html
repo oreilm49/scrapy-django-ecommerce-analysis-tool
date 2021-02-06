@@ -8,7 +8,8 @@
 {% endblock %}
 
 {% block main_content %}
-    <form action="">
+    {% include "includes/filter.html" %}
+    <form action="POST">
         {% csrf_token %}
         {% bootstrap_form form.management_form %}
         <table class="ellipsis-head table table-striped">
