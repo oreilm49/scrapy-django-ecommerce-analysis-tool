@@ -15,6 +15,8 @@ class BaseQuerySet(QuerySet):
     """
     Queryset for base model
     """
+    def published(self):
+        return self.filter(publish=True)
 
 
 class BaseModel(models.Model):
