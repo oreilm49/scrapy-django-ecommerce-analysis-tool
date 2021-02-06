@@ -12,10 +12,11 @@ from cms.models import Product, Category, ProductQuerySet
 class ProductMergeForm(forms.Form):
     duplicates = forms.ModelMultipleChoiceField(queryset=Product.objects.none(), label=_('Select Duplicates'))
 
-    def __init__(self, *args, products: Generator[Product, Any, None] = None, **kwargs):
+    def __init__(self, *args, products_iterator: Generator[Product, Any, None] = None, products: ProductQuerySet = None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.product = next(products)
-        self.fields['duplicates'].queryset = Product.objects.published().exclude(pk=self.product.pk)
+        self.product = next(products_iterator, None)
+        if self.product:
+            self.fields['duplicates'].queryset = products.exclude(pk=self.product.pk)
 
     def clean_duplicates(self):
         duplicates = self.cleaned_data['duplicates']
