@@ -1,7 +1,13 @@
 from django.contrib import admin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.forms import modelformset_factory
+from django.urls import path
+from django.utils.translation import gettext as _
+from django.views.generic import FormView
 
+from cms.forms import ProductMergeForm
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
-    ProductImage
+    ProductImage, ProductQuerySet
 
 
 @admin.register(Website)
@@ -63,3 +69,34 @@ class WebsiteProductAttributeAdmin(admin.ModelAdmin):
 class ProductImageAdmin(admin.ModelAdmin):
     list_display = 'id', 'product', 'image_type', 'image',
     list_filter = 'image_type', 'product',
+
+
+class ProductMapView(SuccessMessageMixin, FormView):
+    template_name = 'admin/map_products.html'
+    success_message = _('Products mapped successfully')
+
+    @property
+    def products(self) -> ProductQuerySet:
+        return Product.objects.published()
+
+    def get_form_class(self):
+        return modelformset_factory(Product, form=ProductMergeForm, extra=0, can_delete=True)
+
+    def get_form_kwargs(self):
+        kwargs = super(ProductMapView, self).get_form_kwargs()
+        kwargs.update(
+            queryset=self.products,
+        )
+        return kwargs
+
+
+def get_admin_urls(urls):
+    def get_urls():
+        return urls + [
+            path('map_products/', admin.site.admin_view(ProductMapView.as_view())),
+        ]
+    return get_urls
+
+
+admin_urls = get_admin_urls(admin.site.get_urls())
+admin.site.get_urls = admin_urls
