@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'cms',
     'scraper',
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
