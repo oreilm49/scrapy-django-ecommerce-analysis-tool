@@ -1,10 +1,17 @@
 {% extends "admin/base_site.html" %}
 {% load bootstrap4 %}
+{% load static %}
 
-{% block extrahead %}{% bootstrap_css %}{% endblock %}
+{% block extrahead %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css">
+{% endblock %}
 
 {% block content %}
     {% block main_content %}
     {% endblock %}
-    {% bootstrap_javascript jquery='full' %}
+    {% block extra_js %}
+        <script src="{{ STATIC_URL }}js/jquery-3.5.1.min.js"></script>
+        <script src="{{ STATIC_URL }}js/popper.min.js"></script>
+        <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+    {% endblock %}
 {% endblock %}
