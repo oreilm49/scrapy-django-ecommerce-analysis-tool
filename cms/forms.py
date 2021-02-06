@@ -59,8 +59,8 @@ class ProductMergeForm(forms.Form):
 
 
 class ProductFilterForm(forms.Form):
-    category = forms.ModelChoiceField(queryset=Category.objects.published(), label=_('Category'))
-    q = forms.CharField(label=_('Search'))
+    category = forms.ModelChoiceField(queryset=Category.objects.published(), label=_('Category'), required=False)
+    q = forms.CharField(label=_('Search'), required=False)
 
     def search(self, queryset: ProductQuerySet) -> ProductQuerySet:
         if self.cleaned_data['category']:
