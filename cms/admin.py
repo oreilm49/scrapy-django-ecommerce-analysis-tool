@@ -90,7 +90,8 @@ class ProductMapView(SuccessMessageMixin, FormView):
         kwargs = super().get_form_kwargs()
         kwargs.update(
             form_kwargs=dict(
-                products=self.products.iterator()
+                products_iterator=self.products.iterator(),
+                products=self.products,
             ),
         )
         return kwargs
