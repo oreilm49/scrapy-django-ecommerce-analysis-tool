@@ -72,7 +72,7 @@ class ProductImageAdmin(admin.ModelAdmin):
 
 
 class ProductMapView(SuccessMessageMixin, FormView):
-    template_name = 'admin/map_products.html'
+    template_name = 'site/map_products.html'
     success_message = _('Products mapped successfully')
 
     @property

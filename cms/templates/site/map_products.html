@@ -1,0 +1,9 @@
+{% extends "site/base.html" %}
+{% load bootstrap4 %}
+
+{% block main_content %}
+    <form action="">
+        {% bootstrap_button _('Save') button_type="submit" button_class='btn-success' %}
+        {% bootstrap_formset form %}
+    </form>
+{% endblock %}
