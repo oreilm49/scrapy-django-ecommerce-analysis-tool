@@ -47,3 +47,11 @@ class ProductMergeForm(forms.Form):
         duplicate.websiteproductattributes.update(product=product)
         duplicate.delete()
         return product
+
+    class Media:
+        js = 'js/bootstrap-multiselect.min.js', 'js/duplicates.js',
+        css = {
+            'all': (
+                'css/bootstrap-multiselect.min.css',
+            ),
+        }
