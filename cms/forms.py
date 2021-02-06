@@ -63,10 +63,12 @@ class ProductFilterForm(forms.Form):
     q = forms.CharField(label=_('Search'), required=False)
 
     def search(self, queryset: ProductQuerySet) -> ProductQuerySet:
-        if self.cleaned_data['category']:
-            queryset = queryset.filter(category=self.cleaned_data['category'])
-        if self.cleaned_data['q']:
-            queryset = queryset.filter(model__like=self.cleaned_data['q'])
+        if self.is_valid():
+            if self.cleaned_data['category']:
+                queryset = queryset.filter(category=self.cleaned_data['category'])
+            if self.cleaned_data['q']:
+                queryset = queryset.filter(model__contains=self.cleaned_data['q'])
+            return queryset
         return queryset
 
 
