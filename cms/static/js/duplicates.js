@@ -1,3 +1,6 @@
 $(document).ready(function() {
-   $('select[multiple].form-control').multiselect();
+   $('select[multiple]').select2({
+      allowClear: true,
+      closeOnSelect: false,
+   });
 });

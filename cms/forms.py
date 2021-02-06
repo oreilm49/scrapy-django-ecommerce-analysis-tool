@@ -49,9 +49,9 @@ class ProductMergeForm(forms.Form):
         return product
 
     class Media:
-        js = 'js/bootstrap-multiselect.min.js', 'js/duplicates.js',
+        js = 'js/select2.min.js', 'js/duplicates.js',
         css = {
             'all': (
-                'css/bootstrap-multiselect.min.css',
+                'css/select2.min.css',
             ),
         }
