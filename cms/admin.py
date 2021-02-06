@@ -77,10 +77,11 @@ class ProductMapView(SuccessMessageMixin, FormView):
 
     @property
     def products(self) -> ProductQuerySet:
-        products: ProductQuerySet = Product.objects.published()
-        if self.request.GET:
-            return ProductFilterForm(self.request.GET).search(products)
-        return products
+        return self.filter_form.search(Product.objects.published())
+
+    @property
+    def filter_form(self):
+        return ProductFilterForm(self.request.GET or None)
 
     def get_form_class(self):
         return formset_factory(ProductMergeForm, extra=self.products.count())
@@ -97,7 +98,7 @@ class ProductMapView(SuccessMessageMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
-            filter_form=ProductFilterForm()
+            filter_form=self.filter_form
         )
         return context
 
