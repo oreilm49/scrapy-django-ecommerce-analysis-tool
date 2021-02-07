@@ -1,13 +1,9 @@
 from django.contrib import admin
-from django.contrib.messages.views import SuccessMessageMixin
-from django.db import transaction
-from django.urls import path, reverse
-from django.utils.translation import gettext as _
-from django.views.generic import FormView
+from django.urls import path
 
-from cms.forms import ProductMergeForm
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
     ProductImage, AttributeType
+from cms.views.admin import ProductMapView, AttributeTypeMapView
 
 
 @admin.register(Website)
@@ -78,27 +74,11 @@ class AttributeTypeAdmin(admin.ModelAdmin):
     list_filter = 'name', 'alternate_names', 'unit',
 
 
-class ProductMapView(SuccessMessageMixin, FormView):
-    template_name = 'site/map_products.html'
-    success_message = _('Products mapped successfully')
-    form_class = ProductMergeForm
-
-    def get_success_url(self):
-        return reverse('admin:map_products')
-
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        form: ProductMergeForm = self.get_form()
-        if form.is_valid():
-            form.save()
-            return self.form_valid(form)
-        return super(ProductMapView, self).form_invalid(form)
-
-
 def get_admin_urls(urls):
     def get_urls():
         return urls + [
             path('map_products/', admin.site.admin_view(ProductMapView.as_view()), name="map_products"),
+            path('map_attribute_types/', admin.site.admin_view(AttributeTypeMapView.as_view()), name="map_attribute_types"),
         ]
     return get_urls
 
