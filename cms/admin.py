@@ -75,50 +75,18 @@ class ProductImageAdmin(admin.ModelAdmin):
 class ProductMapView(SuccessMessageMixin, FormView):
     template_name = 'site/map_products.html'
     success_message = _('Products mapped successfully')
+    form_class = ProductMergeForm
 
     def get_success_url(self):
         return reverse('admin:map_products')
 
-    @property
-    def products(self) -> ProductQuerySet:
-        return self.filter_form.search(Product.objects.published())
-
-    @property
-    def filter_form(self):
-        return ProductFilterForm(self.request.GET or None)
-
-    def get_form_class(self) -> formset_factory:
-        return formset_factory(ProductMergeForm, extra=self.products.count())
-
-    @property
-    def form_kwargs(self):
-        return dict(
-            products_iterator=self.products.iterator(),
-            products=self.products,
-        )
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update(form_kwargs=self.form_kwargs)
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            filter_form=self.filter_form
-        )
-        return context
-
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        formset = self.get_form_class()(self.request.POST)
-        formset.form_kwargs = self.form_kwargs
-        if formset.is_valid():
-            for form in formset:
-                print(form)
-                form.save()
-            return super().post(request, *args, **kwargs)
-        return super(ProductMapView, self).form_invalid(self.get_form_class())
+        form: ProductMergeForm = self.get_form()
+        if form.is_valid():
+            form.save()
+            return self.form_valid(form)
+        return super(ProductMapView, self).form_invalid(form)
 
 
 def get_admin_urls(urls):
