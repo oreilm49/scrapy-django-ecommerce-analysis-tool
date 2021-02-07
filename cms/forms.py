@@ -4,27 +4,41 @@ from django.db import transaction
 from django.utils.translation import gettext as _
 
 from cms import constants
-from cms.models import Product, Category, ProductQuerySet
+from cms.models import Product, Category, ProductQuerySet, BaseModel, AttributeType
 
 
-class ProductMergeForm(forms.Form):
-    product = forms.ModelChoiceField(queryset=Product.objects.published())
-    duplicates = forms.ModelMultipleChoiceField(queryset=Product.objects.published())
+class BaseMergeForm(forms.Form):
 
     def clean_duplicates(self):
         duplicates = self.cleaned_data['duplicates']
-        product = self.cleaned_data['product']
-        if duplicates.filter(pk=product.pk):
-            raise ValidationError(_('{product} cannot be a duplicate of itself').format(product=product))
+        target = self.cleaned_data['target']
+        if duplicates.filter(pk=target.pk):
+            raise ValidationError(_('{target} cannot be a duplicate of itself').format(target=target))
         return self.cleaned_data['duplicates']
 
     @transaction.atomic
     def save(self) -> Product:
         for duplicate in self.cleaned_data['duplicates']:
-            self.merge_product(self.cleaned_data['product'], duplicate)
-        return self.cleaned_data['product']
+            self.merge(self.cleaned_data['target'], duplicate)
+        return self.cleaned_data['target']
 
-    def merge_product(self, product: Product, duplicate: Product) -> Product:
+    def merge(self, target: BaseModel, duplicate: BaseModel):
+        return
+
+    class Media:
+        js = 'js/select2.min.js', 'js/duplicates.js',
+        css = {
+            'all': (
+                'css/select2.min.css',
+            ),
+        }
+
+
+class ProductMergeForm(BaseMergeForm):
+    target = forms.ModelChoiceField(queryset=Product.objects.published())
+    duplicates = forms.ModelMultipleChoiceField(queryset=Product.objects.published())
+
+    def merge(self, product: Product, duplicate: Product) -> Product:
         """
         Merges all attributes of duplicate into product, then deletes duplicate.
         :param product: the source product.
@@ -43,13 +57,29 @@ class ProductMergeForm(forms.Form):
         duplicate.delete()
         return product
 
-    class Media:
-        js = 'js/select2.min.js', 'js/duplicates.js',
-        css = {
-            'all': (
-                'css/select2.min.css',
-            ),
-        }
+
+class AttributeTypeMergeForm(BaseMergeForm):
+    target = forms.ModelChoiceField(queryset=AttributeType.objects.published())
+    duplicates = forms.ModelMultipleChoiceField(queryset=AttributeType.objects.published())
+
+    def merge(self, attribute_type: AttributeType, duplicate: AttributeType) -> AttributeType:
+        """
+        Merges all relations of duplicate into attribute type, then deletes duplicate.
+        :param attribute_type: the source attribute type.
+        :param duplicate: the attribute type to be merged into source.
+        :return: the merged attribute type instance.
+        """
+        attribute_type_products = attribute_type.productattributes.values_list('product', flat=True)
+        duplicate.productattributes.exclude(product__in=attribute_type_products).update(attribute_type=attribute_type)
+        duplicate.productattributes.all().delete()
+        duplicate.websiteproductattributes.update(attribute_type=attribute_type)
+        if not attribute_type.unit and duplicate.unit:
+            attribute_type.unit = duplicate.unit
+        attribute_type.alternate_names.append(duplicate.name)
+        attribute_type.alternate_names += duplicate.alternate_names
+        attribute_type.save()
+        duplicate.delete()
+        return attribute_type
 
 
 class ProductFilterForm(forms.Form):
