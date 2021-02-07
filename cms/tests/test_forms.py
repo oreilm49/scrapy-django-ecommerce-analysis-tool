@@ -26,9 +26,9 @@ class TestForms(TestCase):
         main_image: ProductImage = ProductImage.objects.create(product=dup_product, image_type=MAIN)
         thumb_image: ProductImage = ProductImage.objects.create(product=dup_product, image_type=THUMBNAIL)
 
-        form: ProductMergeForm = ProductMergeForm({'duplicates': [self.product.pk, dup_product.pk]}, product=self.product)
+        form: ProductMergeForm = ProductMergeForm(dict(duplicates=[self.product.pk, dup_product.pk], target=self.product))
         self.assertFalse(form.is_valid())
-        form: ProductMergeForm = ProductMergeForm({'duplicates': [dup_product.pk]}, product=self.product)
+        form: ProductMergeForm = ProductMergeForm(dict(duplicates=[dup_product.pk], target=self.product))
         self.assertTrue(form.is_valid(), msg=form.errors)
         form.save()
 
