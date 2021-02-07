@@ -10,26 +10,21 @@ from cms.models import Product, Category, ProductQuerySet
 
 
 class ProductMergeForm(forms.Form):
-    duplicates = forms.ModelMultipleChoiceField(queryset=Product.objects.none(), label=_('Select Duplicates'))
-
-    def __init__(self, *args, products_iterator: Generator[Product, Any, None] = None, products: ProductQuerySet = None, **kwargs):
-        super().__init__(*args, **kwargs)
-        if products_iterator:
-            self.product = next(products_iterator, None)
-            if self.product:
-                self.fields['duplicates'].queryset = products.exclude(pk=self.product.pk)
+    product = forms.ModelChoiceField(queryset=Product.objects.published())
+    duplicates = forms.ModelMultipleChoiceField(queryset=Product.objects.published())
 
     def clean_duplicates(self):
         duplicates = self.cleaned_data['duplicates']
-        if duplicates.filter(pk=self.product.pk):
-            raise ValidationError({'duplicates': _('{product} cannot be a duplicate of itself').format(product=self.product)})
-        return duplicates
+        product = self.cleaned_data['product']
+        if duplicates.filter(pk=product.pk):
+            raise ValidationError(_('{product} cannot be a duplicate of itself').format(product=product))
+        return self.cleaned_data['duplicates']
 
     @transaction.atomic
     def save(self) -> Product:
         for duplicate in self.cleaned_data['duplicates']:
-            self.merge_product(self.product, duplicate)
-        return self.product
+            self.merge_product(self.cleaned_data['product'], duplicate)
+        return self.cleaned_data['product']
 
     def merge_product(self, product: Product, duplicate: Product) -> Product:
         """
