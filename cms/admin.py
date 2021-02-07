@@ -1,14 +1,13 @@
 from django.contrib import admin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
-from django.forms import formset_factory
 from django.urls import path, reverse
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
-from cms.forms import ProductMergeForm, ProductFilterForm
+from cms.forms import ProductMergeForm
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
-    ProductImage, ProductQuerySet
+    ProductImage, AttributeType
 
 
 @admin.register(Website)
@@ -50,6 +49,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = 'id', 'model', 'category', 'alternate_models',
     list_editable = 'model', 'category', 'alternate_models',
     list_filter = 'category',
+    list_per_page = 50
 
 
 @admin.register(ProductAttribute)
@@ -70,6 +70,12 @@ class WebsiteProductAttributeAdmin(admin.ModelAdmin):
 class ProductImageAdmin(admin.ModelAdmin):
     list_display = 'id', 'product', 'image_type', 'image',
     list_filter = 'image_type', 'product',
+
+
+@admin.register(AttributeType)
+class AttributeTypeAdmin(admin.ModelAdmin):
+    list_display = 'id', 'name', 'alternate_names', 'unit',
+    list_filter = 'name', 'alternate_names', 'unit',
 
 
 class ProductMapView(SuccessMessageMixin, FormView):
