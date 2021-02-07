@@ -35,8 +35,8 @@ class BaseMergeForm(forms.Form):
 
 
 class ProductMergeForm(BaseMergeForm):
-    target = forms.ModelChoiceField(queryset=Product.objects.published())
-    duplicates = forms.ModelMultipleChoiceField(queryset=Product.objects.published())
+    target = forms.ModelChoiceField(queryset=Product.objects.published(), label=_('Product'))
+    duplicates = forms.ModelMultipleChoiceField(queryset=Product.objects.published(), label=_('Duplicates'), help_text=_('All relational data from duplicates will be merged into product.'))
 
     def merge(self, product: Product, duplicate: Product) -> Product:
         """
@@ -59,8 +59,8 @@ class ProductMergeForm(BaseMergeForm):
 
 
 class AttributeTypeMergeForm(BaseMergeForm):
-    target = forms.ModelChoiceField(queryset=AttributeType.objects.published())
-    duplicates = forms.ModelMultipleChoiceField(queryset=AttributeType.objects.published())
+    target = forms.ModelChoiceField(queryset=AttributeType.objects.published(), label=_('Attribute Type'))
+    duplicates = forms.ModelMultipleChoiceField(queryset=AttributeType.objects.published(), label=_('Duplicates'), help_text=_('All relational data from duplicates will be merged into the selected attribute type.'))
 
     def merge(self, attribute_type: AttributeType, duplicate: AttributeType) -> AttributeType:
         """
