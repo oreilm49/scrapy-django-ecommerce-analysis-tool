@@ -1,5 +1,6 @@
 {% load bootstrap4 %}
-<form method="get">
-    {% bootstrap_form filter_form %}
-    {% bootstrap_button _('Filter') button_type="submit" button_class='btn-primary' %}
+<form method="get" class="form-inline">
+    {% bootstrap_form filter_form layout="inline" %}
+    {% bootstrap_button _('Filter') button_type="submit" button_class='btn-primary'  %}
 </form>
+{{ filter_form.media.css }}

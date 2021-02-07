@@ -65,4 +65,11 @@ class ProductFilterForm(forms.Form):
             return queryset
         return queryset
 
+    class Media:
+        css = {
+            'all': (
+                'css/form-inline.css',
+            ),
+        }
+
 

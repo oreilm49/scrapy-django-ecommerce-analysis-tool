@@ -1,0 +1,10 @@
+/* Style the form - display items horizontally */
+.form-inline {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.form-inline .form-group {
+    margin-right: 10px;
+}
