@@ -1,0 +1,12 @@
+{% extends "admin/change_list_object_tools.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+      <li>
+        {% url 'admin:map_products' as map_products_url %}
+        <a href="{% add_preserved_filters map_products_url is_popup to_field %}" class="addlink">
+          {% blocktranslate %}Map Products{% endblocktranslate %}
+        </a>
+      </li>
+{% endblock %}
