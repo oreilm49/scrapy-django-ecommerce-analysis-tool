@@ -4,7 +4,7 @@ from model_mommy import mommy
 from cms.constants import MAIN, THUMBNAIL
 from cms.models import Category, Product, ProductAttribute, Website, WebsiteProductAttribute, AttributeType,\
     ProductImage
-from cms.forms import ProductMergeForm
+from cms.forms import ProductMergeForm, AttributeTypeMergeForm
 
 
 class TestForms(TestCase):
@@ -15,7 +15,7 @@ class TestForms(TestCase):
         cls.website: Website = mommy.make(Website, name="test_website", currency__name="€")
         cls.category: Category = mommy.make(Category, name="washing machines")
         cls.product: Product = mommy.make(Product, model="model_number")
-        cls.attribute: AttributeType = mommy.make(AttributeType, name="test_attr")
+        cls.attribute: AttributeType = mommy.make(AttributeType, name="test_attr", unit=None)
         cls.product_attribute: ProductAttribute = mommy.make(ProductAttribute, product=cls.product, attribute_type=cls.attribute)
 
     def test_product_merge_form(self):
@@ -39,3 +39,20 @@ class TestForms(TestCase):
         self.assertEqual(WebsiteProductAttribute.objects.get(pk=prod_web_attr.pk).product, self.product)
         self.assertEqual(ProductImage.objects.get(pk=main_image.pk).product, self.product)
         self.assertEqual(ProductImage.objects.get(pk=thumb_image.pk).product, self.product)
+
+    def test_attribute_type_merge_form(self):
+        duplicate: AttributeType = mommy.make(AttributeType, name="duplicate attr", unit__name="test unit", alternate_names=["test alternate name"])
+        product_attr__deleted: ProductAttribute = mommy.make(ProductAttribute, product=self.product, attribute_type=duplicate)
+        product_attr__mapped: ProductAttribute = mommy.make(ProductAttribute, attribute_type=duplicate)
+        web_attr__mapped: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, product=self.product, attribute_type=duplicate)
+
+        form: AttributeTypeMergeForm = AttributeTypeMergeForm(dict(duplicates=[self.attribute.pk, duplicate.pk], target=self.attribute))
+        self.assertFalse(form.is_valid())
+        form: AttributeTypeMergeForm = AttributeTypeMergeForm(dict(duplicates=[duplicate.pk], target=self.attribute))
+        self.assertTrue(form.is_valid(), msg=form.errors)
+        form.save()
+
+        self.assertFalse(ProductAttribute.objects.filter(pk=product_attr__deleted.pk).exists())
+        self.assertEqual(ProductAttribute.objects.get(pk=product_attr__mapped.pk).attribute_type, self.attribute)
+        self.assertIsNotNone(AttributeType.objects.get(pk=self.attribute.pk).unit)
+        self.assertEqual(WebsiteProductAttribute.objects.get(pk=web_attr__mapped.pk).attribute_type, self.attribute)
