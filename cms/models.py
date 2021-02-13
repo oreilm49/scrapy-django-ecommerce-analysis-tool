@@ -1,4 +1,7 @@
+import datetime
 import uuid
+from statistics import mean
+from typing import Optional
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -121,6 +124,17 @@ class Product(BaseModel):
     @cached_property
     def image_thumb_required(self) -> bool:
         return not self.images.filter(image_type=THUMBNAIL).exists()
+
+    @cached_property
+    def current_average_price(self) -> float:
+        """avg price of product from last 24 hours"""
+        prices = self.websiteproductattributes.published().filter(attribute_type__name="price").for_last_day().values_list('value', flat=True)
+        return mean([float(price) for price in prices])
+
+    @cached_property
+    def brand(self) -> Optional[str]:
+        attribute: ProductAttribute = self.productattributes.filter(attribute_type__name="brand").first()
+        return attribute.value if attribute else None
 
 
 class AttributeTypeQuerySet(BaseQuerySet):
