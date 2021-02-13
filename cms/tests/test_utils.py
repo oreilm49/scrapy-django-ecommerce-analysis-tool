@@ -1,3 +1,5 @@
+import itertools
+
 from django.test import TestCase
 from model_mommy import mommy
 
@@ -26,3 +28,11 @@ class TestUtils(TestCase):
         with self.subTest("website product attributes"):
             website_attribute: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, attribute_type__name="price", value="199", product=product)
             self.assertEqual(products_grouper(product, website_attribute.attribute_type, ["0", "99", "199", "299"]), "199")
+
+        with self.subTest("for queryset"):
+            groups = itertools.groupby(Product.objects.iterator(), key=lambda product: products_grouper(
+                product,
+                website_attribute.attribute_type,
+                ["0", "99", "199", "299"]
+            ))
+            self.assertEqual(list(groups)[0][0], "199")
