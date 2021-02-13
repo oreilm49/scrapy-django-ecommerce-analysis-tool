@@ -164,11 +164,20 @@ class ProductAttribute(BaseProductAttribute):
         unique_together = ['product', 'attribute_type']
 
 
+class WebsiteProductAttributeQuerySet(BaseQuerySet):
+
+    def for_last_day(self) -> QuerySet:
+        """returns attribs for the last 24 hours"""
+        return self.filter(created__gte=datetime.datetime.now() - datetime.timedelta(hours=24))
+
+
 class WebsiteProductAttribute(BaseProductAttribute):
     website = models.ForeignKey(to=Website, verbose_name=_("Website"), on_delete=CASCADE, related_name="productattributes")
 
     def __str__(self):
         return f"{self.website} > {self.product} > {self.attribute_type}"
+
+    objects = WebsiteProductAttributeQuerySet.as_manager()
 
 
 class ProductImage(BaseModel):
