@@ -1,17 +1,20 @@
 import datetime
 import uuid
 from statistics import mean
-from typing import Optional, Dict
+from typing import Optional, Dict, Union, Type
 
+from django import forms
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q
 from django.utils.functional import cached_property
+from django.utils.module_loading import import_string
 from django.utils.translation import gettext as _
 from django_extensions.db.fields import ModificationDateTimeField, CreationDateTimeField
 
-from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN,\
-    THUMBNAIL, WIDGET_CHOICES
+from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN, \
+    THUMBNAIL, WIDGET_CHOICES, WIDGETS
+from cms.serializers import serializers, CustomValueSerializer
 
 
 def json_data_default() -> Dict[str, None]:
@@ -57,6 +60,22 @@ class Unit(BaseModel):
     def __str__(self):
         return self.name
 
+    @property
+    def serializer(self) -> CustomValueSerializer:
+        return serializers.get(self.field_class)
+
+    @cached_property
+    def field_class(self) -> Type[forms.Field]:
+        widget_class = self.widget_class
+        return WIDGETS[widget_class]
+
+    @cached_property
+    def widget_class(self) -> Type[forms.Widget]:
+        try:
+            return import_string(self.widget)
+        except ImportError:
+            raise ValueError(_('"{}" is not a valid widget').format(self.widget))
+
 
 class Website(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The website name"), unique=True)
@@ -68,13 +87,12 @@ class Website(BaseModel):
 
     def create_product_attribute(self, product: 'Product', attribute_type: 'AttributeType', value: str) -> 'WebsiteProductAttribute':
         """
-        Creates a website product attribute
-        :param product:
-        :param attribute_type:
-        :param value:
-        :return:
+        Creates a website product attribute.
+        Serializes value using attribute_type unit's serializer before creating product attribute.
         """
-        return WebsiteProductAttribute.objects.create(website=self, product=product, attribute_type=attribute_type, value=value)
+        if attribute_type.unit:
+            value = attribute_type.unit.serializer.serializer(value)
+        return WebsiteProductAttribute.objects.create(website=self, product=product, attribute_type=attribute_type, data={'value': value})
 
 
 class Url(BaseModel):
@@ -110,14 +128,14 @@ class Selector(BaseModel):
 
 class ProductQuerySet(BaseQuerySet):
 
-    def get_or_create_for_item(self, item: 'ProductPageItem') -> 'Product':
-        product_check = self.filter(category=item['category']).filter(
-            Q(model=item['model']) |
-            Q(alternate_models__contains=[item['model']]),
+    def custom_get_or_create(self, model: str, category: Category) -> 'Product':
+        product_check = self.filter(category=category).filter(
+            Q(model=model) |
+            Q(alternate_models__contains=[model]),
         )
         if product_check.exists():
             return product_check.first()
-        return Product.objects.create(model=item['model'], category=item['category'])
+        return Product.objects.create(model=model, category=category)
 
 
 class Product(BaseModel):
@@ -132,31 +150,31 @@ class Product(BaseModel):
 
     @cached_property
     def image_main_required(self) -> bool:
-        return not self.images.filter(image_type=MAIN).exists()
+        return self.images.filter(image_type=MAIN).exists() is False
 
     @cached_property
     def image_thumb_required(self) -> bool:
-        return not self.images.filter(image_type=THUMBNAIL).exists()
+        return self.images.filter(image_type=THUMBNAIL).exists() is False
 
     @cached_property
     def current_average_price(self) -> float:
         """avg price of product from last 24 hours"""
-        prices = self.websiteproductattributes.published().filter(attribute_type__name="price").for_last_day().values_list('value', flat=True)
+        prices = self.websiteproductattributes.published().filter(attribute_type__name="price").for_last_day().values_list('data__value', flat=True)
         return mean([float(price) for price in prices])
 
     @cached_property
     def brand(self) -> Optional[str]:
         attribute: ProductAttribute = self.productattributes.filter(attribute_type__name="brand").first()
-        return attribute.value if attribute else None
+        return attribute.data['value'] if attribute else None
 
 
 class AttributeTypeQuerySet(BaseQuerySet):
 
-    def get_or_create_by_name(self, name: str) -> 'AttributeType':
-        attribute_type_check = self.filter(Q(name=name) | Q(alternate_names__contains=[name]))
+    def custom_get_or_create(self, name: str, unit: Unit) -> 'AttributeType':
+        attribute_type_check = self.filter(unit=unit).filter(Q(name=name) | Q(alternate_names__contains=[name]))
         if attribute_type_check.exists():
             return attribute_type_check.first()
-        return AttributeType.objects.create(name=name)
+        return AttributeType.objects.create(name=name, unit=unit)
 
 
 class AttributeType(BaseModel):
@@ -183,6 +201,21 @@ class BaseProductAttribute(BaseModel):
 
     class Meta:
         abstract = True
+
+
+class ProductAttributeQuerySet(BaseQuerySet):
+
+    def custom_get_or_create(self, product: Product, attribute_type: AttributeType, value: Union[int, str, float, bool, datetime.datetime]) -> 'ProductAttribute':
+        """
+        Checks if product attribute exists before creating.
+        Serializes value using attribute_type unit's serializer before creating product attribute.
+        """
+        product_attribute_check = self.filter(product=product, attribute_type=attribute_type)
+        if product_attribute_check.exists():
+            return product_attribute_check.first()
+        if attribute_type.unit:
+            value = attribute_type.unit.serializer(value)
+        return self.create(product=product, attribute_type=attribute_type, data__value=value)
 
 
 class ProductAttribute(BaseProductAttribute):
