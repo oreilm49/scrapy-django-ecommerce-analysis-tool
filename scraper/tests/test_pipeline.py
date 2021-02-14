@@ -19,7 +19,7 @@ class TestPipeline(TestCase):
         super().setUpClass()
         cls.website: Website = mommy.make(Website, name="test_website", currency__name="€")
         cls.category: Category = mommy.make(Category, name="washing machines")
-        cls.product: Product = mommy.make(Product, model="model_number")
+        cls.product: Product = mommy.make(Product, model="model_number", category=cls.category)
 
     def test_product(self):
         with self.subTest("create"):
