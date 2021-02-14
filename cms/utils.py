@@ -2,8 +2,6 @@ from typing import List, Union, Optional
 
 from django.db.models import QuerySet
 
-from cms.models import Product, AttributeType, ProductAttribute
-
 
 def extract_grouper(value: Union[str, float, int], grouper_values: List[Union[str]]) -> Optional[Union[str]]:
     """
@@ -22,7 +20,7 @@ def extract_grouper(value: Union[str, float, int], grouper_values: List[Union[st
             return grouper_value
 
 
-def products_grouper(product: Product, attribute: AttributeType, attribute_values: List[Union[str]]) -> Optional[Union[str]]:
+def products_grouper(product: 'Product', attribute: 'AttributeType', attribute_values: List[Union[str]]) -> Optional[Union[str]]:
     """
     Extracts a grouper key for product by comparing attribute value against list of attribute_values.
     :param product: Product object.
@@ -36,3 +34,8 @@ def products_grouper(product: Product, attribute: AttributeType, attribute_value
     web_product_attribute: QuerySet = attribute.websiteproductattributes.filter(product=product)
     if web_product_attribute.exists():
         return extract_grouper(web_product_attribute.first().value, attribute_values)
+
+
+def get_dotted_path(cls: type) -> str:
+    """Returns python dotted path for class"""
+    return u'{}.{}'.format(cls.__module__, cls.__name__)
