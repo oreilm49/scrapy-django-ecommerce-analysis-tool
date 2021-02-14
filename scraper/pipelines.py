@@ -15,7 +15,7 @@ class ProductPipeline:
     @transaction.atomic
     def process_item(self, item, spider):
         if isinstance(item, ProductPageItem):
-            item['product'] = Product.objects.get_or_create_for_item(item)
+            item['product'] = Product.objects.custom_get_or_create(item['model'], item['category'])
         return item
 
 
