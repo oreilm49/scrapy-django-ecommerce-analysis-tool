@@ -4,7 +4,7 @@ from django import forms
 from django.test import TestCase
 from pint import UnitRegistry, Quantity
 
-from cms.data_processing.constants import Value, UnitValue
+from cms.data_processing.constants import Value, UnitValue, RangeUnitValue
 from cms.data_processing.units import contains_number, is_range_value, UnitManager, widget_from_type
 from cms.form_widgets import FloatInput
 from cms.models import Unit
@@ -57,6 +57,25 @@ class TestUnits(TestCase):
             watt: Quantity = units.ureg("1w")
             self.assertTrue(isinstance(watt, Quantity))
             self.assertEqual(str(watt.units), "watt")
+
+    def test_get_processed_unit_and_value(self):
+        units: UnitManager = UnitManager()
+        with self.subTest("str"):
+            self.assertEqual(units.get_processed_unit_and_value("str"), Value(value="str"))
+
+        with self.subTest("valid unit"):
+            parsed_value: UnitValue = units.get_processed_unit_and_value("1kg")
+            kg_unit: Unit = Unit.objects.get(name="kilogram", widget=get_dotted_path(forms.widgets.NumberInput))
+            self.assertEqual(parsed_value, UnitValue(value=1, unit=kg_unit))
+
+        with self.subTest("undefined unit"):
+            parsed_value: UnitValue = units.get_processed_unit_and_value("1lkj")
+            self.assertEqual(parsed_value, Value(value="1lkj"))
+
+        with self.subTest("range value"):
+            parsed_value: RangeUnitValue = units.get_processed_unit_and_value("200-240v")
+            volt_unit: Unit = Unit.objects.get(name="volt", widget=get_dotted_path(forms.widgets.NumberInput))
+            self.assertEqual(parsed_value, RangeUnitValue(unit=volt_unit, value_low=200, value_high=240))
 
     def test_get_or_create_unit(self):
         units: UnitManager = UnitManager()
