@@ -3,7 +3,7 @@ from typing import Union, Dict
 from django.db import transaction
 from django.db.models import Q
 
-from cms.constants import PRICE, IMAGE, MAIN, THUMBNAIL
+from cms.constants import PRICE, MAIN, THUMBNAIL
 from cms.data_processing.constants import UnitValue, Value, RangeUnitValue
 from cms.data_processing.units import UnitManager
 from cms.models import Product, ProductAttribute, Selector, AttributeType, ProductImage
@@ -42,12 +42,12 @@ class ProductAttributePipeline:
                     if ProductAttribute.objects.filter(Q(attribute_type__name=name_low) | Q(attribute_type__name=name_high), product=product).exists():
                         continue
 
-                    attribute_type_low: AttributeType = AttributeType.objects.get_or_create_by_name(f"{attribute['label']} - low")
-                    attribute_type_high: AttributeType = AttributeType.objects.get_or_create_by_name(f"{attribute['label']} - high")
-                    ProductAttribute.objects.create(product=product, attribute_type=attribute_type_low, value=processed_unit.value_low)
-                    ProductAttribute.objects.create(product=product, attribute_type=attribute_type_high, value=processed_unit.value_high)
+                    attribute_type_low: AttributeType = AttributeType.objects.custom_get_or_create(f"{attribute['label']} - low", unit=processed_unit.unit)
+                    attribute_type_high: AttributeType = AttributeType.objects.custom_get_or_create(f"{attribute['label']} - high", unit=processed_unit.unit)
+                    ProductAttribute.objects.custom_get_or_create(product=product, attribute_type=attribute_type_low, value=processed_unit.value_low)
+                    ProductAttribute.objects.custom_get_or_create(product=product, attribute_type=attribute_type_high, value=processed_unit.value_high)
                 else:
-                    ProductAttribute.objects.create(product=product, attribute_type=attribute_type, value=processed_unit.value)
+                    ProductAttribute.objects.custom_get_or_create(product=product, attribute_type=attribute_type, value=processed_unit.value)
         return item
 
 
