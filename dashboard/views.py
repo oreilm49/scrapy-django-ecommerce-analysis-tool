@@ -20,13 +20,12 @@ class CategoryLineUp(TemplateView):
         if self.request.GET:
             if form.is_valid():
                 products = form.search(Product.objects.published())
-                x_axis_groups = itertools.groupby(products.iterator(), key=lambda product: products_grouper(
-                    product,
-                    form.x_axis_attribute,
-                    form.x_axis_values
-                ))
                 data.update(
-                    x_axis_groups=x_axis_groups,
+                    x_axis_groups=itertools.groupby(products.iterator(), key=lambda product: products_grouper(
+                        product,
+                        form.x_axis_attribute,
+                        form.x_axis_values
+                    )),
                     y_axis_groups=form.y_axis_values,
                 )
                 return data
