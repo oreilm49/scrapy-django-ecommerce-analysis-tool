@@ -68,6 +68,8 @@ class UnitManager:
         name: str = str(quantity.units)
         value: Union[str, int, float] = quantity.magnitude
         if unit:
+            # if pre existing unit has different type to new data,
+            # convert new data to type of unit
             if unit.name is not name:
                 quantity: Quantity = quantity.to(unit.name)
                 value: Union[str, int, float] = quantity.magnitude
