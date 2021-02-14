@@ -5,3 +5,4 @@ dialogflow==1.1.0
 model-mommy==2.0.0
 pint==0.16.1
 psycopg2-binary==2.8
+python-dateutil==2.8.1
