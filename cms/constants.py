@@ -39,17 +39,6 @@ SELECTOR_TYPES = (
     (TABLE_LABEL_COLUMN, _("Table Label Column")),
 )
 
-INTEGER = "int"
-FLOAT = "float"
-STRING = "str"
-BOOLEAN = "bool"
-
-DATA_TYPES = (
-    (INTEGER, _("Integer")),
-    (FLOAT, _("Float")),
-    (STRING, _("String")),
-    (BOOLEAN, _("Boolean"))
-)
 
 ONCE = 'once'
 HOURLY = 'hourly'
