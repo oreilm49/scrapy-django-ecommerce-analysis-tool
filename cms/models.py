@@ -1,7 +1,7 @@
 import datetime
 import uuid
 from statistics import mean
-from typing import Optional
+from typing import Optional, Dict
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -11,7 +11,14 @@ from django.utils.translation import gettext as _
 from django_extensions.db.fields import ModificationDateTimeField, CreationDateTimeField
 
 from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, DATA_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, \
-    MAIN, THUMBNAIL
+    MAIN, THUMBNAIL, WIDGET_CHOICES
+
+
+def json_data_default() -> Dict[str, None]:
+    """
+    Default callable for JSONField.
+    """
+    return {"value": None}
 
 
 class BaseQuerySet(QuerySet):
@@ -45,6 +52,7 @@ class Unit(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The unit name"), unique=True)
     alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True, default=list)
     data_type = models.CharField(verbose_name=_("Data Type"), max_length=MAX_LENGTH, choices=DATA_TYPES, help_text=_("The data type of the unit"), blank=True, null=True)
+    widget = models.CharField(verbose_name=_('widget'), choices=WIDGET_CHOICES, max_length=70, help_text=_("The input widget, which denotes the data type, serializer and deserializer of the unit's corresponding values."))
     repeat = models.CharField(verbose_name=_("Repeat"), max_length=MAX_LENGTH, default=ONCE, choices=TRACKING_FREQUENCIES, help_text=_("The frequency with which this unit should be tracked."), blank=True, null=True)
 
     def __str__(self):
@@ -60,6 +68,13 @@ class Website(BaseModel):
         return self.name
 
     def create_product_attribute(self, product: 'Product', attribute_type: 'AttributeType', value: str) -> 'WebsiteProductAttribute':
+        """
+        Creates a website product attribute
+        :param product:
+        :param attribute_type:
+        :param value:
+        :return:
+        """
         return WebsiteProductAttribute.objects.create(website=self, product=product, attribute_type=attribute_type, value=value)
 
 
@@ -97,10 +112,9 @@ class Selector(BaseModel):
 class ProductQuerySet(BaseQuerySet):
 
     def get_or_create_for_item(self, item: 'ProductPageItem') -> 'Product':
-        product_check = self.filter(
+        product_check = self.filter(category=item['category']).filter(
             Q(model=item['model']) |
             Q(alternate_models__contains=[item['model']]),
-            category=item['category']
         )
         if product_check.exists():
             return product_check.first()
@@ -163,7 +177,7 @@ class AttributeType(BaseModel):
 class BaseProductAttribute(BaseModel):
     product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="%(class)ss")
     attribute_type = models.ForeignKey(to=AttributeType, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="%(class)ss")
-    value = models.CharField(verbose_name=_("Value"), max_length=MAX_LENGTH, help_text=_("The value for this attribute"))
+    data = models.JSONField(verbose_name=_("Data"), help_text=_("The data for this attribute"), null=True, default=json_data_default)
 
     def __str__(self):
         return f"{self.product.model} > {self.attribute_type}"
