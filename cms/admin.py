@@ -36,8 +36,8 @@ class SelectorAdmin(admin.ModelAdmin):
 
 @admin.register(Unit)
 class UnitAdmin(admin.ModelAdmin):
-    list_display = 'id', 'name', 'alternate_names', 'data_type', 'repeat',
-    list_editable = 'name', 'alternate_names', 'data_type', 'repeat',
+    list_display = 'id', 'name', 'alternate_names', 'widget', 'repeat',
+    list_editable = 'name', 'alternate_names', 'widget', 'repeat',
 
 
 @admin.register(Product)
