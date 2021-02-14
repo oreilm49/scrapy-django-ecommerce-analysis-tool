@@ -64,7 +64,7 @@ class UnitManager:
     def get_or_create_unit(self, value: str, unit: Optional[Unit] = None):
         quantity: Union[Quantity, int] = self.ureg(value)
         if isinstance(quantity, int):
-            return Value(value=value)
+            return Value(value=quantity)
         name: str = str(quantity.units)
         value: Union[str, int, float] = quantity.magnitude
         if unit:
