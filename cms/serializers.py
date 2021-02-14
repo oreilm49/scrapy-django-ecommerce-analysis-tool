@@ -7,7 +7,7 @@ from cms.constants import FIELD_TYPES
 
 CustomValueSerializer = namedtuple('CustomValueSerializer', ['serializer', 'deserializer'])
 
-custom_fields = {
+serializers = {
     forms.CharField: CustomValueSerializer(
         serializer=str,
         deserializer=str,
@@ -29,5 +29,5 @@ custom_fields = {
         deserializer=lambda value: float,
     ),
 }
-assert set(custom_fields.keys()) == set(FIELD_TYPES), 'All allowed field types must have serializer data defined'
+assert set(serializers.keys()) == set(FIELD_TYPES), 'All allowed field types must have serializer data defined'
 
