@@ -10,8 +10,8 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django_extensions.db.fields import ModificationDateTimeField, CreationDateTimeField
 
-from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, DATA_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, \
-    MAIN, THUMBNAIL, WIDGET_CHOICES
+from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN,\
+    THUMBNAIL, WIDGET_CHOICES
 
 
 def json_data_default() -> Dict[str, None]:
@@ -51,7 +51,6 @@ class BaseModel(models.Model):
 class Unit(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The unit name"), unique=True)
     alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True, default=list)
-    data_type = models.CharField(verbose_name=_("Data Type"), max_length=MAX_LENGTH, choices=DATA_TYPES, help_text=_("The data type of the unit"), blank=True, null=True)
     widget = models.CharField(verbose_name=_('widget'), choices=WIDGET_CHOICES, max_length=70, help_text=_("The input widget, which denotes the data type, serializer and deserializer of the unit's corresponding values."))
     repeat = models.CharField(verbose_name=_("Repeat"), max_length=MAX_LENGTH, default=ONCE, choices=TRACKING_FREQUENCIES, help_text=_("The frequency with which this unit should be tracked."), blank=True, null=True)
 
