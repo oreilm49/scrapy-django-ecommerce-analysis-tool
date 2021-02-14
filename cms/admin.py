@@ -50,15 +50,15 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductAttribute)
 class ProductAttributeAdmin(admin.ModelAdmin):
-    list_display = 'id', 'attribute_type', 'value', 'product',
-    list_editable = 'attribute_type', 'value', 'product',
+    list_display = 'id', 'attribute_type', 'data', 'product',
+    list_editable = 'attribute_type', 'data', 'product',
     list_filter = 'product', 'product__category', 'attribute_type',
 
 
 @admin.register(WebsiteProductAttribute)
 class WebsiteProductAttributeAdmin(admin.ModelAdmin):
-    list_display = 'id', 'website', 'attribute_type', 'value', 'product',
-    list_editable = 'website', 'attribute_type', 'value', 'product',
+    list_display = 'id', 'website', 'attribute_type', 'data', 'product',
+    list_editable = 'website', 'attribute_type', 'data', 'product',
     list_filter = 'website', 'product', 'product__category', 'attribute_type',
 
 
