@@ -1,12 +1,14 @@
 from django.db import transaction
 
 from cms.constants import CATEGORY, TABLE_LABEL_COLUMN, TABLE_VALUE_COLUMN, TABLE, LINK, PAGINATION, PRICE, MODEL, \
-    INTEGER, HOURLY, IMAGE
+    HOURLY, IMAGE
+from cms.form_widgets import FloatInput
 from cms.models import Website, Category, Url, Selector, Unit
+from cms.utils import get_dotted_path
 
 
 def set_up_websites():
-    currency, _ = Unit.objects.get_or_create(name="€", alternate_names=["euro"], data_type=INTEGER, repeat=HOURLY)
+    currency, _ = Unit.objects.get_or_create(name="€", alternate_names=["euro"], widget=get_dotted_path(FloatInput), repeat=HOURLY)
     harvey_norman, _ = Website.objects.get_or_create(name="harvey_norman", domain="harveynorman.ie", currency=currency)
     laundry, _ = Category.objects.get_or_create(name="laundry")
     washing_machines, _ = Category.objects.get_or_create(name="washing machines", parent=laundry, alternate_names=["washers", "front loaders"])
