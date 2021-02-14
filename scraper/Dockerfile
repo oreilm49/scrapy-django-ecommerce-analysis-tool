@@ -4,6 +4,8 @@ EXPOSE 6000
 
 RUN apk -U add \
         gcc \
+        cargo \
+        curl ca-certificates \
         libffi-dev \
         libxml2-dev \
         libxslt-dev \
@@ -12,9 +14,9 @@ RUN apk -U add \
         python3-dev \
         py-pillow \
         py-pip \
-        curl ca-certificates \
         postgresql-libs \
         postgresql-dev \
+        rust \
     && update-ca-certificates \
     && rm -rf /var/cache/apk/* \
     && pip install --upgrade pip
