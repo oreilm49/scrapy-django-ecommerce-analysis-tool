@@ -72,5 +72,5 @@ class UnitManager:
                 quantity: Quantity = quantity.to(unit.name)
                 value: Union[str, int, float] = quantity.magnitude
         else:
-            unit, _ = Unit.objects.get_or_create(name=name)
+            unit, _ = Unit.objects.get_or_create(name=name, widget=widget_from_type(value))
         return UnitValue(unit=unit, value=value)
