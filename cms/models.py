@@ -216,8 +216,8 @@ class ProductAttributeQuerySet(BaseQuerySet):
         if product_attribute_check.exists():
             return product_attribute_check.first()
         if attribute_type.unit:
-            value = attribute_type.unit.serializer(value)
-        return self.create(product=product, attribute_type=attribute_type, data__value=value)
+            value = attribute_type.unit.serializer.serializer(value)
+        return self.create(product=product, attribute_type=attribute_type, data={'value': value})
 
 
 class ProductAttribute(BaseProductAttribute):
