@@ -225,6 +225,8 @@ class ProductAttribute(BaseProductAttribute):
     class Meta:
         unique_together = ['product', 'attribute_type']
 
+    objects = ProductAttributeQuerySet.as_manager()
+
 
 class WebsiteProductAttributeQuerySet(BaseQuerySet):
 
