@@ -27,7 +27,7 @@ class ProductAttributePipeline:
             product: Product = item['product']
             for attribute in item['attributes']:
                 attribute: Dict
-                attribute_type: AttributeType = AttributeType.objects.get_or_create_by_name(attribute['label'])
+                attribute_type: AttributeType = AttributeType.objects.custom_get_or_create(attribute['label'])
                 product_attribute_exists: bool = ProductAttribute.objects.filter(attribute_type=attribute_type, product=product).exists()
                 if product_attribute_exists:
                     continue
