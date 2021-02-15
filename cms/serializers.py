@@ -17,16 +17,16 @@ serializers = {
         deserializer=int,
     ),
     forms.BooleanField: CustomValueSerializer(
-        serializer=lambda value: bool,
-        deserializer=lambda value: bool,
+        serializer=bool,
+        deserializer=bool,
     ),
     forms.DateTimeField: CustomValueSerializer(
         serializer=lambda value: str(value),
         deserializer=lambda value: parser.parse(value),
     ),
     forms.FloatField: CustomValueSerializer(
-        serializer=lambda value: float,
-        deserializer=lambda value: float,
+        serializer=float,
+        deserializer=float,
     ),
 }
 assert set(serializers.keys()) == set(FIELD_TYPES), 'All allowed field types must have serializer data defined'
