@@ -87,9 +87,11 @@ class TestModels(TestCase):
     def test_product_current_average_price(self):
         product: Product = mommy.make(Product)
         attribute: AttributeType = mommy.make(AttributeType, name="price")
-        mommy.make(WebsiteProductAttribute, attribute_type=attribute, data={'value': 299.99})
-        mommy.make(WebsiteProductAttribute, attribute_type=attribute, data={'value': 249.99})
-        mommy.make(WebsiteProductAttribute, attribute_type=attribute, data={'value': 99.99}, created=datetime.datetime.now() - datetime.timedelta(days=1))
+        mommy.make(WebsiteProductAttribute, attribute_type=attribute, data={'value': 299.99}, product=product)
+        mommy.make(WebsiteProductAttribute, attribute_type=attribute, data={'value': 249.99}, product=product)
+        old_attrib: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, attribute_type=attribute, data={'value': 99.99}, product=product)
+        old_attrib.created = datetime.datetime.now() - datetime.timedelta(hours=24)
+        old_attrib.save()
         self.assertEqual(product.current_average_price, statistics.mean([299.99, 249.99]))
 
     def test_product_brand(self):
@@ -117,7 +119,9 @@ class TestModels(TestCase):
 
     def test_website_product_attributes__for_last_day(self):
         attrib_1: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, website__name="site", attribute_type__name="test")
-        attrib_2: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, website=attrib_1.website, attribute_type=attrib_1.attribute_type, created=datetime.datetime.now() - datetime.timedelta(hours=25))
+        attrib_2: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, website=attrib_1.website, attribute_type=attrib_1.attribute_type)
+        attrib_2.created = datetime.datetime.now() - datetime.timedelta(hours=24)
+        attrib_2.save()
         attribs: WebsiteProductAttributeQuerySet = WebsiteProductAttribute.objects.for_last_day()
         self.assertIn(attrib_1, attribs)
         self.assertNotIn(attrib_2, attribs)
