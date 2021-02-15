@@ -170,8 +170,10 @@ class Product(BaseModel):
 
 class AttributeTypeQuerySet(BaseQuerySet):
 
-    def custom_get_or_create(self, name: str, unit: Unit) -> 'AttributeType':
-        attribute_type_check = self.filter(unit=unit).filter(Q(name=name) | Q(alternate_names__contains=[name]))
+    def custom_get_or_create(self, name: str, unit: Optional[Unit] = None) -> 'AttributeType':
+        attribute_type_check = self.filter(Q(name=name) | Q(alternate_names__contains=[name]))
+        if unit:
+            attribute_type_check = attribute_type_check.filter(unit=unit)
         if attribute_type_check.exists():
             return attribute_type_check.first()
         return AttributeType.objects.create(name=name, unit=unit)
