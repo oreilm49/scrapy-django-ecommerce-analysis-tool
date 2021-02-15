@@ -157,10 +157,10 @@ class Product(BaseModel):
         return self.images.filter(image_type=THUMBNAIL).exists() is False
 
     @cached_property
-    def current_average_price(self) -> float:
+    def current_average_price(self) -> Optional[float]:
         """avg price of product from last 24 hours"""
         prices = self.websiteproductattributes.published().filter(attribute_type__name="price").for_last_day().values_list('data__value', flat=True)
-        return mean([float(price) for price in prices])
+        return mean([float(price) for price in prices]) if prices else None
 
     @cached_property
     def brand(self) -> Optional[str]:
