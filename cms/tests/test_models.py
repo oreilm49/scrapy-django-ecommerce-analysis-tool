@@ -125,3 +125,14 @@ class TestModels(TestCase):
         attribs: WebsiteProductAttributeQuerySet = WebsiteProductAttribute.objects.for_last_day()
         self.assertIn(attrib_1, attribs)
         self.assertNotIn(attrib_2, attribs)
+
+    def test_custom_get_or_create__product_attribute(self):
+        attribute_type: AttributeType = mommy.make(AttributeType, unit__widget=get_dotted_path(FloatInput))
+        product: Product = mommy.make(Product)
+        created_attribute: ProductAttribute = ProductAttribute.objects.custom_get_or_create(product, attribute_type, "299")
+        self.assertEqual(created_attribute.attribute_type, attribute_type)
+        self.assertEqual(created_attribute.product, product)
+        self.assertEqual(created_attribute.data['value'], 299.0)
+
+        retrieved_attribute: ProductAttribute = ProductAttribute.objects.custom_get_or_create(product, attribute_type, "299")
+        self.assertEqual(retrieved_attribute, created_attribute)
