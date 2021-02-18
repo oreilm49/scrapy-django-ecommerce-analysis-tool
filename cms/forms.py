@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 
 from cms import constants
 from cms.models import Product, Category, ProductQuerySet, BaseModel, AttributeType
+from cms.utils import serialized_values_for_attribute_type, is_value_numeric
 
 
 class BaseMergeForm(forms.Form):
