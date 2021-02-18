@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'cms',
     'scraper',
     'bootstrap4',
+    'bsmodals',
     'dashboard',
 ]
 
