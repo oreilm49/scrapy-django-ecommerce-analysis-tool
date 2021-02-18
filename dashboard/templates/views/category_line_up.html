@@ -1,5 +1,37 @@
 {% extends 'dashboard_base.html' %}
+{% load bootstrap4 %}
 
 {% block content %}
-    <h1>Hello world</h1>
+    <table>
+        <thead>
+            <th></th>
+            {% for x_axis_header in x_axis_values %}
+                <th>{{ x_axis_header }}</th>
+            {% endfor %}
+        </thead>
+        <tbody>
+            {% for header, products in table_data.items %}
+                <tr>
+                    <th>{{ header }}</th>
+                    {% for x_header in x_axis_values %}
+                        <td>
+                        <table>
+                            <tr>
+                            {% for product in products %}
+                                {% ifequal x_header product.x_axis_grouper %}
+                                    <td>{{ product.x_axis_grouper }} - {{ product.product.model }}</td>
+                                {% endifequal %}
+                            {% endfor %}
+                            </tr>
+                        </table>
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form method="get">
+        {% bootstrap_form form %}
+        {% bootstrap_button 'Save' 'submit' %}
+    </form>
 {% endblock %}
