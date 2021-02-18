@@ -1,0 +1,22 @@
+{% extends "bsmodals/generic.html" %}
+{% load bootstrap4 %}
+
+{% block title %}
+    <form method="get">
+        <h5 id="mydialog-title">Edit Line Up</h5>
+{% endblock title %}
+
+{% block body %}
+        {% bootstrap_form form %}
+{% endblock body %}
+
+{% block footer %}
+        <button type="button" data-dismiss="modal" class="btn btn-danger">Close</button>
+        {% bootstrap_button 'Save' 'submit' button_class='btn btn-primary'%}
+    </form>
+{% endblock footer %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ form.media.js }}
+{% endblock %}
