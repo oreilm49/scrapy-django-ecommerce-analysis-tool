@@ -58,8 +58,8 @@ class TestForms(TestCase):
         self.assertEqual(WebsiteProductAttribute.objects.get(pk=web_attr__mapped.pk).attribute_type, self.attribute)
 
     def test_category_table_form__values_numeric(self):
-        x_axis_attribute: AttributeType = mommy.make(AttributeType, productattributes__value="s")
-        y_axis_attribute: AttributeType = mommy.make(AttributeType, productattributes__value="s")
+        x_axis_attribute: AttributeType = mommy.make(AttributeType, productattributes__data={"value": "s"})
+        y_axis_attribute: AttributeType = mommy.make(AttributeType, productattributes__data={"value": "s"})
         with self.subTest("int"):
             form_data: dict = dict(x_axis_values=["1"], y_axis_values=["1"], x_axis_attribute=x_axis_attribute, y_axis_attribute=y_axis_attribute, category=self.category)
             form: CategoryTableForm = CategoryTableForm(form_data)
@@ -82,8 +82,8 @@ class TestForms(TestCase):
             self.assertFalse(form.is_y_axis_values_numeric)
 
     def test_category_table_form__clean_axis_values(self):
-        attr_1: AttributeType = mommy.make(AttributeType, name="attr_1", productattributes__value="s")
-        attr_2: AttributeType = mommy.make(AttributeType, name="attr_2", productattributes__value="s")
+        attr_1: AttributeType = mommy.make(AttributeType, name="attr_1", productattributes__data={"value": "s"})
+        attr_2: AttributeType = mommy.make(AttributeType, name="attr_2", productattributes__data={"value": "s"})
         form_data: dict = dict(x_axis_values=["s"], y_axis_values=["s"], x_axis_attribute=attr_1, y_axis_attribute=attr_2, category=self.category)
         with self.subTest("valid values"):
             form: CategoryTableForm = CategoryTableForm(form_data)
@@ -113,11 +113,11 @@ class TestForms(TestCase):
         product_5: Product = mommy.make(Product, category=self.category, model="filtered_by_search")
         brand_attr: AttributeType = mommy.make(AttributeType, name="brand")
         price_attr: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, attribute_type__name="price")
-        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_1, value="whirlpool")
-        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_2, value="hotpoint")
-        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_3, value="indesit")
-        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_4, value="hotpoint")
-        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_5, value="hotpoint")
+        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_1, data={"value": "whirlpool"})
+        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_2, data={"value": "hotpoint"})
+        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_3, data={"value": "indesit"})
+        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_4, data={"value": "hotpoint"})
+        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_5, data={"value": "hotpoint"})
         form: CategoryTableForm = CategoryTableForm(dict(
             x_axis_values=["0", "199", "299", "399", "499"],
             y_axis_values=["whirlpool", "hotpoint"],
