@@ -118,50 +118,33 @@ class CategoryTableForm(forms.Form):
     category = forms.ModelChoiceField(Category.objects.published(), label=_('Category'), help_text=_('The category products should belong to in order to appear in the table.'))
     q = forms.CharField(label=_('Search'), required=False, help_text=_('General search text used to further filter products.'))
 
-    @property
-    def is_x_axis_values_numeric(self):
-        return self.cleaned_data['x_axis_values'][0].replace('.', '', 1).isdigit()
-
-    @property
-    def is_y_axis_values_numeric(self):
-        return self.cleaned_data['y_axis_values'][0].replace('.', '', 1).isdigit()
-
     def clean_x_axis_values(self) -> List[str]:
+        return self.clean_axis_attributes(self.cleaned_data['x_axis_values'], self.cleaned_data['x_axis_attribute'])
+
+    def clean_y_axis_values(self) -> List[str]:
+        return self.clean_axis_attributes(self.cleaned_data['y_axis_values'], self.cleaned_data['y_axis_attribute'])
+
+    def clean_axis_attributes(self, values: List[str], attribute_type: AttributeType):
         """
         Ensures that string values submitted for attribute exist and can be used to filter
         products. If values are numeric, cleaned data is returned. Numeric data can be used for
         value ranges and an attribute doesn't need to exist with that exact value.
         """
-        values: List[str] = self.cleaned_data['x_axis_values']
-        if self.is_x_axis_values_numeric:
-            return values
-        x_axis_attribute: AttributeType = self.cleaned_data['x_axis_attribute']
+        if is_value_numeric(values[0]):
+            return serialized_values_for_attribute_type(values, attribute_type)
         for value in values:
-            if not x_axis_attribute.productattributes.filter(value=value).exists() and not x_axis_attribute.websiteproductattributes.filter(value=value).exists():
-                raise ValidationError(_("'{attribute}' with value '{value}' does not exist.").format(attribute=x_axis_attribute.name, value=value))
-        return values
-
-    def clean_y_axis_values(self) -> List[str]:
-        """
-        same behavior as clean_x_axis_values
-        """
-        values: List[str] = self.cleaned_data['y_axis_values']
-        if self.is_y_axis_values_numeric:
-            return values
-        y_axis_attribute: AttributeType = self.cleaned_data['y_axis_attribute']
-        for value in values:
-            if not y_axis_attribute.productattributes.filter(value=value).exists() and not y_axis_attribute.websiteproductattributes.filter(value=value).exists():
-                raise ValidationError(_("'{attribute}' with value '{value}' does not exist.").format(attribute=y_axis_attribute.name, value=value))
-        return values
+            if not attribute_type.productattributes.filter(data__value=value).exists() and not attribute_type.websiteproductattributes.filter(data__value=value).exists():
+                raise ValidationError(_("'{attribute}' with value '{value}' does not exist.").format(attribute=attribute_type.name, value=value))
+        return serialized_values_for_attribute_type(values, attribute_type)
 
     def search(self, queryset: ProductQuerySet) -> QuerySet:
         if self.is_valid():
             product_pks: List[int] = []
-            if not self.is_x_axis_values_numeric:
-                products_from_attributes: ProductQuerySet = self.cleaned_data['x_axis_attribute'].productattributes.filter(value__in=self.cleaned_data['x_axis_values'])
+            if not is_value_numeric(self.cleaned_data['x_axis_values'][0]):
+                products_from_attributes: ProductQuerySet = self.cleaned_data['x_axis_attribute'].productattributes.filter(data__value__in=self.cleaned_data['x_axis_values'])
                 product_pks.append(products_from_attributes.values_list('product', flat=True))
-            if not self.is_y_axis_values_numeric:
-                products_from_attributes: ProductQuerySet = self.cleaned_data['y_axis_attribute'].productattributes.filter(value__in=self.cleaned_data['y_axis_values'])
+            if not is_value_numeric(self.cleaned_data['y_axis_values'][0]):
+                products_from_attributes: ProductQuerySet = self.cleaned_data['y_axis_attribute'].productattributes.filter(data__value__in=self.cleaned_data['y_axis_values'])
                 product_pks.append(products_from_attributes.values_list('product', flat=True))
             if self.cleaned_data['q']:
                 queryset = queryset.filter(model__contains=self.cleaned_data['q'])
