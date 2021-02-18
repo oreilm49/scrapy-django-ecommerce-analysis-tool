@@ -4,7 +4,7 @@ from typing import Iterator, Tuple
 
 from django.views.generic import TemplateView
 
-from cms.forms import CategoryTableForm
+from dashboard.forms import CategoryTableForm
 from cms.models import Product
 from cms.utils import products_grouper
 
