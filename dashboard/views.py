@@ -1,10 +1,15 @@
 import itertools
+from collections import namedtuple
+from typing import Iterator, Tuple
 
 from django.views.generic import TemplateView
 
 from cms.forms import CategoryTableForm
 from cms.models import Product
 from cms.utils import products_grouper
+
+
+CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_axis_grouper', 'product'])
 
 
 class CategoryLineUp(TemplateView):
@@ -19,14 +24,21 @@ class CategoryLineUp(TemplateView):
         data.update(form=self.get_form())
         if self.request.GET:
             if form.is_valid():
-                products = form.search(Product.objects.published())
-                data.update(
-                    x_axis_groups=itertools.groupby(products.iterator(), key=lambda product: products_grouper(
-                        product,
-                        form.x_axis_attribute,
-                        form.x_axis_values
-                    )),
-                    y_axis_groups=form.y_axis_values,
+                products = [CategoryTableProduct(
+                    x_axis_grouper=products_grouper(product, form.cleaned_data['x_axis_attribute'], form.cleaned_data['x_axis_values']),
+                    y_axis_grouper=products_grouper(product, form.cleaned_data['y_axis_attribute'], form.cleaned_data['y_axis_values']),
+                    product=product
+                ) for product in form.search(Product.objects.published()).iterator()]
+                y_axis_groups: Iterator[Tuple] = itertools.groupby(
+                    sorted(products, key=lambda product: product.y_axis_grouper),
+                    key=lambda product: product.y_axis_grouper
                 )
-                return data
+                table_data = {}
+                for grouper, products in y_axis_groups:
+                    table_data[grouper] = [product for product in products]
+                data.update(
+                    table_data=table_data,
+                    x_axis_values=form.cleaned_data['x_axis_values'],
+                    form=form
+                )
         return data
