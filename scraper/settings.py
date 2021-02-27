@@ -65,7 +65,10 @@ ITEM_PIPELINES = {
    'scraper.pipelines.ProductImagePipeline': 500,
 }
 
-IMAGES_STORE = '/app/cms/media'
+AWS_ENDPOINT_URL = 'http://minio:9000'
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+IMAGES_STORE = 's3://product-images/'
 IMAGES_THUMBS = {
     'small': (50, 50),
     'big': (270, 270),
