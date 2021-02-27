@@ -70,19 +70,18 @@ class ProductImagePipeline:
     @transaction.atomic
     def process_item(self, item, spider):
         if isinstance(item, ProductPageItem):
-            if item['images']:
-                path: str = item['images'][0]['path']
-                if item['product'].image_main_required:
-                    ProductImage.objects.create(
-                        product=item['product'],
-                        image_type=MAIN,
-                        image=item['images'][0]['path'],
-                    )
-                if item['product'].image_thumb_required:
-                    thumb_path: str = path.replace("full", "thumbs/big")
-                    ProductImage.objects.create(
-                        product=item['product'],
-                        image_type=THUMBNAIL,
-                        image=thumb_path,
-                    )
+            path: str = item['images'][0]['path']
+            if item['product'].image_main_required:
+                ProductImage.objects.create(
+                    product=item['product'],
+                    image_type=MAIN,
+                    image=item['images'][0]['path'],
+                )
+            if item['product'].image_thumb_required:
+                thumb_path: str = path.replace("full", "thumbs/big")
+                ProductImage.objects.create(
+                    product=item['product'],
+                    image_type=THUMBNAIL,
+                    image=thumb_path,
+                )
         return item
