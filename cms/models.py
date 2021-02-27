@@ -257,7 +257,7 @@ class WebsiteProductAttribute(BaseProductAttribute):
 class ProductImage(BaseModel):
     product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="images")
     image_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=IMAGE_TYPES)
-    image = models.FilePathField(verbose_name=_("image"))
+    image = models.ImageField(verbose_name=_("image"), upload_to='product_images/')
 
     def __str__(self):
         return f"{self.product} | {self.image}"
