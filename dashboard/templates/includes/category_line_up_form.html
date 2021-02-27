@@ -2,7 +2,6 @@
 {% load bootstrap4 %}
 
 {% block title %}
-    <form method="get">
         <h5 id="mydialog-title">Edit Line Up</h5>
 {% endblock title %}
 
@@ -13,7 +12,6 @@
 {% block footer %}
         <button type="button" data-dismiss="modal" class="btn btn-danger">Close</button>
         {% bootstrap_button 'Save' 'submit' button_class='btn btn-primary'%}
-    </form>
 {% endblock footer %}
 
 {% block extra_js %}
