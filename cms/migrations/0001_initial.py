@@ -164,7 +164,7 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='creation time')),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modification time')),
                 ('image_type', models.CharField(choices=[('main', 'Main'), ('thumbnail', 'Thumbnail')], max_length=100, verbose_name='Type')),
-                ('image', models.FilePathField(verbose_name='image')),
+                ('image', models.ImageField(upload_to='product_images/', verbose_name='image')),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='images', to='cms.product', verbose_name='Product')),
             ],
             options={
