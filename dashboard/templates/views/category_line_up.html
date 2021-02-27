@@ -36,5 +36,7 @@
             {% endfor %}
         </tbody>
     </table>
-    {% include 'includes/category_line_up_form.html' with dialog_id="category_line_up_form"%}
+    <form action="get">
+        {% include 'includes/category_line_up_form.html' with dialog_id="category_line_up_form"%}
+    </form>
 {% endblock %}
