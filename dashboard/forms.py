@@ -17,7 +17,7 @@ class CategoryTableForm(forms.Form):
     x_axis_attribute = forms.ModelChoiceField(AttributeType.objects.published(), label=_('X Axis Attribute'), help_text=_('The attribute used to group products into rows on the table.'))
     x_axis_values = SimpleArrayField(forms.CharField(max_length=100), label=_('X Axis Values'), help_text=_('The values products must have for the x axis attribute in order to appear in the table.'))
     y_axis_attribute = forms.ModelChoiceField(AttributeType.objects.published(), label=_('Y Axis Attribute'), help_text=_('The attribute used to group products into rows on the table.'))
-    y_axis_values = SimpleArrayField(forms.CharField(max_length=100), label=_('X Axis Values'), help_text=_('The values products must have for the y axis attribute in order to appear in the table.'))
+    y_axis_values = SimpleArrayField(forms.CharField(max_length=100), label=_('Y Axis Values'), help_text=_('The values products must have for the y axis attribute in order to appear in the table.'))
     category = forms.ModelChoiceField(Category.objects.published(), label=_('Category'), help_text=_('The category products should belong to in order to appear in the table.'))
     q = forms.CharField(label=_('Search'), required=False, help_text=_('General search text used to further filter products.'))
 
