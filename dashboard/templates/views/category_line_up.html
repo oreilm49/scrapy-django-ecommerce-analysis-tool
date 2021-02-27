@@ -3,7 +3,7 @@
 
 {% block content %}
     <button type="button" data-toggle="modal" data-target="#category_line_up_form" class="btn btn-success">Edit Line Up</button>
-    <table>
+    <table class="category-table">
         <thead>
             <th></th>
             {% for x_axis_header in x_axis_values %}
@@ -20,7 +20,12 @@
                             <tr>
                             {% for product in products %}
                                 {% ifequal x_header product.x_axis_grouper %}
-                                    <td>{{ product.x_axis_grouper }} - {{ product.product.model }}</td>
+                                    <td>
+                                        <div class="model">{{ product.product.model }}</div>
+                                        <div class="image"><img src="{{ product.product.image_thumb.url }}" alt=""></div>
+                                        <div class="specs"></div>
+                                        <div class="price">{{ product.product.current_average_price }}</div>
+                                    </td>
                                 {% endifequal %}
                             {% endfor %}
                             </tr>
