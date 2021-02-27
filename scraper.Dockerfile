@@ -27,4 +27,4 @@ WORKDIR /app
 COPY requirements.scraper.txt /app/
 RUN pip install -r requirements.scraper.txt
 
-COPY scraper /app/
+COPY . /app/
