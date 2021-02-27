@@ -1,7 +1,9 @@
+boto3==1.17.17
 Django==3.1.5
 django-bootstrap4==2.3.1
 django-bstrap-modals==2.1.0
 django_extensions==3.1.0
+django-storages==1.11.1
 dialogflow==1.1.0
 model-mommy==2.0.0
 pillow==8.1.0
