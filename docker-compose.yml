@@ -21,6 +21,8 @@ services:
       - DIALOGFLOW_PROJECT_ID=specr-1612006278245
       - DIALOGFLOW_LANGUAGE_CODE=en
       - SESSION_ID=development
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
     command: python manage.py runserver 0.0.0.0:5000
     volumes:
       - .:/app
@@ -29,6 +31,7 @@ services:
       - "5000:5000"
     depends_on:
       - db
+      - minio
   scraper:
     build:
       context: .
@@ -41,6 +44,8 @@ services:
       - HTTPCACHE_ENABLED=True
       - HTTPCACHE_EXPIRATION_SECS=604800
       - DEBUG=True
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
     command: scrapy
     volumes:
       - .:/app
@@ -49,8 +54,25 @@ services:
       - "6000:6000"
     depends_on:
       - db
+      - minio
+  minio:
+    image: minio/minio:latest
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+    environment:
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+    command: minio server /data/minio/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
 volumes:
   db-data:
   cms-media:
   redis-data:
+  minio-data:
