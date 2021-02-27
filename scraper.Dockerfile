@@ -12,6 +12,7 @@ RUN apk -U add \
         musl-dev \
         libressl-dev \
         python3-dev \
+        jpeg-dev \
         py-pillow \
         py-pip \
         postgresql-libs \
@@ -23,7 +24,7 @@ RUN apk -U add \
 
 WORKDIR /app
 
-COPY requirements.txt /app/
-RUN pip install -r requirements.txt
+COPY requirements.scraper.txt /app/
+RUN pip install -r requirements.scraper.txt
 
-COPY . /app/
+COPY scraper /app/
