@@ -25,6 +25,8 @@ services:
       - SESSION_ID=development
       - AWS_ACCESS_KEY_ID=admin
       - AWS_SECRET_ACCESS_KEY=password
+      - DJANGO_SETTINGS_MODULE=cms.settings
+      - AWS_CUSTOM_MEDIA_DOMAIN=localhost:9000
     command: python manage.py runserver 0.0.0.0:5000
     volumes:
       - .:/app
@@ -48,6 +50,7 @@ services:
       - DEBUG=True
       - AWS_ACCESS_KEY_ID=admin
       - AWS_SECRET_ACCESS_KEY=password
+      - AWS_CUSTOM_MEDIA_DOMAIN=localhost:9000
     command: scrapy
     volumes:
       - .:/app
