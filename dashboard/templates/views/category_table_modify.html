@@ -1,0 +1,16 @@
+{% extends 'dashboard_base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+    <h5>{% if pk %}Edit {{ table.name }}{% else %}Create New Category Table{% endif %}</h5>
+    <form action="post">
+        {% bootstrap_form form %}
+        <a href="{% url 'category-tables' %}" class="btn btn-danger">Cancel</a>
+        {% bootstrap_button 'Save' 'submit' button_class='btn btn-primary'%}
+    </form>
+{% endblock content %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ form.media.js }}
+{% endblock %}
