@@ -1,6 +1,5 @@
 from typing import List, TYPE_CHECKING
 
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
@@ -22,7 +21,7 @@ class CategoryTable(BaseModel):
         null=True,
         related_name='category_tables_x_axis'
     )
-    x_axis_values = ArrayField(base_field=models.CharField(max_length=100), verbose_name=_('X Axis Values'), help_text=_('The values products must have for the x axis attribute in order to appear in the table.'))
+    x_axis_values = models.JSONField(verbose_name=_('X Axis Values'), help_text=_('The values products must have for the x axis attribute in order to appear in the table.'), default=list)
     y_axis_attribute = models.ForeignKey(
         "cms.AttributeType",
         verbose_name=_('Y Axis Attribute'),
@@ -31,7 +30,7 @@ class CategoryTable(BaseModel):
         null=True,
         related_name='category_tables_y_axis'
     )
-    y_axis_values = ArrayField(base_field=models.CharField(max_length=100), verbose_name=_('Y Axis Values'), help_text=_('The values products must have for the y axis attribute in order to appear in the table.'))
+    y_axis_values = models.JSONField(verbose_name=_('Y Axis Values'), help_text=_('The values products must have for the y axis attribute in order to appear in the table.'), default=list)
     category = models.ForeignKey("cms.Category", verbose_name=_('Category'), help_text=_('The category products should belong to in order to appear in the table.'), on_delete=models.SET_NULL, null=True)
     query = models.CharField(verbose_name=_('Search'), blank=True, null=True, max_length=100, help_text=_('General search text used to further filter products.'))
 
