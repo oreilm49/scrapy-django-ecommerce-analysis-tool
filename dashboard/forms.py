@@ -1,6 +1,7 @@
 from typing import List
 
 from django import forms
+from django.contrib.postgres.forms import SimpleArrayField
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
@@ -13,6 +14,9 @@ class CategoryTableForm(forms.ModelForm):
     """
     Form to filter products by attributes, and build dataset for use in category table.
     """
+    x_axis_values = SimpleArrayField(base_field=forms.CharField())
+    y_axis_values = SimpleArrayField(base_field=forms.CharField())
+
     class Meta:
         model = CategoryTable
         fields = ['name', 'x_axis_attribute', 'x_axis_values', 'y_axis_attribute', 'y_axis_values', 'category', 'query']
