@@ -41,31 +41,28 @@ class CategoryTableCreate(CategoryTableMixin, CreateView):
 
 class CategoryTableDetail(CategoryTableMixin, DetailView):
     template_name = 'views/category_table.html'
+    queryset = CategoryTable.objects.published()
 
-    def get_form(self):
-        return CategoryTableForm(self.request.GET or None)
+    @property
+    def table(self):
+        return self.get_object(self.queryset)
 
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
-        form: CategoryTableForm = self.get_form()
-        data.update(form=self.get_form())
-        if self.request.GET:
-            if form.is_valid():
-                products = [CategoryTableProduct(
-                    x_axis_grouper=products_grouper(product, form.cleaned_data['x_axis_attribute'], form.cleaned_data['x_axis_values']),
-                    y_axis_grouper=products_grouper(product, form.cleaned_data['y_axis_attribute'], form.cleaned_data['y_axis_values']),
-                    product=product
-                ) for product in form.search(Product.objects.published()).iterator()]
-                y_axis_groups: Iterator[Tuple] = itertools.groupby(
-                    sorted(products, key=lambda product: product.y_axis_grouper),
-                    key=lambda product: product.y_axis_grouper
-                )
-                table_data = {}
-                for grouper, products in y_axis_groups:
-                    table_data[grouper] = [product for product in products]
-                data.update(
-                    table_data=table_data,
-                    x_axis_values=form.cleaned_data['x_axis_values'],
-                    form=form
-                )
+        products = [CategoryTableProduct(
+            x_axis_grouper=products_grouper(product, self.table.x_axis_attribute, self.table.x_axis_values),
+            y_axis_grouper=products_grouper(product, self.table.y_axis_attribute, self.table.y_axis_values),
+            product=product
+        ) for product in self.table.products(Product.objects.published())]
+        y_axis_groups: Iterator[Tuple] = itertools.groupby(
+            sorted(products, key=lambda product: product.y_axis_grouper),
+            key=lambda product: product.y_axis_grouper
+        )
+        table_data = {}
+        for grouper, products in y_axis_groups:
+            table_data[grouper] = [product for product in products]
+        data.update(
+            table_data=table_data,
+            x_axis_values=self.table.x_axis_values,
+        )
         return data
