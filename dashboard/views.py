@@ -2,18 +2,23 @@ import itertools
 from collections import namedtuple
 from typing import Iterator, Tuple
 
-from django.views.generic import TemplateView
+from django.views.generic import ListView, DetailView
 
 from dashboard.forms import CategoryTableForm
 from cms.models import Product
 from cms.utils import products_grouper
-
+from dashboard.models import CategoryTable
 
 CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_axis_grouper', 'product'])
 
 
-class CategoryLineUp(TemplateView):
-    template_name = 'views/category_line_up.html'
+class CategoryTables(ListView):
+    template_name = 'views/category_tables.html'
+    queryset = CategoryTable.objects.published()
+
+
+class CategoryTableDetail(DetailView):
+    template_name = 'views/category_table.html'
 
     def get_form(self):
         return CategoryTableForm(self.request.GET or None)
