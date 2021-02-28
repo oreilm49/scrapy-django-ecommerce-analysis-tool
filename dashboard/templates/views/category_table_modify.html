@@ -3,7 +3,8 @@
 
 {% block content %}
     <h5>{% if pk %}Edit {{ table.name }}{% else %}Create New Category Table{% endif %}</h5>
-    <form action="post">
+    <form method="post">
+        {% csrf_token %}
         {% bootstrap_form form %}
         <a href="{% url 'category-tables' %}" class="btn btn-danger">Cancel</a>
         {% bootstrap_button 'Save' 'submit' button_class='btn btn-primary'%}
