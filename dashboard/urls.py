@@ -1,8 +1,8 @@
 from django.conf.urls import url
 
-from dashboard.views import CategoryLineUp
+from dashboard.views import CategoryTables, CategoryTableDetail
 
 urlpatterns = [
-    url(r'category/', CategoryLineUp.as_view(), name='category-line-up'),
-    url(r'category/(?P<pk>\d+)/', CategoryLineUp.as_view(), name='category-line-up'),
+    url(r'category-tables/', CategoryTables.as_view(), name='category-tables'),
+    url(r'category-table/(?P<pk>\d+)/', CategoryTableDetail.as_view(), name='category-table'),
 ]
