@@ -2,8 +2,12 @@ import itertools
 from collections import namedtuple
 from typing import Iterator, Tuple
 
+from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
+from django.db import transaction
 from django.urls import reverse
-from django.views.generic import ListView, DetailView, CreateView
+from django.utils.translation import gettext as _
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from dashboard.forms import CategoryTableForm
 from cms.models import Product
@@ -33,10 +37,43 @@ class CategoryTables(CategoryTableMixin, ListView):
     queryset = CategoryTable.objects.published()
 
 
-class CategoryTableCreate(CategoryTableMixin, CreateView):
+class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
     template_name = 'views/category_table_modify.html'
     queryset = CategoryTable.objects.published()
     form_class = CategoryTableForm
+
+    @property
+    def table(self) -> CategoryTable:
+        return self.object
+
+    def get_success_url(self):
+        return reverse('category-table', kwargs={'pk': self.table.pk})
+
+
+class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
+    template_name = 'views/category_table_modify.html'
+    queryset = CategoryTable.objects.published()
+    form_class = CategoryTableForm
+    success_message = _('Table modified')
+
+    @property
+    def table(self) -> CategoryTable:
+        return self.get_object(self.queryset)
+
+    @property
+    def deleting(self):
+        return self.request.POST.get('delete')
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        if self.deleting:
+            self.table.delete()
+            messages.success(request, _('Table deleted'))
+            return reverse('category-tables')
+        return super().post(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('category-table', kwargs={'pk': self.table.pk})
 
 
 class CategoryTableDetail(CategoryTableMixin, DetailView):
@@ -44,7 +81,7 @@ class CategoryTableDetail(CategoryTableMixin, DetailView):
     queryset = CategoryTable.objects.published()
 
     @property
-    def table(self):
+    def table(self) -> CategoryTable:
         return self.get_object(self.queryset)
 
     def get_context_data(self, **kwargs):
