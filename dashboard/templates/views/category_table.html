@@ -2,7 +2,6 @@
 {% load bootstrap4 %}
 
 {% block content %}
-    <button type="button" data-toggle="modal" data-target="#category_line_up_form" class="btn btn-success">Edit Line Up</button>
     <table class="category-table">
         <thead>
             <th></th>
@@ -36,7 +35,4 @@
             {% endfor %}
         </tbody>
     </table>
-    <form action="get">
-        {% include 'includes/category_line_up_form.html' with dialog_id="category_line_up_form"%}
-    </form>
 {% endblock %}
