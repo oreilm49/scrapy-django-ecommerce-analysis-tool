@@ -42,6 +42,7 @@ class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
     template_name = 'views/category_table_modify.html'
     queryset = CategoryTable.objects.published()
     form_class = CategoryTableForm
+    success_message = _('Sucessfully created "{name}"')
 
     @property
     def table(self) -> CategoryTable:
@@ -55,7 +56,7 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
     template_name = 'views/category_table_modify.html'
     queryset = CategoryTable.objects.published()
     form_class = CategoryTableForm
-    success_message = _('Table modified')
+    success_message = _('Sucessfully updated "{name}"')
 
     @property
     def table(self) -> CategoryTable:
@@ -71,7 +72,7 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
             table = self.table
             table.publish = False
             table.save()
-            messages.success(request, _('Table deleted'))
+            messages.success(request, _('Sucessfully deleted "{table}"').format(table=table))
             return HttpResponseRedirect(reverse('category-tables'))
         return super().post(request, *args, **kwargs)
 
