@@ -14,4 +14,10 @@
             </div>
         </div>
     </div>
+    {% include 'includes/dialog.html' %}
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{{ STATIC_URL }}js/dialog.js"></script>
 {% endblock %}
