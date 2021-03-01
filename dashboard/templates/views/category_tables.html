@@ -19,7 +19,19 @@
                     <td>{{ table.category }}</td>
                     <td>{{ table.x_axis_attribute }}</td>
                     <td>{{ table.y_axis_attribute }}</td>
-                    <td></td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{% url 'category-table-update' pk=table.pk %}" class="btn"><i class="fa fa-pen"></i></a>
+                            {% blocktrans asvar message with name=table.name %}Are you sure you want to remove {{ name }}?{% endblocktrans %}
+                            <button type="button" class="btn btn-danger shadowed" onclick="showDialog('{% trans 'Delete Table' %}', '{{ message }}', null, BTN_CANCEL, btnRemove(function() {
+                                        $('form#delete-form').submit();
+                                    }))"><i class="fa fa-trash"></i> {% trans 'Remove' %}</button>
+                            <form id="delete-form" method="post" action="{% url 'category-table-update' pk=table.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="delete" value="save">
+                            </form>
+                        </div>
+                    </td>
                 </tr>
             {% empty %}
                 <tr><td colspan="5" style="text-align: center">No category tables</td></tr>
