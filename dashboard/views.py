@@ -5,6 +5,7 @@ from typing import Iterator, Tuple
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
@@ -67,9 +68,11 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         if self.deleting:
-            self.table.delete()
+            table = self.table
+            table.publish = False
+            table.save()
             messages.success(request, _('Table deleted'))
-            return reverse('category-tables')
+            return HttpResponseRedirect(reverse('category-tables'))
         return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
