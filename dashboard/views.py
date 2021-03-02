@@ -3,12 +3,13 @@ from collections import namedtuple
 from typing import Iterator, Tuple
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView
 
 from dashboard.forms import CategoryTableForm
 from cms.models import Product
@@ -19,7 +20,13 @@ from dashboard.toolbar import ToolbarItem
 CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_axis_grouper', 'product'])
 
 
-class CategoryTableMixin:
+class DashboardHome(RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('category-tables')
+
+
+class CategoryTableMixin(LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
