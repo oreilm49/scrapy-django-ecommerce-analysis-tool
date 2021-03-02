@@ -6,7 +6,7 @@ from model_mommy import mommy
 
 from dashboard.forms import CategoryTableForm
 from dashboard.models import CategoryTable
-from models import AttributeType, Category
+from cms.models import AttributeType, Category
 
 
 class TestViews(TestCase):
