@@ -149,4 +149,5 @@ AWS_STORAGE_BUCKET_NAME = 'product-images'
 AWS_AUTO_CREATE_BUCKET = True
 AWS_QUERYSTRING_AUTH = False
 
-LOGIN_REDIRECT_URL = '/dashboard'
+LOGIN_REDIRECT_URL = '/dashboard/home'
+LOGOUT_REDIRECT_URL = '/accounts/login'
