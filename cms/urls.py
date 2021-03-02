@@ -7,4 +7,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('dashboard/', include('dashboard.urls')),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block body_content %}
+    <nav class="navbar navbar-expand navbar-light bg-primary topbar mb-4 static-top shadow">
+    </nav>
+    <div class="container-fluid">
+        {% block content %}
+        {% endblock %}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+{% endblock %}
