@@ -1,0 +1,9 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb text-gray-600 small">
+      {% for breadcrumb in breadcrumbs %}
+          <li class="breadcrumb-item {% if breadcrumb.active %}active{% endif %}">
+              <a href="{% if breadcrumb.active %}#{% else %}{{ breadcrumb.url }}{% endif %}">{{ breadcrumb.name }}</a>
+          </li>
+      {% endfor %}
+  </ol>
+</nav>
