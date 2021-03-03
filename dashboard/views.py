@@ -1,6 +1,6 @@
 import itertools
 from collections import namedtuple
-from typing import Iterator, Tuple
+from typing import Iterator, Tuple, List, Optional
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -26,7 +26,26 @@ class DashboardHome(RedirectView):
         return reverse('dashboard:category-tables')
 
 
-class CategoryTableMixin(LoginRequiredMixin):
+Breadcrumb = namedtuple('breadcrumb', ['url', 'name', 'active'])
+
+
+class BreadcrumbMixin:
+
+    def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
+        """
+        override this method to add breadcrumbs to template context.
+        """
+        return None
+
+    def get_context_data(self, **kwargs):
+        data: dict = super().get_context_data(**kwargs)
+        data.update(
+            breadcrumbs=self.get_breadcrumbs()
+        )
+        return data
+
+
+class CategoryTableMixin(LoginRequiredMixin, BreadcrumbMixin):
 
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
@@ -44,6 +63,11 @@ class CategoryTables(CategoryTableMixin, ListView):
     template_name = 'views/category_tables.html'
     queryset = CategoryTable.objects.published()
 
+    def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
+        return [
+            Breadcrumb(name="Pivot Tables", url=reverse('dashboard:category-tables'), active=True),
+        ]
+
 
 class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
     template_name = 'views/category_table_modify.html'
@@ -57,6 +81,12 @@ class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
 
     def get_success_url(self):
         return reverse('dashboard:category-table', kwargs={'pk': self.table.pk})
+
+    def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
+        return [
+            Breadcrumb(name="Pivot Tables", url=reverse('dashboard:category-tables'), active=False),
+            Breadcrumb(name="Create", url=reverse('dashboard:category-table-create'), active=True),
+        ]
 
 
 class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
@@ -86,6 +116,12 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
     def get_success_url(self):
         return reverse('dashboard:category-table', kwargs={'pk': self.table.pk})
 
+    def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
+        return [
+            Breadcrumb(name="Pivot Tables", url=reverse('dashboard:category-tables'), active=False),
+            Breadcrumb(name="Update", url=reverse('dashboard:category-table-update', kwargs={'pk': self.table.pk}), active=True),
+        ]
+
 
 class CategoryTableDetail(CategoryTableMixin, DetailView):
     template_name = 'views/category_table.html'
@@ -114,3 +150,9 @@ class CategoryTableDetail(CategoryTableMixin, DetailView):
             x_axis_values=self.table.x_axis_values,
         )
         return data
+
+    def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
+        return [
+            Breadcrumb(name="Pivot Tables", url=reverse('dashboard:category-tables'), active=False),
+            Breadcrumb(name=self.table.name, url=reverse('dashboard:category-table', kwargs={'pk': self.table.pk}), active=True),
+        ]
