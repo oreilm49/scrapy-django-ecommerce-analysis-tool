@@ -1,5 +1,5 @@
 <nav aria-label="breadcrumb">
-  <ol class="breadcrumb text-gray-600 small">
+  <ol class="breadcrumb text-gray-600 small" style="margin: 0; background-color: white;">
       {% for breadcrumb in breadcrumbs %}
           <li class="breadcrumb-item {% if breadcrumb.active %}active{% endif %}">
               <a href="{% if breadcrumb.active %}#{% else %}{{ breadcrumb.url }}{% endif %}">{{ breadcrumb.name }}</a>
