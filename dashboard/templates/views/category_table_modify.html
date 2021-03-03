@@ -6,7 +6,7 @@
     <form method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
-        <a href="{% url 'category-tables' %}" class="btn btn-danger">Cancel</a>
+        <a href="{% url 'dashboard:category-tables' %}" class="btn btn-danger">Cancel</a>
         {% bootstrap_button 'Save' 'submit' button_class='btn btn-primary'%}
     </form>
 {% endblock content %}

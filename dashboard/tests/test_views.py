@@ -22,7 +22,7 @@ class TestViews(TestCase):
 
     def test_category_tables(self):
         with self.subTest("empty"):
-            response: TemplateResponse = self.client.get(reverse('category-tables'))
+            response: TemplateResponse = self.client.get(reverse('dashboard:category-tables'))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "No category tables")
             self.assertContains(response, "Create")
@@ -30,19 +30,19 @@ class TestViews(TestCase):
         with self.subTest("tables"):
             mommy.make(CategoryTable, name="test 1")
             mommy.make(CategoryTable, name="test 2")
-            response: TemplateResponse = self.client.get(reverse('category-tables'))
+            response: TemplateResponse = self.client.get(reverse('dashboard:category-tables'))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "test 1")
             self.assertContains(response, "test 2")
 
     def test_category_table_create(self):
         with self.subTest("page content"):
-            response: TemplateResponse = self.client.get(reverse('category-table-create'))
+            response: TemplateResponse = self.client.get(reverse('dashboard:category-table-create'))
             self.assertContains(response, CategoryTableForm)
             self.assertContains(response, 'Create New Category Table')
 
         with self.subTest("post"):
-            response: TemplateResponse = self.client.post(reverse('category-table-create'), data={
+            response: TemplateResponse = self.client.post(reverse('dashboard:category-table-create'), data={
                 'name': 'test table',
                 'x_axis_attribute': mommy.make(AttributeType, name="x axis attr").pk,
                 'x_axis_values': '1, 2, 3',
@@ -52,13 +52,13 @@ class TestViews(TestCase):
                 'query': 'test query',
             }, follow=True)
             self.assertEqual(response.status_code, 201)
-            self.assertRedirects(response, reverse('category-tables'))
+            self.assertRedirects(response, reverse('dashboard:category-tables'))
             self.assertContains(response, 'test table')
             self.assertContains(response, 'Sucessfully created "test table"')
 
     def test_category_table_update(self):
         table: CategoryTable = mommy.make(CategoryTable, name="test table")
-        url: str = reverse('category-table-update', kwargs={'pk': table.pk})
+        url: str = reverse('dashboard:category-table-update', kwargs={'pk': table.pk})
         with self.subTest("page content"):
             response: TemplateResponse = self.client.get(url)
             self.assertContains(response, CategoryTableForm)
@@ -75,7 +75,7 @@ class TestViews(TestCase):
                 'query': 'test query',
             }, follow=True)
             self.assertEqual(response.status_code, 201)
-            self.assertRedirects(response, reverse('category-tables'))
+            self.assertRedirects(response, reverse('dashboard:category-tables'))
             self.assertContains(response, 'test table')
             self.assertContains(response, 'Sucessfully updated "modified table name"')
 
@@ -92,7 +92,7 @@ class TestViews(TestCase):
         with self.subTest("delete"):
             response: TemplateResponse = self.client.post(url, data={'delete': 'save'}, follow=True)
             self.assertEqual(response.status_code, 201)
-            self.assertRedirects(response, reverse('category-tables'))
+            self.assertRedirects(response, reverse('dashboard:category-tables'))
             self.assertContains(response, 'Sucessfully deleted "modified table name"')
             table: CategoryTable = CategoryTable.objects.get(pk=table.pk)
             self.assertFalse(table.publish)

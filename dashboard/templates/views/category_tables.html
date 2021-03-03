@@ -16,20 +16,20 @@
         <tbody>
             {% for table in object_list %}
                 <tr>
-                    <td><a href="{% url 'category-table' pk=table.pk %}">{{ table.name }}</a></td>
+                    <td><a href="{% url 'dashboard:category-table' pk=table.pk %}">{{ table.name }}</a></td>
                     <td>{{ table.category }}</td>
                     <td>{{ table.x_axis_attribute }}</td>
                     <td>{{ table.y_axis_attribute }}</td>
                     <td>
                         <div class="btn-group">
-                            <a href="{% url 'category-table-update' pk=table.pk %}" class="btn"><i class="fa fa-pen"></i></a>
+                            <a href="{% url 'dashboard:category-table-update' pk=table.pk %}" class="btn"><i class="fa fa-pen"></i></a>
                             {% blocktrans asvar message with name=table.name %}Are you sure you want to remove {{ name }}?{% endblocktrans %}
                             <button class="btn text-danger" onclick="showDialog('{% trans 'Delete Table' %}', '{{ message }}', null, BTN_CANCEL, btnRemove(function() {
                                         $('form#delete-form').submit();
                                     }))">
                                 <i class="fa fa-trash"></i>
                             </button>
-                            <form id="delete-form" method="post" action="{% url 'category-table-update' pk=table.pk %}">
+                            <form id="delete-form" method="post" action="{% url 'dashboard:category-table-update' pk=table.pk %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="delete" value="save">
                             </form>

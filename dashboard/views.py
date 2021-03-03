@@ -23,7 +23,7 @@ CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_
 class DashboardHome(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('category-tables')
+        return reverse('dashboard:category-tables')
 
 
 class CategoryTableMixin(LoginRequiredMixin):
@@ -33,7 +33,7 @@ class CategoryTableMixin(LoginRequiredMixin):
         data.update(
             toolbar_items=[ToolbarItem(
                 label='Create',
-                url=reverse('category-table-create'),
+                url=reverse('dashboard:category-table-create'),
                 icon='fa fa-plus'
             )]
         )
@@ -56,7 +56,7 @@ class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
         return self.object
 
     def get_success_url(self):
-        return reverse('category-table', kwargs={'pk': self.table.pk})
+        return reverse('dashboard:category-table', kwargs={'pk': self.table.pk})
 
 
 class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
@@ -80,11 +80,11 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
             table.publish = False
             table.save()
             messages.success(request, _('Sucessfully deleted "{table}"').format(table=table))
-            return HttpResponseRedirect(reverse('category-tables'))
+            return HttpResponseRedirect(reverse('dashboard:category-tables'))
         return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse('category-table', kwargs={'pk': self.table.pk})
+        return reverse('dashboard:category-table', kwargs={'pk': self.table.pk})
 
 
 class CategoryTableDetail(CategoryTableMixin, DetailView):

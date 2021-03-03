@@ -2,6 +2,8 @@ from django.conf.urls import url
 
 from dashboard.views import CategoryTables, CategoryTableDetail, CategoryTableCreate, CategoryTableUpdate, DashboardHome
 
+app_name = 'dashboard'
+
 urlpatterns = [
     url(r'home/$', DashboardHome.as_view(), name='home'),
     url(r'category-tables/$', CategoryTables.as_view(), name='category-tables'),
