@@ -129,8 +129,12 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
         ]
 
 
-class CategoryTableDetail(CategoryTableMixin, DetailView):
+class CategoryTableDetail(LoginRequiredMixin, BreadcrumbMixin, DetailView):
     template_name = 'views/category_table.html'
+    queryset: CategoryTableQuerySet = CategoryTable.objects.published()
+
+    def get_queryset(self) -> CategoryTableQuerySet:
+        return self.queryset.for_user(self.request.user)
 
     @property
     def table(self) -> CategoryTable:
@@ -151,6 +155,7 @@ class CategoryTableDetail(CategoryTableMixin, DetailView):
         for grouper, products in y_axis_groups:
             table_data[grouper] = [product for product in products]
         data.update(
+            table=self.table,
             table_data=table_data,
             x_axis_values=self.table.x_axis_values,
         )
