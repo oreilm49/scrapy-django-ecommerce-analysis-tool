@@ -11,7 +11,7 @@ class Company(BaseModel):
 
 
 class Profile(BaseModel):
-    user = models.OneToOneField(User, verbose_name=_("Profile"), on_delete=models.CASCADE)
+    user = models.OneToOneField(User, verbose_name=_("User"), on_delete=models.CASCADE)
     company = models.ForeignKey(Company, verbose_name=_('Company'), on_delete=models.CASCADE)
 
 
