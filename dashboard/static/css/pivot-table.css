@@ -1,0 +1,22 @@
+.category-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.category-table .cell {
+    border: 2px solid #e3e6f0;
+}
+
+.category-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: white;
+}
+
+.category-table tbody th {
+    position: sticky;
+    left: 0;
+    background-color: white;
+}
