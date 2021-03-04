@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView
@@ -14,7 +15,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, R
 from dashboard.forms import CategoryTableForm
 from cms.models import Product
 from cms.utils import products_grouper
-from dashboard.models import CategoryTable
+from dashboard.models import CategoryTable, CategoryTableQuerySet
 from dashboard.toolbar import ToolbarItem
 
 CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_axis_grouper', 'product'])
@@ -46,6 +47,10 @@ class BreadcrumbMixin:
 
 
 class CategoryTableMixin(LoginRequiredMixin, BreadcrumbMixin):
+    queryset: CategoryTableQuerySet = CategoryTable.objects.published()
+
+    def get_queryset(self) -> CategoryTableQuerySet:
+        return self.queryset.for_user(self.request.user)
 
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
@@ -61,7 +66,6 @@ class CategoryTableMixin(LoginRequiredMixin, BreadcrumbMixin):
 
 class CategoryTables(CategoryTableMixin, ListView):
     template_name = 'views/category_tables.html'
-    queryset = CategoryTable.objects.published()
 
     def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
         return [
@@ -71,7 +75,6 @@ class CategoryTables(CategoryTableMixin, ListView):
 
 class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
     template_name = 'views/category_table_modify.html'
-    queryset = CategoryTable.objects.published()
     form_class = CategoryTableForm
     success_message = _('Sucessfully created "{name}"')
 
@@ -91,13 +94,12 @@ class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
 
 class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
     template_name = 'views/category_table_modify.html'
-    queryset = CategoryTable.objects.published()
     form_class = CategoryTableForm
     success_message = _('Sucessfully updated "{name}"')
 
     @property
     def table(self) -> CategoryTable:
-        return self.get_object(self.queryset)
+        return get_object_or_404(self.queryset, pk=self.request.args.get('pk'))
 
     @property
     def deleting(self):
@@ -125,11 +127,10 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
 
 class CategoryTableDetail(CategoryTableMixin, DetailView):
     template_name = 'views/category_table.html'
-    queryset = CategoryTable.objects.published()
 
     @property
     def table(self) -> CategoryTable:
-        return self.get_object(self.queryset)
+        return get_object_or_404(self.queryset, pk=self.request.args.get('pk'))
 
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
