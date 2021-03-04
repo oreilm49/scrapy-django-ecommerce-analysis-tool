@@ -6,6 +6,7 @@ set -e
 ./manage.py migrate --run-syncdb
 ./manage.py createsuperuser --username=admin --email=me@mor.dev --noinput
 ./manage.py set_fake_passwords
+./manage.py runscript --traceback load_accounts
 ./manage.py runscript --traceback load_cms
 ./manage.py runscript --traceback load_minio
 exit 0
