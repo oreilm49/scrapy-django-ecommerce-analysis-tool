@@ -91,6 +91,10 @@ class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
             Breadcrumb(name="Create", url=reverse('dashboard:category-table-create'), active=True),
         ]
 
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
 
 class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
     template_name = 'views/category_table_modify.html'
