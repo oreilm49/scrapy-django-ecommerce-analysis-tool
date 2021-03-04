@@ -76,7 +76,7 @@ class CategoryTables(CategoryTableMixin, ListView):
 class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
     template_name = 'views/category_table_modify.html'
     form_class = CategoryTableForm
-    success_message = _('Sucessfully created "{name}"')
+    success_message = _('Sucessfully created "%(name)s"')
 
     @property
     def table(self) -> CategoryTable:
@@ -95,7 +95,7 @@ class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
 class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
     template_name = 'views/category_table_modify.html'
     form_class = CategoryTableForm
-    success_message = _('Sucessfully updated "{name}"')
+    success_message = _('Sucessfully updated "%(name)s"')
 
     @property
     def table(self) -> CategoryTable:
