@@ -59,7 +59,8 @@ class CategoryTableMixin(LoginRequiredMixin, BreadcrumbMixin):
                 label='Create',
                 url=reverse('dashboard:category-table-create'),
                 icon='fa fa-plus'
-            )]
+            )],
+            show_toolbar=True,
         )
         return data
 
