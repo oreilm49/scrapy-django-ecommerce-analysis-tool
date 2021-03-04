@@ -103,7 +103,7 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
 
     @property
     def table(self) -> CategoryTable:
-        return get_object_or_404(self.queryset, pk=self.request.args.get('pk'))
+        return get_object_or_404(self.queryset, pk=self.request.resolver_match.kwargs.get('pk'))
 
     @property
     def deleting(self):
@@ -134,7 +134,7 @@ class CategoryTableDetail(CategoryTableMixin, DetailView):
 
     @property
     def table(self) -> CategoryTable:
-        return get_object_or_404(self.queryset, pk=self.request.args.get('pk'))
+        return get_object_or_404(self.queryset, pk=self.request.resolver_match.kwargs.get('pk'))
 
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
