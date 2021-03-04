@@ -2,37 +2,45 @@
 {% load bootstrap4 %}
 
 {% block content %}
-    <table class="category-table">
-        <thead>
-            <th></th>
-            {% for x_axis_header in x_axis_values %}
-                <th>{{ x_axis_header }}</th>
-            {% endfor %}
-        </thead>
-        <tbody>
-            {% for header, products in table_data.items %}
-                <tr>
-                    <th>{{ header }}</th>
-                    {% for x_header in x_axis_values %}
-                        <td>
-                        <table>
-                            <tr>
-                            {% for product in products %}
-                                {% ifequal x_header product.x_axis_grouper %}
-                                    <td>
-                                        <div class="model">{{ product.product.model }}</div>
-                                        <div class="image"><img src="{{ product.product.image_thumb }}" alt=""></div>
-                                        <div class="specs"></div>
-                                        <div class="price">{{ product.product.current_average_price }}</div>
-                                    </td>
-                                {% endifequal %}
-                            {% endfor %}
-                            </tr>
-                        </table>
-                        </td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="card shadow mb-4" style="max-height: 750px;">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">{{ table.name }}</h6>
+            <a href="{% url 'dashboard:category-table-update' pk=table.pk %}">
+                <i class="fas fa-pen fa-sm fa-fw text-gray-400"></i>
+            </a>
+        </div>
+        <table class="category-table">
+            <thead>
+                <th class="cell"></th>
+                {% for x_axis_header in x_axis_values %}
+                    <th class="cell">{{ x_axis_header }}</th>
+                {% endfor %}
+            </thead>
+            <tbody>
+                {% for header, products in table_data.items %}
+                    <tr>
+                        <th class="cell">{{ header }}</th>
+                        {% for x_header in x_axis_values %}
+                            <td class="cell">
+                            <table>
+                                <tr>
+                                {% for product in products %}
+                                    {% ifequal x_header product.x_axis_grouper %}
+                                        <td>
+                                            <div class="model">{{ product.product.model }}</div>
+                                            <div class="image"><img src="{{ product.product.image_thumb }}" alt=""></div>
+                                            <div class="specs"></div>
+                                            <div class="price">{{ product.product.current_average_price }}</div>
+                                        </td>
+                                    {% endifequal %}
+                                {% endfor %}
+                                </tr>
+                            </table>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
