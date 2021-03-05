@@ -1,4 +1,5 @@
 {% extends 'dashboard_base.html' %}
+{% load dashboard_extras %}
 {% load bootstrap4 %}
 
 {% block content %}
@@ -29,8 +30,12 @@
                                         <td>
                                             <div class="model">{{ product.product.model }}</div>
                                             <div class="image"><img src="{{ product.product.image_thumb }}" alt=""></div>
-                                            <div class="specs"></div>
-                                            <div class="price">{{ product.product.current_average_price }}</div>
+                                            <div class="specs">{% product_specs product.product %}</div>
+                                            <div class="price">
+                                                {% with price=product.product.current_average_price %}
+                                                {% if  price %}€{{ product.product.current_average_price }}{% endif %}
+                                                {% endwith %}
+                                            </div>
                                         </td>
                                     {% endifequal %}
                                 {% endfor %}
