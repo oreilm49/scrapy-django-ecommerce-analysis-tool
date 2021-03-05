@@ -7,7 +7,7 @@ from typing import Optional, Dict, Union, Type
 from django import forms
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q
+from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q, Count
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext as _
@@ -114,6 +114,10 @@ class Category(BaseModel):
 
     def __str__(self):
         return self.name
+
+    @cached_property
+    def top_attribute_types(self) -> 'AttributeTypeQuerySet':
+        return AttributeType.objects.filter(productattributes__product__category=self).annotate(num=Count('productattributes')).order_by('-num')
 
 
 class Selector(BaseModel):
