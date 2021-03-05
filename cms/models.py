@@ -2,7 +2,7 @@ import datetime
 import os
 import uuid
 from statistics import mean
-from typing import Optional, Dict, Union, Type
+from typing import Optional, Dict, Union, Type, Iterator
 
 from django import forms
 from django.contrib.postgres.fields import ArrayField
@@ -181,6 +181,11 @@ class Product(BaseModel):
     def brand(self) -> Optional[str]:
         attribute: ProductAttribute = self.productattributes.filter(attribute_type__name="brand").first()
         return attribute.data['value'] if attribute else None
+
+    @cached_property
+    def top_attributes(self) -> Iterator[ProductQuerySet]:
+        for attribute in self.category.top_attribute_types.iterator():
+            yield attribute.productattributes.filter(product__pk=self.pk).first()
 
 
 class AttributeTypeQuerySet(BaseQuerySet):
