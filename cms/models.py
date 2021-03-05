@@ -205,7 +205,7 @@ class AttributeType(BaseModel):
     unit = models.ForeignKey(to=Unit, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="attribute_types")
 
     def __str__(self):
-        return f"{self.name} > {self.unit}"
+        return self.name + f"> {self.unit}" if self.unit else ""
 
     objects = AttributeTypeQuerySet.as_manager()
 
@@ -246,6 +246,10 @@ class ProductAttribute(BaseProductAttribute):
         unique_together = ['product', 'attribute_type']
 
     objects = ProductAttributeQuerySet.as_manager()
+
+    @property
+    def display(self):
+        return f"{self.data['value']} " + f" {self.attribute_type.unit}" if self.attribute_type.unit else ""
 
 
 class WebsiteProductAttributeQuerySet(BaseQuerySet):
