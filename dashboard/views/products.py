@@ -1,15 +1,14 @@
 from typing import Optional, List
 
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import ListView
 
 from cms.models import Product, ProductQuerySet, WebsiteProductAttributeQuerySet, WebsiteProductAttribute
-from dashboard.views.base import Breadcrumb, BreadcrumbMixin
+from dashboard.views.base import Breadcrumb, BaseDashboardMixin
 
 
-class Products(LoginRequiredMixin, BreadcrumbMixin, ListView):
+class Products(BaseDashboardMixin, ListView):
     paginate_by = 25
     queryset: ProductQuerySet = Product.objects.published()
     template_name = 'views/products.html'
@@ -20,7 +19,7 @@ class Products(LoginRequiredMixin, BreadcrumbMixin, ListView):
         ]
 
 
-class ProductDetail(LoginRequiredMixin, BreadcrumbMixin, ListView):
+class ProductDetail(BaseDashboardMixin, ListView):
     paginate_by = 25
     template_name = 'views/product.html'
     queryset: WebsiteProductAttributeQuerySet = WebsiteProductAttribute.objects.published()

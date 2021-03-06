@@ -3,7 +3,6 @@ from collections import namedtuple
 from typing import Iterator, Tuple, List, Optional
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
 from django.http import HttpResponseRedirect
@@ -17,12 +16,12 @@ from cms.models import Product
 from cms.utils import products_grouper
 from dashboard.models import CategoryTable, CategoryTableQuerySet
 from dashboard.toolbar import ToolbarItem
-from dashboard.views.base import BreadcrumbMixin, Breadcrumb
+from dashboard.views.base import Breadcrumb, BaseDashboardMixin
 
 CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_axis_grouper', 'product'])
 
 
-class CategoryTableMixin(LoginRequiredMixin, BreadcrumbMixin):
+class CategoryTableMixin(BaseDashboardMixin):
     queryset: CategoryTableQuerySet = CategoryTable.objects.published()
 
     def get_queryset(self) -> CategoryTableQuerySet:
@@ -106,7 +105,7 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
         ]
 
 
-class CategoryTableDetail(LoginRequiredMixin, BreadcrumbMixin, DetailView):
+class CategoryTableDetail(BaseDashboardMixin, DetailView):
     template_name = 'views/category_table.html'
     queryset: CategoryTableQuerySet = CategoryTable.objects.published()
 
