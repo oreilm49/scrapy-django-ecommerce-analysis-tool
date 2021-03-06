@@ -9,7 +9,7 @@ from dashboard.views.base import Breadcrumb, BaseDashboardMixin
 
 
 class Products(BaseDashboardMixin, ListView):
-    paginate_by = 25
+    paginate_by = 10
     queryset: ProductQuerySet = Product.objects.published()
     template_name = 'views/products.html'
 
