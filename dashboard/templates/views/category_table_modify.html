@@ -2,13 +2,19 @@
 {% load bootstrap4 %}
 
 {% block content %}
-    <h5>{% if pk %}Edit {{ table.name }}{% else %}Create New Category Table{% endif %}</h5>
     <form method="post">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        <a href="{% url 'dashboard:category-tables' %}" class="btn btn-danger">Cancel</a>
-        {% bootstrap_button 'Save' 'submit' button_class='btn btn-primary'%}
-    </form>
+        <div class="card shadow mb-4" style="max-height: 830px;">
+            {% include 'includes/card_header.html' %}
+            <div class="card-body">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'dashboard:category-tables' %}" class="btn btn-danger">Cancel</a>
+                {% bootstrap_button 'Save' 'submit' button_class='btn btn-primary'%}
+            </div>
+        </div>
+     </form>
 {% endblock content %}
 
 {% block extra_js %}
