@@ -37,9 +37,7 @@ services:
       - db
       - minio
   scraper:
-    build:
-      context: .
-      dockerfile: scraper.Dockerfile
+    image: cms-image
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
