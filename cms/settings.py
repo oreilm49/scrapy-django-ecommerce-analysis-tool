@@ -154,3 +154,7 @@ AWS_QUERYSTRING_AUTH = False
 
 LOGIN_REDIRECT_URL = '/dashboard/home'
 LOGOUT_REDIRECT_URL = '/accounts/login'
+
+# Celery
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER', default='amqp://guest:guest@localhost//')
+CELERY_RESULT_BACKEND = None
