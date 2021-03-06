@@ -33,7 +33,7 @@
                                             <div class="specs">{% product_specs product.product %}</div>
                                             <div class="price">
                                                 {% with price=product.product.current_average_price %}
-                                                {% if  price %}€{{ product.product.current_average_price }}{% endif %}
+                                                {% if  price %}€{{ product.product.current_average_price }}{% else %}No Price Data{% endif %}
                                                 {% endwith %}
                                             </div>
                                         </td>
