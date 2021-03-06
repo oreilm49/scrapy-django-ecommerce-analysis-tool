@@ -34,14 +34,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="row">
-                <div class="col-sm-12 col-md-5">
-                    <div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">Showing {{ page_obj.number }} to {{ paginator.per_page }} of {{ paginator.count }} products</div>
-                </div>
-                <div class="col-sm-12 col-md-7">
-                    <div class="float-right">{% bootstrap_pagination page_obj size='small' %}</div>
-                </div>
-            </div>
+            {% include 'includes/table_pagination.html' %}
         </div>
     </div>
 {% endblock %}
