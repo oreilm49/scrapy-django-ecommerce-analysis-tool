@@ -8,9 +8,5 @@
     <hr class="sidebar-divider my-0">
 
     <!-- Nav Item - Dashboard -->
-    <li class="nav-item active">
-        <a class="nav-link" href="{% url 'dashboard:category-tables' %}">
-            <i class="fa fa-table"></i>
-            <span>Pivot</span></a>
-    </li>
+    {% for nav_item in nav_items %}{{ nav_item.render }}{% endfor %}
 </ul>
