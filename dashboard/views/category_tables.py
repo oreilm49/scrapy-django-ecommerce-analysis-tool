@@ -135,6 +135,10 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
             table=self.table,
             table_data=table_data,
             x_axis_values=self.table.x_axis_values,
+            card_action_button=LinkButton(
+                url=reverse('dashboard:category-table-update', kwargs={'pk': self.table.pk}),
+                icon='fas fa-pen fa-sm fa-fw text-gray-400',
+            ),
         )
         return data
 
