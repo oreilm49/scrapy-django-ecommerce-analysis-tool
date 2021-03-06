@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
-from dashboard.views.category_tables import CategoryTables, CategoryTableDetail, CategoryTableCreate, CategoryTableUpdate, DashboardHome
+from dashboard.views.base import DashboardHome
+from dashboard.views.category_tables import CategoryTables, CategoryTableDetail, CategoryTableCreate, CategoryTableUpdate
 
 app_name = 'dashboard'
 

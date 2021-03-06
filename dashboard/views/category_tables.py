@@ -10,40 +10,16 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from dashboard.forms import CategoryTableForm
 from cms.models import Product
 from cms.utils import products_grouper
 from dashboard.models import CategoryTable, CategoryTableQuerySet
 from dashboard.toolbar import ToolbarItem
+from dashboard.views.base import BreadcrumbMixin, Breadcrumb
 
 CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_axis_grouper', 'product'])
-
-
-class DashboardHome(RedirectView):
-
-    def get_redirect_url(self, *args, **kwargs):
-        return reverse('dashboard:category-tables')
-
-
-Breadcrumb = namedtuple('breadcrumb', ['url', 'name', 'active'])
-
-
-class BreadcrumbMixin:
-
-    def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
-        """
-        override this method to add breadcrumbs to template context.
-        """
-        return None
-
-    def get_context_data(self, **kwargs):
-        data: dict = super().get_context_data(**kwargs)
-        data.update(
-            breadcrumbs=self.get_breadcrumbs()
-        )
-        return data
 
 
 class CategoryTableMixin(LoginRequiredMixin, BreadcrumbMixin):
