@@ -4,7 +4,8 @@ from django.utils.html import format_html
 
 
 class LinkButton:
-    def __init__(self, label, url, icon, help_text: Optional[str] = None, btn_class: Optional[str] = None):
+    def __init__(self, url, icon, label: Optional[str] = None, help_text: Optional[str] = None,
+                 btn_class: Optional[str] = None):
         self.label = label
         self.url = url
         self.icon = icon
@@ -18,11 +19,11 @@ class LinkButton:
                 <i class="{icon}"></i> {label}
             </a>
             """,
-            label=self.label,
+            label=self.label or '',
             url=self.url,
             icon=self.icon,
             help_text=self.help_text or '',
-            btn_class=self.btn_class or "btn btn-primary"
+            btn_class=self.btn_class or ''
         )
 
 
