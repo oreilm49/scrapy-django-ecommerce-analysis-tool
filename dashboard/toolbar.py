@@ -3,17 +3,18 @@ from typing import Optional
 from django.utils.html import format_html
 
 
-class ToolbarItem:
-    def __init__(self, label, url, icon, help_text: Optional[str] = None):
+class LinkButton:
+    def __init__(self, label, url, icon, help_text: Optional[str] = None, btn_class: Optional[str] = None):
         self.label = label
         self.url = url
         self.icon = icon
         self.help_text = help_text
+        self.btn_class = btn_class
 
     def render(self):
         return format_html(
             """
-            <a class="btn btn-primary" href="{url}">
+            <a class="{btn_class}" href="{url}">
                 <i class="{icon}"></i> {label}
             </a>
             """,
@@ -21,6 +22,7 @@ class ToolbarItem:
             url=self.url,
             icon=self.icon,
             help_text=self.help_text or '',
+            btn_class=self.btn_class or "btn btn-primary"
         )
 
 
