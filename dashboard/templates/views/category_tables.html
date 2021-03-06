@@ -4,10 +4,9 @@
 
 {% block content %}
     <div class="card shadow mb-4" style="max-height: 830px;">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Pivot Tables</h6>
-            {% if card_action_button %}{{ card_action_button.render }}{% endif %}
-        </div>
+        {% with 'Pivot Tables' as header %}
+            {% include 'includes/card_header.html' %}
+        {% endwith %}
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered scrollable-table">
