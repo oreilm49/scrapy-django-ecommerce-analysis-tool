@@ -36,28 +36,6 @@ services:
     depends_on:
       - db
       - minio
-  scraper:
-    image: cms-image
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - DJANGO_SETTINGS_MODULE=cms.settings
-      - HTTPCACHE_ENABLED=True
-      - HTTPCACHE_EXPIRATION_SECS=604800
-      - DEBUG=True
-      - AWS_ACCESS_KEY_ID=admin
-      - AWS_SECRET_ACCESS_KEY=password
-      - AWS_CUSTOM_MEDIA_DOMAIN=localhost:9000
-    command: scrapy
-    volumes:
-      - .:/app
-      - cms-media:/app/cms/media
-    ports:
-      - "6000:6000"
-    depends_on:
-      - db
-      - minio
   minio:
     image: minio/minio:latest
     volumes:
