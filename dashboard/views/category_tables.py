@@ -41,6 +41,7 @@ class CategoryTableMixin(BaseDashboardMixin):
 
 
 class CategoryTables(CategoryTableMixin, ListView):
+    paginate_by = 10
     template_name = 'views/category_tables.html'
 
     def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
