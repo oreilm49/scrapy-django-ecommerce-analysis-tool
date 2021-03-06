@@ -24,3 +24,21 @@
 .category-table img {
     height: 100px;
 }
+
+.category-table .model, .category-table .price {
+    font-weight: 500;
+    font-size: 12px;
+    color: black;
+}
+
+.category-table .model {
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.category-table .price {
+    border-top: 1px solid #e3e6f0;
+}
+
+.category-table .specs {
+    font-size: 12px;
+}
