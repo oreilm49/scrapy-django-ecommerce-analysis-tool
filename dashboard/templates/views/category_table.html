@@ -2,6 +2,10 @@
 {% load dashboard_extras %}
 {% load bootstrap4 %}
 
+{% block extrahead %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/pivot-table.css">
+{% endblock %}
+
 {% block content %}
     <div class="card shadow mb-4" style="max-height: 830px;">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
