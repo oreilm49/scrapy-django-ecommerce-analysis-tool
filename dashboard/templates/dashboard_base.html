@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css">
+{% endblock %}
+
 {% block body_content %}
     <div id="wrapper">
         {% include "includes/sidebar.html" %}
