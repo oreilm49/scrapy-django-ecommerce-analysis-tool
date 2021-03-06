@@ -30,4 +30,3 @@ class Team(BaseModel):
     company = models.ForeignKey(Company, verbose_name=_('Company'), on_delete=models.CASCADE)
     users = models.ManyToManyField(User, verbose_name=_("Users"))
     permissions = models.ManyToManyField(Permission, verbose_name=_("Permissions"))
-
