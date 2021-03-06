@@ -10,8 +10,8 @@ urlpatterns = [
     url(r'home/$', DashboardHome.as_view(), name='home'),
     url(r'category-tables/$', CategoryTables.as_view(), name='category-tables'),
     url(r'category-tables/add/$', CategoryTableCreate.as_view(), name='category-table-create'),
-    url(r'category-table/(?P<pk>\d+)/$', CategoryTableDetail.as_view(), name='category-table'),
-    url(r'category-table/(?P<pk>\d+)/update$', CategoryTableUpdate.as_view(), name='category-table-update'),
+    url(r'category-tables/(?P<pk>\d+)/$', CategoryTableDetail.as_view(), name='category-table'),
+    url(r'category-tables/(?P<pk>\d+)/update$', CategoryTableUpdate.as_view(), name='category-table-update'),
     url(r'products/$', Products.as_view(), name='products'),
-    url(r'product/(?P<pk>\d+)/$', ProductDetail.as_view(), name='product'),
+    url(r'products/(?P<pk>\d+)/$', ProductDetail.as_view(), name='product'),
 ]
