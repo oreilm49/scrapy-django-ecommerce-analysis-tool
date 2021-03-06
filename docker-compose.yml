@@ -13,6 +13,7 @@ services:
       - "5432:5432"
   cms:
     build: .
+    image: cms-image
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -27,7 +28,8 @@ services:
       - AWS_SECRET_ACCESS_KEY=password
       - DJANGO_SETTINGS_MODULE=cms.settings
       - AWS_CUSTOM_MEDIA_DOMAIN=localhost:9000
-    command: python manage.py runserver 0.0.0.0:5000
+      - CELERY_BROKER=amqp://guest:guest@celery-broker//
+    command: python3 manage.py runserver 0.0.0.0:5000
     volumes:
       - .:/app
       - cms-media:/app/cms/media
@@ -51,6 +53,46 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+
+  celery-broker:
+    image: rabbitmq:3.8.5-alpine
+
+  celery-worker:
+    image: cms-image
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - CACHE_DURATION=30
+      - HTTPCACHE_ENABLED=True
+      - HTTPCACHE_EXPIRATION_SECS=604800
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - DJANGO_SETTINGS_MODULE=cms.settings
+      - CELERY_BROKER=amqp://guest:guest@celery-broker//
+    restart: on-failure
+    depends_on:
+      - celery-broker
+      - db
+      - minio
+    volumes:
+      - .:/app
+      - cms-media:/app/cms/media
+    command: ["celery", "-A", "cms", "worker", "-l", "DEBUG", "--concurrency", "1", "--events"]
+
+  celery-beat:
+    image: cms-image
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DJANGO_SETTINGS_MODULE=cms.settings
+      - CELERY_BROKER=amqp://guest:guest@celery-broker//
+    restart: on-failure
+    depends_on:
+      - celery-broker
+    command: ["celery", "-A", "cms",  "beat", "-l", "DEBUG"]
+
 
 volumes:
   db-data:
