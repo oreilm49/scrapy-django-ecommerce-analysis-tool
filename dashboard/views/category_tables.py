@@ -15,7 +15,7 @@ from dashboard.forms import CategoryTableForm
 from cms.models import Product
 from cms.utils import products_grouper
 from dashboard.models import CategoryTable, CategoryTableQuerySet
-from dashboard.toolbar import ToolbarItem
+from dashboard.toolbar import LinkButton
 from dashboard.views.base import Breadcrumb, BaseDashboardMixin
 
 CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_axis_grouper', 'product'])
@@ -27,18 +27,6 @@ class CategoryTableMixin(BaseDashboardMixin):
     def get_queryset(self) -> CategoryTableQuerySet:
         return self.queryset.for_user(self.request.user)
 
-    def get_context_data(self, **kwargs):
-        data: dict = super().get_context_data(**kwargs)
-        data.update(
-            toolbar_items=[ToolbarItem(
-                label='Create',
-                url=reverse('dashboard:category-table-create'),
-                icon='fa fa-plus'
-            )],
-            show_toolbar=True,
-        )
-        return data
-
 
 class CategoryTables(CategoryTableMixin, ListView):
     paginate_by = 10
@@ -48,6 +36,18 @@ class CategoryTables(CategoryTableMixin, ListView):
         return [
             Breadcrumb(name="Pivot Tables", url=reverse('dashboard:category-tables'), active=True),
         ]
+
+    def get_context_data(self, **kwargs):
+        data: dict = super().get_context_data(**kwargs)
+        data.update(
+            card_action_button=LinkButton(
+                label='New',
+                url=reverse('dashboard:category-table-create'),
+                icon='fa fa-plus',
+                btn_class='btn btn-primary btn-sm',
+            ),
+        )
+        return data
 
 
 class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
