@@ -4,8 +4,8 @@ import django
 
 BOT_NAME = 'scraper'
 
-SPIDER_MODULES = ['scraper.spiders']
-NEWSPIDER_MODULE = 'scraper.spiders'
+SPIDER_MODULES = ['cms.scraper.spiders']
+NEWSPIDER_MODULE = 'cms.scraper.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
