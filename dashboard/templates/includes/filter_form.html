@@ -1,0 +1,11 @@
+{% load bootstrap4 %}
+
+<form method="get" class="row">
+    {% csrf_token %}
+    {% for field in filter_form %}
+        <div class="{{ field_col_class }}">{% bootstrap_field field size='small' show_label=False %}</div>
+    {% endfor %}
+        <div class="{{ field_col_class }}" style="text-align: right">
+            {% bootstrap_button 'Filter' button_type='submit' size='small' %}
+        </div>
+</form>

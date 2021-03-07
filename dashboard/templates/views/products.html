@@ -2,6 +2,16 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
+{% block extrahead %}
+    {{ block.super }}
+    {{ filter_form.media.css }}
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ filter_form.media.js }}
+{% endblock %}
+
 {% block content %}
     <div class="card shadow mb-4" style="max-height: 830px;">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -9,6 +19,9 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
+                {% with field_col_class='col-xs-12 col-sm-2' %}
+                    {% include 'includes/filter_form.html' %}
+                {% endwith %}
                 <table class="table table-bordered scrollable-table">
                     <thead>
                         <tr>
