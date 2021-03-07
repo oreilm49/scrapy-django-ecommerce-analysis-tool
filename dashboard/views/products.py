@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.views.generic import ListView
 
 from cms.models import Product, ProductQuerySet, WebsiteProductAttributeQuerySet, WebsiteProductAttribute
+from dashboard.forms import ProductsFilterForm
 from dashboard.views.base import Breadcrumb, BaseDashboardMixin
 
 
@@ -17,6 +18,21 @@ class Products(BaseDashboardMixin, ListView):
         return [
             Breadcrumb(name="Products", url=reverse('dashboard:products'), active=True),
         ]
+
+    def get_form(self) -> ProductsFilterForm:
+        return ProductsFilterForm(self.request.GET or None)
+
+    def get_queryset(self) -> ProductQuerySet:
+        queryset: ProductQuerySet = super().get_queryset()
+        form: ProductsFilterForm = self.get_form()
+        if self.request.GET and form.is_valid():
+            queryset: ProductQuerySet = form.search(queryset)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        data: dict = super().get_context_data(**kwargs)
+        data.update(filter_form=self.get_form())
+        return data
 
 
 class ProductDetail(BaseDashboardMixin, ListView):
