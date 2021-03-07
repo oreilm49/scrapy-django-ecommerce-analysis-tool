@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
-from dashboard.forms import CategoryTableForm
+from dashboard.forms import CategoryTableForm, CategoryTableFilterForm
 from cms.models import Product
 from cms.utils import products_grouper
 from dashboard.models import CategoryTable, CategoryTableQuerySet
@@ -46,8 +46,19 @@ class CategoryTables(CategoryTableMixin, ListView):
                 icon='fa fa-plus',
                 btn_class='btn btn-primary btn-sm',
             ),
+            filter_form=self.get_form()
         )
         return data
+
+    def get_form(self) -> CategoryTableFilterForm:
+        return CategoryTableFilterForm(self.request.GET or None)
+
+    def get_queryset(self) -> CategoryTableQuerySet:
+        queryset: CategoryTableQuerySet = super().get_queryset()
+        form: CategoryTableFilterForm = self.get_form()
+        if self.request.GET and form.is_valid():
+            queryset: CategoryTableQuerySet = form.search(queryset)
+        return queryset
 
 
 class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
