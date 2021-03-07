@@ -1,6 +1,6 @@
 from model_mommy import mommy
 
-from accounts.models import Company, Profile, Team
+from cms.accounts.models import Company, Profile, Team
 
 
 def run():

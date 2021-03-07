@@ -1,8 +1,8 @@
 from django.test import TestCase
 from model_mommy import mommy
 
-from cms.models import Product, ProductAttribute, AttributeType, Website, Category
-from dashboard.forms import CategoryTableForm
+from cms.dashboard.forms import CategoryTableForm
+from cms.models import Product, AttributeType, Category
 
 
 class TestForms(TestCase):

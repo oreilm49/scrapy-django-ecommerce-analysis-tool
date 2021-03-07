@@ -4,8 +4,8 @@ from django.test import TestCase
 from django.urls import reverse
 from model_mommy import mommy
 
-from dashboard.forms import CategoryTableForm
-from dashboard.models import CategoryTable
+from cms.dashboard.forms import CategoryTableForm
+from cms.dashboard.models import CategoryTable
 from cms.models import AttributeType, Category
 
 

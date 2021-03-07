@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.views.generic import RedirectView
 
-from dashboard.toolbar import NavItem
+from cms.dashboard.toolbar import NavItem
 
 
 class DashboardHome(RedirectView):

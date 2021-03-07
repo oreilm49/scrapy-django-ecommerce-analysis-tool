@@ -9,9 +9,9 @@ from cms.models import Category, Product, ProductAttribute, Unit, Website, Selec
     AttributeType, ProductImage
 from cms.utils import get_dotted_path
 
-from scraper.pipelines import ProductPipeline, ProductAttributePipeline, WebsiteProductAttributePipeline, \
+from cms.scraper.items import ProductPageItem
+from cms.scraper.pipelines import ProductPipeline, ProductAttributePipeline, WebsiteProductAttributePipeline, \
     ProductImagePipeline
-from scraper.items import ProductPageItem
 
 
 class TestPipeline(TestCase):

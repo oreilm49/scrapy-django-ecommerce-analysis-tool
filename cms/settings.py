@@ -39,13 +39,13 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_extensions',
-    'accounts',
+    'cms.accounts',
     'cms',
-    'scraper',
+    'cms.scraper',
     'storages',
     'bootstrap4',
     'bsmodals',
-    'dashboard',
+    'cms.dashboard',
 ]
 
 MIDDLEWARE = [

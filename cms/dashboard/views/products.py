@@ -5,8 +5,8 @@ from django.urls import reverse
 from django.views.generic import ListView
 
 from cms.models import Product, ProductQuerySet, WebsiteProductAttributeQuerySet, WebsiteProductAttribute
-from dashboard.forms import ProductsFilterForm
-from dashboard.views.base import Breadcrumb, BaseDashboardMixin
+from cms.dashboard.forms import ProductsFilterForm
+from cms.dashboard.views.base import Breadcrumb, BaseDashboardMixin
 
 
 class Products(BaseDashboardMixin, ListView):

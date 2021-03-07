@@ -1,8 +1,9 @@
 from django.conf.urls import url
 
-from dashboard.views.base import DashboardHome
-from dashboard.views.category_tables import CategoryTables, CategoryTableDetail, CategoryTableCreate, CategoryTableUpdate
-from dashboard.views.products import Products, ProductDetail
+from cms.dashboard.views.base import DashboardHome
+from cms.dashboard.views.category_tables import CategoryTables, CategoryTableCreate, CategoryTableDetail, \
+    CategoryTableUpdate
+from cms.dashboard.views.products import Products, ProductDetail
 
 app_name = 'dashboard'
 

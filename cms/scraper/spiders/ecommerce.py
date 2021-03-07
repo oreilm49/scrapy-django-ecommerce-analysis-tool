@@ -5,8 +5,8 @@ import scrapy
 from cms.constants import CATEGORY, PAGINATION, LINK, TABLE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, PRICE, IMAGE
 from cms.models import Website, Url, Category, Selector
 
-from scraper.exceptions import WebsiteNotProvidedInArguments
-from scraper.items import ProductPageItem
+from cms.scraper.exceptions import WebsiteNotProvidedInArguments
+from cms.scraper.items import ProductPageItem
 
 
 class EcommerceSpider(scrapy.Spider):

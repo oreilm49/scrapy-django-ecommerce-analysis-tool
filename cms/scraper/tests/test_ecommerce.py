@@ -5,7 +5,7 @@ from cms.constants import CATEGORY
 from cms.models import Website, Url, Category
 from cms.scripts.load_cms import set_up_websites
 
-from scraper.spiders.ecommerce import EcommerceSpider
+from cms.scraper.spiders.ecommerce import EcommerceSpider
 
 
 class TestEcommerce(TestCase):

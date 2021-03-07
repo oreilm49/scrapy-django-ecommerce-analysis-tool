@@ -6,10 +6,10 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils.translation import gettext as _
 
+from cms.dashboard.models import CategoryTable, CategoryTableQuerySet
+from cms.dashboard.utils import get_brands
 from cms.models import AttributeType, Category, ProductQuerySet
 from cms.utils import serialized_values_for_attribute_type, is_value_numeric
-from dashboard.models import CategoryTable, CategoryTableQuerySet
-from dashboard.utils import get_brands
 
 
 class CategoryTableForm(forms.ModelForm):

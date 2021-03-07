@@ -2,8 +2,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from model_mommy import mommy
 
+from cms.dashboard.models import CategoryTable
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute, AttributeType, Category
-from dashboard.models import CategoryTable
 
 
 class TestModels(TestCase):

@@ -7,7 +7,7 @@ from cms.constants import PRICE, MAIN, THUMBNAIL
 from cms.data_processing.constants import UnitValue, Value, RangeUnitValue
 from cms.data_processing.units import UnitManager
 from cms.models import Product, ProductAttribute, Selector, AttributeType, ProductImage
-from scraper.items import ProductPageItem
+from cms.scraper.items import ProductPageItem
 
 
 class ProductPipeline:

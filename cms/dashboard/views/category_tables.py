@@ -11,12 +11,12 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
-from dashboard.forms import CategoryTableForm, CategoryTableFilterForm
+from cms.dashboard.forms import CategoryTableFilterForm, CategoryTableForm
+from cms.dashboard.models import CategoryTableQuerySet, CategoryTable
 from cms.models import Product
 from cms.utils import products_grouper
-from dashboard.models import CategoryTable, CategoryTableQuerySet
-from dashboard.toolbar import LinkButton
-from dashboard.views.base import Breadcrumb, BaseDashboardMixin
+from cms.dashboard.toolbar import LinkButton
+from cms.dashboard.views.base import Breadcrumb, BaseDashboardMixin
 
 CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_axis_grouper', 'product'])
 
