@@ -142,6 +142,7 @@ MEDIA_URL = '/media/'
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
+STATIC_ROOT = 'cms/sitestatic'
 
 # File storage
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
