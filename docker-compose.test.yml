@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+  cms:
+    build:
+      context: .
+      target: dev
+    image: cms-image
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - TEST_DB_NAME=test_cms
+      - DEBUG=True
+      - SESSION_ID=testing
+      - DJANGO_SETTINGS_MODULE=cms.settings
+      - CONSOLE_LOG_LEVEL=ERROR
+    command:
+      - python
+      - -W
+      - all
+      - manage.py
+      - test
+      - --noinput
+      - --keepdb
+    depends_on:
+      - db

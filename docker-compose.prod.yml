@@ -14,24 +14,18 @@ services:
   cms:
     build:
       context: .
-      target: dev
+      target: deployment
     image: cms-image
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - TEST_DB_NAME=test_cms
-      - DEBUG=True
-      - GOOGLE_APPLICATION_CREDENTIALS=google-cloud-service-account-private-key.json
-      - DIALOGFLOW_PROJECT_ID=specr-1612006278245
-      - DIALOGFLOW_LANGUAGE_CODE=en
-      - SESSION_ID=development
+      - SESSION_ID=production
       - AWS_ACCESS_KEY_ID=admin
       - AWS_SECRET_ACCESS_KEY=password
-      - DJANGO_SETTINGS_MODULE=cms.settings
+      - DJANGO_SETTINGS_MODULE=cms.production
       - AWS_CUSTOM_MEDIA_DOMAIN=localhost:9000
       - CELERY_BROKER=amqp://guest:guest@celery-broker//
-    command: python3 manage.py runserver 0.0.0.0:5000
     volumes:
       - .:/app
       - cms-media:/app/cms/media
