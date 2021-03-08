@@ -9,7 +9,6 @@ ENV DJANGO_SETTINGS_MODULE cms.development
 EXPOSE 5000
 
 RUN apk -U add \
-        gcc \
         cargo \
         curl ca-certificates \
         libffi-dev \
@@ -23,8 +22,6 @@ RUN apk -U add \
         py-pip \
         postgresql-libs \
         postgresql-dev \
-        rust \
-        g++ \
         nginx \
     && update-ca-certificates \
     && rm -rf /var/cache/apk/* \
