@@ -3,34 +3,19 @@ version: "3.9"
 services:
   db:
     image: postgres
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
     volumes:
       - db-data:/var/lib/postgresql/data/
-    ports:
-      - "5432:5432"
   cms:
-    build:
-      context: .
-      target: deployment
-    image: cms-image
+    image: specr.azurecr.io/specr:deployment
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - SESSION_ID=production
-      - AWS_ACCESS_KEY_ID=admin
-      - AWS_SECRET_ACCESS_KEY=password
+      - POSTGRES_HOST=db
       - DJANGO_SETTINGS_MODULE=cms.production
-      - AWS_CUSTOM_MEDIA_DOMAIN=localhost:9000
       - CELERY_BROKER=amqp://guest:guest@celery-broker//
     volumes:
       - .:/app
       - cms-media:/app/cms/media
     ports:
-      - "5000:5000"
+      - "80:80"
     depends_on:
       - db
       - minio
@@ -40,9 +25,6 @@ services:
       - minio-data:/data
     ports:
       - "9000:9000"
-    environment:
-      - MINIO_ACCESS_KEY=admin
-      - MINIO_SECRET_KEY=password
     command: minio server /data/minio/
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -54,17 +36,10 @@ services:
     image: rabbitmq:3.8.5-alpine
 
   celery-worker:
-    image: cms-image
+    image: specr.azurecr.io/specr:deployment
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - CACHE_DURATION=30
-      - HTTPCACHE_ENABLED=True
-      - HTTPCACHE_EXPIRATION_SECS=604800
-      - AWS_ACCESS_KEY_ID=admin
-      - AWS_SECRET_ACCESS_KEY=password
-      - DJANGO_SETTINGS_MODULE=cms.settings
+      - POSTGRES_HOST=db
+      - DJANGO_SETTINGS_MODULE=cms.production
       - CELERY_BROKER=amqp://guest:guest@celery-broker//
     restart: on-failure
     depends_on:
@@ -79,10 +54,8 @@ services:
   celery-beat:
     image: cms-image
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - DJANGO_SETTINGS_MODULE=cms.settings
+      - POSTGRES_HOST=db
+      - DJANGO_SETTINGS_MODULE=cms.production
       - CELERY_BROKER=amqp://guest:guest@celery-broker//
     restart: on-failure
     depends_on:
