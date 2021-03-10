@@ -15,8 +15,9 @@ services:
     build:
       context: .
       target: dev
-    image: cms-image
+    image: specr-cms
     environment:
+      - POSTGRES_HOST=db
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -60,8 +61,9 @@ services:
     image: rabbitmq:3.8.5-alpine
 
   celery-worker:
-    image: cms-image
+    image: specr-cms
     environment:
+      - POSTGRES_HOST=db
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -83,8 +85,9 @@ services:
     command: ["celery", "-A", "cms", "worker", "-l", "DEBUG", "--concurrency", "1", "--events"]
 
   celery-beat:
-    image: cms-image
+    image: specr-cms
     environment:
+      - POSTGRES_HOST=db
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
