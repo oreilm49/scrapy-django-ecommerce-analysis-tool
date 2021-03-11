@@ -27,8 +27,6 @@ services:
       - DIALOGFLOW_PROJECT_ID=specr-1612006278245
       - DIALOGFLOW_LANGUAGE_CODE=en
       - SESSION_ID=development
-      - AWS_ACCESS_KEY_ID=admin
-      - AWS_SECRET_ACCESS_KEY=password
       - DJANGO_SETTINGS_MODULE=cms.settings
       - AWS_CUSTOM_MEDIA_DOMAIN=localhost:9000
       - CELERY_BROKER=amqp://guest:guest@celery-broker//
@@ -40,22 +38,6 @@ services:
       - "5000:5000"
     depends_on:
       - db
-      - minio
-  minio:
-    image: minio/minio:latest
-    volumes:
-      - minio-data:/data
-    ports:
-      - "9000:9000"
-    environment:
-      - MINIO_ACCESS_KEY=admin
-      - MINIO_SECRET_KEY=password
-    command: minio server /data/minio/
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
 
   celery-broker:
     image: rabbitmq:3.8.5-alpine
@@ -70,8 +52,6 @@ services:
       - CACHE_DURATION=30
       - HTTPCACHE_ENABLED=True
       - HTTPCACHE_EXPIRATION_SECS=604800
-      - AWS_ACCESS_KEY_ID=admin
-      - AWS_SECRET_ACCESS_KEY=password
       - DJANGO_SETTINGS_MODULE=cms.settings
       - CELERY_BROKER=amqp://guest:guest@celery-broker//
     restart: on-failure
