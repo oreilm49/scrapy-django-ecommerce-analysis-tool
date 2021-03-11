@@ -11,3 +11,11 @@ $ docker login azure
 $ docker context use specr
 $ docker compose up
 ```
+
+## Storage - Notes
+- No data protection enabled yet (cost saving)
+
+## TODO
+- remove minio from project - replace with default django filestorage implementation
+- ensure that ACI specr can use the specr-vnet vpn. This is required to access the storage account.
+
