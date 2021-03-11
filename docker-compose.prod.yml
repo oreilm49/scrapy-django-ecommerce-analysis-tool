@@ -65,6 +65,22 @@ services:
 
 volumes:
   db-data:
+    driver: azure_file
+    driver_opts:
+      share_name: db-data
+      storage_account_name: specr
   cms-media:
+    driver: azure_file
+    driver_opts:
+      share_name: cms-media
+      storage_account_name: specr
   redis-data:
+    driver: azure_file
+    driver_opts:
+      share_name: redis-data
+      storage_account_name: specr
   minio-data:
+    driver: azure_file
+    driver_opts:
+      share_name: minio-data
+      storage_account_name: specr
