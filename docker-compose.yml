@@ -83,4 +83,3 @@ volumes:
   db-data:
   cms-media:
   redis-data:
-  minio-data:
