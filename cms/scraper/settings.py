@@ -1,6 +1,7 @@
 import sys
 import os
 import django
+from cms.settings import BASE_DIR
 
 BOT_NAME = 'scraper'
 
@@ -65,12 +66,8 @@ ITEM_PIPELINES = {
    'scraper.pipelines.ProductImagePipeline': 500,
 }
 
-AWS_ENDPOINT_URL = 'http://minio:9000'
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-IMAGES_STORE = 's3://product-images/'
+IMAGES_STORE = os.path.join(BASE_DIR, 'media/product_images')
 IMAGES_THUMBS = {
-    'small': (50, 50),
     'big': (270, 270),
 }
 
