@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'cms.accounts',
     'cms',
     'cms.scraper',
-    'storages',
     'bootstrap4',
     'bsmodals',
     'cms.dashboard',
