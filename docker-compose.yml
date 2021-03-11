@@ -58,7 +58,6 @@ services:
     depends_on:
       - celery-broker
       - db
-      - minio
     volumes:
       - .:/app
       - cms-media:/app/cms/media
