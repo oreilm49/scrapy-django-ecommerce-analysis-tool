@@ -275,8 +275,3 @@ class ProductImage(BaseModel):
 
     def __str__(self):
         return f"{self.product} | {self.image}"
-
-    @cached_property
-    def image_url(self) -> Optional[str]:
-        if self.image:
-            return self.image.url.replace('minio:9000', os.environ.get('AWS_CUSTOM_MEDIA_DOMAIN'))
