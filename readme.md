@@ -1,3 +1,9 @@
+## Build docker image
+```
+$ docker context use default
+$ docker build -t specr.azurecr.io/specr:deployment .
+```
+
 ## Push image to ACR
 ```
 $ docker login specr.azurecr.io
