@@ -164,12 +164,12 @@ class Product(BaseModel):
     @property
     def image_main(self):
         image: ProductImage = self.images.filter(image_type=MAIN).first()
-        return image.image_url if image else None
+        return image.image.url if image else None
 
     @property
     def image_thumb(self):
         image: ProductImage = self.images.filter(image_type=THUMBNAIL).first()
-        return image.image_url if image else None
+        return image.image.url if image else None
 
     @cached_property
     def current_average_price(self) -> Optional[float]:
