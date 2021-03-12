@@ -6,6 +6,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 from cms.settings import *
 
 DEBUG = False
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # Sentry configuration
 # https://sentry.megsupporttools.com/meg/mat-cms/
