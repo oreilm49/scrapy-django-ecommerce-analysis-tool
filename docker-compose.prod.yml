@@ -1,74 +1,74 @@
 version: "3.9"
 
 services:
-  db:
-    image: postgres
-    volumes:
-      - db-data:/var/lib/postgresql/data/
   cms:
     image: specr.azurecr.io/specr:deployment
-    environment:
-      - POSTGRES_HOST=db
-      - DJANGO_SETTINGS_MODULE=cms.production
-      - CELERY_BROKER=amqp://guest:guest@celery-broker//
+    env_file:
+      - .env
     volumes:
-      - .:/app
       - cms-media:/app/cms/media
     ports:
-      - "80:80"
-    depends_on:
-      - db
-      - minio
-  minio:
-    image: minio/minio:latest
-    volumes:
-      - minio-data:/data
-    ports:
-      - "9000:9000"
-    command: minio server /data/minio/
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
+      - "8000:8000"
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 2G
+        limits:
+          cpus: '1'
+          memory: 3G
 
   celery-broker:
     image: rabbitmq:3.8.5-alpine
+    env_file:
+      - .env
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+        limits:
+          cpus: '0.5'
+          memory: 1.5G
 
   celery-worker:
     image: specr.azurecr.io/specr:deployment
-    environment:
-      - POSTGRES_HOST=db
-      - DJANGO_SETTINGS_MODULE=cms.production
-      - CELERY_BROKER=amqp://guest:guest@celery-broker//
+    env_file:
+      - .env
     restart: on-failure
     depends_on:
       - celery-broker
-      - db
-      - minio
     volumes:
-      - .:/app
       - cms-media:/app/cms/media
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+        limits:
+          cpus: '0.5'
+          memory: 1.5G
     command: ["celery", "-A", "cms", "worker", "-l", "DEBUG", "--concurrency", "1", "--events"]
 
   celery-beat:
-    image: cms-image
-    environment:
-      - POSTGRES_HOST=db
-      - DJANGO_SETTINGS_MODULE=cms.production
-      - CELERY_BROKER=amqp://guest:guest@celery-broker//
+    image: specr.azurecr.io/specr:deployment
+    env_file:
+      - .env
     restart: on-failure
     depends_on:
       - celery-broker
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+        limits:
+          cpus: '0.5'
+          memory: 1.5G
     command: ["celery", "-A", "cms",  "beat", "-l", "DEBUG"]
 
 
 volumes:
-  db-data:
-    driver: azure_file
-    driver_opts:
-      share_name: db-data
-      storage_account_name: specr
   cms-media:
     driver: azure_file
     driver_opts:
@@ -78,9 +78,4 @@ volumes:
     driver: azure_file
     driver_opts:
       share_name: redis-data
-      storage_account_name: specr
-  minio-data:
-    driver: azure_file
-    driver_opts:
-      share_name: minio-data
       storage_account_name: specr
