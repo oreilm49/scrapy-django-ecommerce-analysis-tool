@@ -82,7 +82,11 @@ class ProductsFilterForm(forms.Form):
     category = forms.ModelChoiceField(label=_('Category'), queryset=Category.objects.published(), required=False)
     price_low = forms.FloatField(label=_('Price: low'), required=False)
     price_high = forms.FloatField(label=_('Price: high'), required=False)
-    brands = forms.MultipleChoiceField(label=_('Brands'), choices=((brand, brand) for brand in get_brands()), required=False)
+    brands = forms.MultipleChoiceField(label=_('Brands'), choices=(), required=False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fields['brands'].choices = ((brand, brand) for brand in get_brands())
 
     def search(self, queryset: ProductQuerySet) -> ProductQuerySet:
         if self.cleaned_data.get('q'):
