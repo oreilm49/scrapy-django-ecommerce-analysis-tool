@@ -137,10 +137,7 @@ USE_TZ = True
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = '/media/'
-
-# URL prefix for static files.
-# Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATIC_ROOT = 'cms/sitestatic'
 
 LOGIN_REDIRECT_URL = '/dashboard/home'
