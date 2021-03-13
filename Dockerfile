@@ -49,13 +49,13 @@ RUN adduser --system -uid 102 specr
 RUN chown specr:root .
 RUN chmod -R a+xr /var/log/apache2
 RUN chmod -R a+xr /var/log/apache2
-USER specr
+RUN rm -r /etc/apache2/sites-enabled/000-default.conf
 
 
-COPY --chown=specr:root --from=build /app/cms/sitestatic/ ./cms/sitestatic/
-COPY --chown=specr:root --from=projectfiles /app/ ./
-COPY --chown=specr:root specr.conf ./specr.conf
+COPY --from=build /app/cms/sitestatic/ ./cms/sitestatic/
+COPY --from=projectfiles /app/ ./
+COPY specr.conf /etc/apache2/sites-enabled/specr.conf
 
 ENV DJANGO_SETTINGS_MODULE cms.production
 
-CMD ["mod_wsgi-express", "start-server", "cms/wsgi.py", "--url-alias", "/static", "cms/sitestatic/", "--url-alias", "/media", "cms/media/", "--trust-proxy-header", "X-Forwarded-Proto", "--port", "80", "--threads", "10", "--processes", "1", "--socket-timeout", "600", "--request-timeout", "600", "--limit-request-body", "104857600", "--log-to-terminal", "--log-level", "info", "--access-log", "--enable-sendfile", "--include-file", "specr.conf"]
+CMD ["mod_wsgi-express", "start-server", "cms/wsgi.py", "--url-alias", "/static", "cms/sitestatic/", "--url-alias", "/media", "cms/media/", "--trust-proxy-header", "X-Forwarded-Proto", "--port", "80", "--user", "www-data", "--group", "www-data", "--threads", "10", "--processes", "1", "--socket-timeout", "600", "--request-timeout", "600", "--limit-request-body", "104857600", "--log-to-terminal", "--log-level", "info", "--access-log", "--enable-sendfile"]
