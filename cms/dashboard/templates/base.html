@@ -7,7 +7,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <link rel="stylesheet" href="{{ STATIC_URL }}css/sb-admin-2.css">
+        <link rel="stylesheet" href="{% static 'css/sb-admin-2.css' %}">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
         {% block extrahead %}
         {% endblock %}
@@ -16,10 +16,10 @@
     <body>
         {% block body_content %}
         {% endblock %}
-        <script src="{{ STATIC_URL }}js/jquery-3.5.1.min.js"></script>
-        <script src="{{ STATIC_URL }}js/popper.min.js"></script>
-        <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
-        <script src="{{ STATIC_URL }}js/bsmodals.js"></script>
+        <script src="{% static 'js/jquery-3.5.1.min.js' %}"></script>
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/bsmodals.js' %}"></script>
         <script src="{% url 'javascript-catalog' %}"></script>
         {% block extra_js %}
         {% endblock %}

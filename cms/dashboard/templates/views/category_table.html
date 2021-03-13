@@ -1,9 +1,10 @@
 {% extends 'dashboard_base.html' %}
 {% load dashboard_extras %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block extrahead %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/pivot-table.css">
+    <link rel="stylesheet" href="{% static 'css/pivot-table.css' %}">
 {% endblock %}
 
 {% block content %}
