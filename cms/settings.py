@@ -25,7 +25,7 @@ SECRET_KEY = '930#$1phdmz0t_y4=nd-bb!-^9ik8zs@#ndbko=jx&*86-k4)m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['app.specr.ie', '20.76.232.37']
+ALLOWED_HOSTS = ['app.specr.ie', '20.76.232.37', 'specr.westeurope.azurecontainer.io']
 
 ADMINS = [('Mark', 'mark@specr.ie')]
 
