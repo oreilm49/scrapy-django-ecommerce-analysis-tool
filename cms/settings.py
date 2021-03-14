@@ -142,3 +142,62 @@ LOGOUT_REDIRECT_URL = '/accounts/login'
 # Celery
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER', default='amqp://guest:guest@localhost//')
 CELERY_RESULT_BACKEND = None
+
+# Email
+EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+SENDGRID_API_KEY = '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'
+SENDGRID_SANDBOX_MODE_IN_DEBUG = True
+DEFAULT_FROM_EMAIL = 'mark@specr.ie'
+SERVER_EMAIL = 'mark@specr.ie'
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'logfile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, "specr.log"),
+            'maxBytes': 50000,
+            'backupCount': 9,
+            'formatter': 'verbose',
+            'delay': True,
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'python_http_client.client': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+        },
+    }
+}
+
