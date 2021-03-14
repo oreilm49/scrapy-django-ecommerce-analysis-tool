@@ -8,3 +8,7 @@ SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', True)
 SESSION_COOKIE_SECURE = os.environ.get('SECURE_SSL_REDIRECT', True)
 # This will ensure that the CSRF Token is only sent over HTTPS
 CSRF_COOKIE_SECURE = os.environ.get('SECURE_SSL_REDIRECT', True)
+
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+SECURE_HSTS_SECONDS = 60
