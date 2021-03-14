@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'bsmodals',
     'cms.dashboard',
+    'sendgrid',
 ]
 
 MIDDLEWARE = [
