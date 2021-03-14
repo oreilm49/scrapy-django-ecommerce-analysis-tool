@@ -194,7 +194,7 @@ LOGGING = {
             'propagate': True,
         },
         'python_http_client.client': {
-            'handlers': ['console', 'logfile'],
+            'handlers': ['console'],
             'level': 'DEBUG',
         },
     }
