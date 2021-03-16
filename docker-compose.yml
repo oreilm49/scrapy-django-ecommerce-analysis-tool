@@ -23,12 +23,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - TEST_DB_NAME=test_cms
       - DEBUG=True
-      - GOOGLE_APPLICATION_CREDENTIALS=google-cloud-service-account-private-key.json
-      - DIALOGFLOW_PROJECT_ID=specr-1612006278245
-      - DIALOGFLOW_LANGUAGE_CODE=en
-      - SESSION_ID=development
       - DJANGO_SETTINGS_MODULE=cms.settings
-      - AWS_CUSTOM_MEDIA_DOMAIN=localhost:9000
       - CELERY_BROKER=amqp://guest:guest@celery-broker//
     command: python3 manage.py runserver 0.0.0.0:5000
     volumes:
