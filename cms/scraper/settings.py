@@ -1,7 +1,7 @@
 import sys
 import os
 import django
-from cms.settings import BASE_DIR
+from django.conf import settings
 
 BOT_NAME = 'scraper'
 
