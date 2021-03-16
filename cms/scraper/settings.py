@@ -66,7 +66,7 @@ ITEM_PIPELINES = {
    'scraper.pipelines.ProductImagePipeline': 500,
 }
 
-IMAGES_STORE = os.path.join(BASE_DIR, 'media/product_images')
+IMAGES_STORE = os.path.join(settings.BASE_DIR, 'media/product_images')
 IMAGES_THUMBS = {
     'big': (270, 270),
 }
