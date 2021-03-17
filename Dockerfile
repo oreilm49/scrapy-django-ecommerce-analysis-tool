@@ -48,13 +48,11 @@ RUN pip install --no-cache-dir mod-wsgi==4.7.1
 RUN adduser --system -uid 102 specr
 RUN chown specr:root .
 RUN chmod -R a+xr /var/log/apache2
-RUN chmod -R a+xr /var/log/apache2
-RUN rm -r /etc/apache2/sites-enabled/000-default.conf
+USER specr
 
-
-COPY --from=build /app/cms/sitestatic/ ./cms/sitestatic/
-COPY --from=projectfiles /app/ ./
-COPY specr.conf /etc/apache2/sites-enabled/specr.conf
+COPY --chown=specr:root --from=build /app/cms/sitestatic/ ./cms/sitestatic/
+COPY --chown=specr:root --from=projectfiles /app/ ./
+COPY --chown=specr:root specr.conf ./specr.conf
 
 ENV DJANGO_SETTINGS_MODULE cms.production
 
