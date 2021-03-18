@@ -16,3 +16,14 @@
 table .image img {
     max-height: 75px;
 }
+
+.content-body {
+	flex: 1 1 auto; padding: 2rem 2.3rem;
+}
+
+.gallery-wrap .img-big-wrap {
+    margin-bottom: 10px;
+    border-radius: 0.37rem;
+    overflow: hidden;
+    background-color: #fff;
+}
