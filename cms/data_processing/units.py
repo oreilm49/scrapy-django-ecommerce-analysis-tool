@@ -24,12 +24,10 @@ def widget_from_type(data: Union[int, float, str, bool, datetime.datetime]):
         return get_dotted_path(forms.widgets.TextInput)
     elif isinstance(data, bool):
         return get_dotted_path(forms.widgets.CheckboxInput)
-    elif isinstance(data, int):
-        return get_dotted_path(forms.widgets.NumberInput)
+    elif isinstance(data, int) or isinstance(data, float):
+        return get_dotted_path(FloatInput)
     elif isinstance(data, datetime.datetime):
         return get_dotted_path(forms.widgets.DateTimeInput)
-    elif isinstance(data, float):
-        return get_dotted_path(FloatInput)
 
 
 class UnitManager:
