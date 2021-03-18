@@ -52,3 +52,8 @@ class ProductDetail(BaseDashboardMixin, ListView):
             Breadcrumb(name="Products", url=reverse('dashboard:products'), active=False),
             Breadcrumb(name=self.product.model, url=reverse('dashboard:product', kwargs={'pk': self.product.pk}), active=True),
         ]
+
+    def get_context_data(self, **kwargs):
+        data: dict = super().get_context_data(**kwargs)
+        data.update(product=self.product)
+        return data
