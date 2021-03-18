@@ -3,6 +3,39 @@
 {% load bootstrap4 %}
 
 {% block content %}
+    <div class="card shadow mb-4">
+        {% with 'Product Info' as header %}
+            {% include 'includes/card_header.html' %}
+        {% endwith %}
+        <div class="row no-gutters">
+            <aside class="col-md-6">
+                <article class="gallery-wrap">
+                    <div class="img-big-wrap">
+                      <div> <a href="#"><img src="{{ product.image_main }}"></a></div>
+                    </div>
+                </article>
+            </aside>
+            <main class="col-md-6 border-left">
+                <article class="content-body">
+                    <h2 class="title">{{ product }}</h2>
+
+                    <div class="mb-3">
+                        <var class="price h4">€ {{ product.current_average_price }}</var>
+                    </div>
+                    <table>
+                        <tbody>
+                            {% for attribute in product.productattributes.all %}
+                                <tr>
+                                  <th>{{ attribute.attribute_type.name }}</th>
+                                  <td>{{ attribute.data.value }} {% if attribute.attribute_type.unit %}{{ attribute.attribute_type.unit }}{% endif %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </article>
+            </main>
+        </div>
+    </div>
     <div class="card shadow mb-4" style="max-height: 830px;">
         {% with 'Price History' as header %}
             {% include 'includes/card_header.html' %}
