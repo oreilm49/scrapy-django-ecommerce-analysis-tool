@@ -7,7 +7,7 @@
 
 {% block body_content %}
     <nav class="navbar navbar-expand navbar-light bg-primary topbar mb-4 static-top shadow">
-        <div class="text-white specr-logo center">Specr</div>
+        <a class="text-white specr-logo center text-decoration-none" href="{% url 'dashboard:home' %}">Specr</a>
     </nav>
     <div class="container-fluid">
         {% block content %}
