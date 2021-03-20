@@ -192,10 +192,12 @@ class AttributeTypeQuerySet(BaseQuerySet):
 
     def custom_get_or_create(self, name: str, unit: Optional[Unit] = None) -> 'AttributeType':
         attribute_type_check = self.filter(Q(name=name) | Q(alternate_names__contains=[name]))
-        if unit:
-            attribute_type_check = attribute_type_check.filter(unit=unit)
         if attribute_type_check.exists():
-            return attribute_type_check.first()
+            attribute_type: AttributeType = attribute_type_check.first()
+            if not attribute_type.unit and unit:
+                attribute_type.unit = unit
+                attribute_type.save()
+            return attribute_type
         return AttributeType.objects.create(name=name, unit=unit)
 
 
