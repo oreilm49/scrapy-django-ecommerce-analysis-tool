@@ -22,10 +22,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - TEST_DB_NAME=test_cms
-      - DEBUG=True
+      - DEBUG=true
       - DJANGO_SETTINGS_MODULE=cms.settings
       - CELERY_BROKER=amqp://guest:guest@celery-broker//
-      - HTTPCACHE_ENABLED=True
+      - HTTPCACHE_ENABLED=true
       - HTTPCACHE_EXPIRATION_SECS=604800
     command: python3 manage.py runserver 0.0.0.0:5000
     volumes:
