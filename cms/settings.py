@@ -143,9 +143,6 @@ LOGOUT_REDIRECT_URL = '/accounts/login'
 # Celery
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER', default='amqp://guest:guest@localhost//')
 CELERY_RESULT_BACKEND = None
-CELERY_IMPORTS = [
-    'cms.scraper.tasks',
-]
 
 # Email
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
