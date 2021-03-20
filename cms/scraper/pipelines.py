@@ -8,6 +8,7 @@ from cms.data_processing.constants import UnitValue, Value, RangeUnitValue
 from cms.data_processing.units import UnitManager
 from cms.models import Product, ProductAttribute, Selector, AttributeType, ProductImage
 from cms.scraper.items import ProductPageItem
+from cms.scraper.settings import IMAGES_FOLDER
 
 
 class ProductPipeline:
@@ -75,13 +76,13 @@ class ProductImagePipeline:
                 ProductImage.objects.create(
                     product=item['product'],
                     image_type=MAIN,
-                    image=item['images'][0]['path'],
+                    image=f"{IMAGES_FOLDER}/{item['images'][0]['path']}",
                 )
             if item['product'].image_thumb_required:
                 thumb_path: str = path.replace("full", "thumbs/big")
                 ProductImage.objects.create(
                     product=item['product'],
                     image_type=THUMBNAIL,
-                    image=thumb_path,
+                    image=f"{IMAGES_FOLDER}/{thumb_path}",
                 )
         return item
