@@ -87,7 +87,7 @@ AUTOTHROTTLE_DEBUG = os.environ.get('DEBUG')
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
-HTTPCACHE_ENABLED = os.environ.get('HTTPCACHE_ENABLED')
+HTTPCACHE_ENABLED = os.environ.get('HTTPCACHE_ENABLED') == 'true'
 HTTPCACHE_EXPIRATION_SECS = os.environ.get('HTTPCACHE_EXPIRATION_SECS')
 HTTPCACHE_DIR = 'httpcache'
 HTTPCACHE_IGNORE_HTTP_CODES = []
