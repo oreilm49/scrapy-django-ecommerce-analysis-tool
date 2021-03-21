@@ -85,8 +85,8 @@ class TestPipeline(TestCase):
     def test_product_image_pipeline(self):
         item: ProductPageItem = ProductPageItem(product=self.product, images=[{'path': 'full/testimage.jpg'}])
         ProductImagePipeline().process_item(item, {})
-        self.assertTrue(ProductImage.objects.filter(product=self.product, image_type=MAIN, image='full/testimage.jpg').exists())
-        self.assertTrue(ProductImage.objects.filter(product=self.product, image_type=THUMBNAIL, image='thumbs/big/testimage.jpg').exists())
+        self.assertTrue(ProductImage.objects.filter(product=self.product, image_type=MAIN, image='product_images/full/testimage.jpg').exists())
+        self.assertTrue(ProductImage.objects.filter(product=self.product, image_type=THUMBNAIL, image='product_images/thumbs/big/testimage.jpg').exists())
         item['images'] = [{'path': 'full/testimage2.jpg'}]
-        self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=MAIN, image='full/testimage2.jpg').exists())
-        self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=THUMBNAIL, image='thumbs/big/testimage2.jpg').exists())
+        self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=MAIN, image='product_images/full/testimage2.jpg').exists())
+        self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=THUMBNAIL, image='product_images/thumbs/big/testimage2.jpg').exists())
