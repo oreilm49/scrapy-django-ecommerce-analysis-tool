@@ -83,6 +83,11 @@ class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data.update(header="Create New Pivot Table")
+        return data
+
 
 class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
     template_name = 'views/category_table_modify.html'
