@@ -62,8 +62,8 @@ class TestViews(TestCase):
         url: str = reverse('dashboard:category-table-update', kwargs={'pk': table.pk})
         with self.subTest("page content"):
             response: TemplateResponse = self.client.get(url)
-            self.assertContains(response, CategoryTableForm)
-            self.assertContains(response, 'Update test table')
+            self.assertIsInstance(response.context_data['form'], CategoryTableForm)
+            self.assertContains(response, 'Edit test table')
 
         with self.subTest("post"):
             response: TemplateResponse = self.client.post(url, data={
@@ -75,10 +75,10 @@ class TestViews(TestCase):
                 'category': mommy.make(Category, name="washing").pk,
                 'query': 'test query',
             }, follow=True)
-            self.assertEqual(response.status_code, 201)
-            self.assertRedirects(response, reverse('dashboard:category-tables'))
-            self.assertContains(response, 'test table')
-            self.assertContains(response, 'Sucessfully updated "modified table name"')
+            self.assertEqual(response.status_code, 200)
+            self.assertRedirects(response, reverse('dashboard:category-table', kwargs={'pk': table.pk}))
+            self.assertNotContains(response, 'test table')
+            self.assertContains(response, 'Successfully updated &quot;modified table name&quot;')
 
         with self.subTest("table content"):
             table: CategoryTable = CategoryTable.objects.get(pk=table.pk)
@@ -92,8 +92,8 @@ class TestViews(TestCase):
 
         with self.subTest("delete"):
             response: TemplateResponse = self.client.post(url, data={'delete': 'save'}, follow=True)
-            self.assertEqual(response.status_code, 201)
+            self.assertEqual(response.status_code, 200)
             self.assertRedirects(response, reverse('dashboard:category-tables'))
-            self.assertContains(response, 'Sucessfully deleted "modified table name"')
+            self.assertContains(response, 'Successfully deleted &quot;modified table name&quot;')
             table: CategoryTable = CategoryTable.objects.get(pk=table.pk)
             self.assertFalse(table.publish)
