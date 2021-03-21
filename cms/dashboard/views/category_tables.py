@@ -100,9 +100,7 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        data.update(
-            header=f"Edit {self.table.name}" if self.table else 'Create New Category Table'
-        )
+        data.update(header=f"Edit {self.table.name}")
         return data
 
     @property
