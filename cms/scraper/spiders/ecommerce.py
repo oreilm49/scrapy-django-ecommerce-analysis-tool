@@ -65,7 +65,7 @@ class EcommerceSpider(scrapy.Spider):
                         value: Optional[str] = response.css(selector.css_selector).get()
                         if value and selector.selector_type == IMAGE:
                             # don't .lower() image urls, filename urls are case sensitive
-                            page_item['image_urls'].append(value.strip())
+                            page_item['image_urls'].append(response.urljoin(value.strip()))
                         elif value:
                             page_item['website_attributes'].append({'value': value.strip().lower(), 'selector': selector})
                 yield page_item
