@@ -14,5 +14,5 @@ def product_specs(context: dict, product: Product):
         product_attribute: ProductAttribute
         if index > specs_limit:
             break
-        html += f"<div style='display: block'>{product_attribute.display}</div>"
+        html += f"<div style='display: block'>{product_attribute.display if product_attribute else ''}</div>"
     return format_html(html)
