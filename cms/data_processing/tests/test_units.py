@@ -28,7 +28,7 @@ class TestUnits(TestCase):
 
     def test_widget_from_type(self):
         self.assertEqual(widget_from_type("1"), get_dotted_path(forms.widgets.TextInput))
-        self.assertEqual(widget_from_type(1), get_dotted_path(forms.widgets.NumberInput))
+        self.assertEqual(widget_from_type(1), get_dotted_path(FloatInput))
         self.assertEqual(widget_from_type(True), get_dotted_path(forms.widgets.CheckboxInput))
         self.assertEqual(widget_from_type(datetime.datetime.now()), get_dotted_path(forms.widgets.DateTimeInput))
         self.assertEqual(widget_from_type(1.11), get_dotted_path(FloatInput))
