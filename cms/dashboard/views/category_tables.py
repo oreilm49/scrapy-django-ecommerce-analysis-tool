@@ -64,7 +64,7 @@ class CategoryTables(CategoryTableMixin, ListView):
 class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
     template_name = 'views/category_table_modify.html'
     form_class = CategoryTableForm
-    success_message = _('Sucessfully created "%(name)s"')
+    success_message = _('Successfully created "%(name)s"')
 
     @property
     def table(self) -> CategoryTable:

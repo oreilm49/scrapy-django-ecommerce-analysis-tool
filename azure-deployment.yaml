@@ -1,0 +1,183 @@
+name: specr
+apiVersion: '2019-12-01'
+location: westeurope
+properties:
+  containers:
+  - name: cms
+    properties:
+      image: specr.azurecr.io/specr:deployment
+      ports:
+        - protocol: TCP
+          port: 8000
+      environmentVariables:
+        - name: POSTGRES_HOST
+          value: specr.postgres.database.azure.com
+        - name: POSTGRES_DB
+          value: specr
+        - name: POSTGRES_PASSWORD
+          secureValue: 9CBDvedK8nQU3vzVLvZZ
+        - name: POSTGRES_USER
+          value: specr@specr
+        - name: DJANGO_SETTINGS_MODULE
+          value: cms.production
+        - name: SECRET_KEY
+          secureValue: JghWZgWM3K
+        - name: CELERY_BROKER
+          value: amqp://guest:guest@localhost:5672//
+      resources:
+        requests:
+          cpu: 1
+          memoryInGb: 1.5
+        limits:
+          cpu: 1
+          memoryInGb: 3
+      volumeMounts:
+        - name: cms-media
+          mountPath: /app/cms/media
+          readOnly: False
+  - name: caddy
+    properties:
+      image: caddy
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 0.5
+        limits:
+          cpu: 0.5
+          memoryInGb: 0.5
+      volumeMounts:
+        - name: caddy-data
+          mountPath: /data
+          readOnly: False
+      command: ["caddy", "reverse-proxy", "--from", "app.specr.ie", "--to", "localhost:8000"]
+  - name: celery-worker
+    properties:
+      image: specr.azurecr.io/specr:deployment
+      command: ["celery", "-A", "specr", "worker", "-l", "DEBUG", "--concurrency", "1", "--events"]
+      environmentVariables:
+        - name: POSTGRES_HOST
+          value: specr.postgres.database.azure.com
+        - name: POSTGRES_DB
+          value: specr
+        - name: POSTGRES_PASSWORD
+          secureValue: 9CBDvedK8nQU3vzVLvZZ
+        - name: POSTGRES_USER
+          value: specr@specr
+        - name: DJANGO_SETTINGS_MODULE
+          value: cms.production
+        - name: SECRET_KEY
+          secureValue: JghWZgWM3K
+        - name: CELERY_BROKER
+          value: amqp://guest:guest@localhost:5672//
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 1
+        limits:
+          cpu: 1
+          memoryInGb: 1.5
+      volumeMounts:
+        - name: cms-media
+          mountPath: /app/cms/media
+          readOnly: False
+  - name: celery-beat
+    properties:
+      image: specr.azurecr.io/specr:deployment
+      command: ["celery", "-A", "specr", "beat", "-l", "DEBUG"]
+      environmentVariables:
+        - name: POSTGRES_HOST
+          value: specr.postgres.database.azure.com
+        - name: POSTGRES_DB
+          value: specr
+        - name: POSTGRES_PASSWORD
+          secureValue: 9CBDvedK8nQU3vzVLvZZ
+        - name: POSTGRES_USER
+          value: specr@specr
+        - name: DJANGO_SETTINGS_MODULE
+          value: cms.production
+        - name: SECRET_KEY
+          secureValue: JghWZgWM3K
+        - name: CELERY_BROKER
+          value: amqp://guest:guest@localhost:5672//
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 1
+        limits:
+          cpu: 0.5
+          memoryInGb: 1.5
+  - name: celery-broker
+    properties:
+      image: rabbitmq:3.8.5-alpine
+      ports:
+        - protocol: TCP
+          port: 5672
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 1
+        limits:
+          cpu: 0.5
+          memoryInGb: 1.5
+  imageRegistryCredentials:
+  - server: specr.azurecr.io
+    username: specr
+    password: CsjRcUfrA3spZSNC5LgM304S=8j+MvNW
+  restartPolicy: OnFailure
+  ipAddress:
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+    type: Public
+    dnsNameLabel: specr
+  osType: Linux
+  volumes:
+    - name: cms-media
+      azureFile:
+        shareName: cms-media
+        readOnly: false
+        storageAccountName: specr
+        storageAccountKey: b8EoRls83maUX9IBr33mS6dkrxKmTKq2bInYEVQwICnx8H7gQ/rCGNRk0Qp+shAc/q7LrQJ0SZ7grKUQaUaGZA==
+    - name: redis-data
+      azureFile:
+        shareName: redis-data
+        readOnly: false
+        storageAccountName: specr
+        storageAccountKey: b8EoRls83maUX9IBr33mS6dkrxKmTKq2bInYEVQwICnx8H7gQ/rCGNRk0Qp+shAc/q7LrQJ0SZ7grKUQaUaGZA==
+    - name: caddy-data
+      azureFile:
+        shareName: caddy-data
+        readOnly: false
+        storageAccountName: specr
+        storageAccountKey: b8EoRls83maUX9IBr33mS6dkrxKmTKq2bInYEVQwICnx8H7gQ/rCGNRk0Qp+shAc/q7LrQJ0SZ7grKUQaUaGZA==
+  initContainers:
+  - name: migrate
+    properties:
+      image: specr.azurecr.io/specr:deployment
+      command: ["python", "manage.py", "migrate"]
+      environmentVariables:
+        - name: POSTGRES_HOST
+          value: specr.postgres.database.azure.com
+        - name: POSTGRES_DB
+          value: specr
+        - name: POSTGRES_PASSWORD
+          secureValue: 9CBDvedK8nQU3vzVLvZZ
+        - name: POSTGRES_USER
+          value: specr@specr
+        - name: DJANGO_SETTINGS_MODULE
+          value: cms.production
+        - name: SECRET_KEY
+          secureValue: JghWZgWM3K
+        - name: CELERY_BROKER
+          value: amqp://guest:guest@localhost:5672//
+      volumeMounts:
+        - name: cms-media
+          mountPath: /app/cms/media
+          readOnly: False
