@@ -38,8 +38,8 @@ class TestViews(TestCase):
     def test_category_table_create(self):
         with self.subTest("page content"):
             response: TemplateResponse = self.client.get(reverse('dashboard:category-table-create'))
-            self.assertContains(response, CategoryTableForm)
-            self.assertContains(response, 'Create New Category Table')
+            self.assertIsInstance(response.context_data['form'], CategoryTableForm)
+            self.assertContains(response, 'Create New Pivot Table')
 
         with self.subTest("post"):
             response: TemplateResponse = self.client.post(reverse('dashboard:category-table-create'), data={
@@ -51,10 +51,11 @@ class TestViews(TestCase):
                 'category': mommy.make(Category, name="washing").pk,
                 'query': 'test query',
             }, follow=True)
-            self.assertEqual(response.status_code, 201)
-            self.assertRedirects(response, reverse('dashboard:category-tables'))
+            self.assertEqual(response.status_code, 200)
+            table: CategoryTable = CategoryTable.objects.first()
+            self.assertRedirects(response, reverse('dashboard:category-table', kwargs={'pk': table.pk}))
             self.assertContains(response, 'test table')
-            self.assertContains(response, 'Sucessfully created "test table"')
+            self.assertContains(response, 'Successfully created &quot;test table&quot;')
 
     def test_category_table_update(self):
         table: CategoryTable = mommy.make(CategoryTable, name="test table")
