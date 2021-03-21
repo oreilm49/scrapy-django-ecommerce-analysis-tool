@@ -65,7 +65,7 @@ class TestUnits(TestCase):
 
         with self.subTest("valid unit"):
             parsed_value: UnitValue = units.get_processed_unit_and_value("1kg")
-            kg_unit: Unit = Unit.objects.get(name="kilogram", widget=get_dotted_path(forms.widgets.NumberInput))
+            kg_unit: Unit = Unit.objects.get(name="kilogram", widget=get_dotted_path(FloatInput))
             self.assertEqual(parsed_value, UnitValue(value=1, unit=kg_unit))
 
         with self.subTest("undefined unit"):
@@ -74,7 +74,7 @@ class TestUnits(TestCase):
 
         with self.subTest("range value"):
             parsed_value: RangeUnitValue = units.get_processed_unit_and_value("200-240v")
-            volt_unit: Unit = Unit.objects.get(name="volt", widget=get_dotted_path(forms.widgets.NumberInput))
+            volt_unit: Unit = Unit.objects.get(name="volt", widget=get_dotted_path(FloatInput))
             self.assertEqual(parsed_value, RangeUnitValue(unit=volt_unit, value_low=200, value_high=240))
 
     def test_get_or_create_unit(self):
@@ -84,7 +84,7 @@ class TestUnits(TestCase):
         with self.subTest("unit created"):
             self.assertFalse(Unit.objects.exists())
             parsed_value: UnitValue = units.get_or_create_unit("1kg")
-            kg_unit: Unit = Unit.objects.get(name="kilogram", widget=get_dotted_path(forms.widgets.NumberInput))
+            kg_unit: Unit = Unit.objects.get(name="kilogram", widget=get_dotted_path(FloatInput))
             self.assertEqual(parsed_value.unit, kg_unit)
             self.assertEqual(parsed_value.value, 1)
 
