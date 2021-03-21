@@ -47,6 +47,9 @@ class CategoryTable(BaseModel):
 
     objects = CategoryTableQuerySet.as_manager()
 
+    def __str__(self):
+        return self.name
+
     def products(self, queryset: 'ProductQuerySet') -> 'QuerySet':
         product_pks: List[int] = []
         if not is_value_numeric(self.x_axis_values[0]):
