@@ -92,7 +92,7 @@ class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
 class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
     template_name = 'views/category_table_modify.html'
     form_class = CategoryTableForm
-    success_message = _('Sucessfully updated "%(name)s"')
+    success_message = _('Successfully updated "%(name)s"')
 
     @property
     def table(self) -> CategoryTable:
@@ -113,7 +113,7 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
             table = self.table
             table.publish = False
             table.save()
-            messages.success(request, _('Sucessfully deleted "{table}"').format(table=table))
+            messages.success(request, _('Successfully deleted "{table}"').format(table=table))
             return HttpResponseRedirect(reverse('dashboard:category-tables'))
         return super().post(request, *args, **kwargs)
 
