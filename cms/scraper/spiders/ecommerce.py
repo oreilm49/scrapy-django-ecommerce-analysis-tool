@@ -28,10 +28,12 @@ class EcommerceSpider(scrapy.Spider):
 
     def parse(self, response, category: Category = None, **kwargs) -> Iterator[scrapy.Request]:
         element: scrapy.selector.unified.Selector
-        for element in response.css(self.website.selectors.filter(selector_type=PAGINATION).first().css_selector):
-            href: Optional[str] = element.attrib.get('href')
-            if href:
-                yield response.follow(response.urljoin(href), self.parse, cb_kwargs={'category': category})
+        pagination_selectors = self.website.selectors.filter(selector_type=PAGINATION)
+        if pagination_selectors.exists():
+            for element in response.css(pagination_selectors.first().css_selector):
+                href: Optional[str] = element.attrib.get('href')
+                if href:
+                    yield response.follow(response.urljoin(href), self.parse, cb_kwargs={'category': category})
 
         for element in response.css(self.website.selectors.filter(selector_type=LINK).first().css_selector):
             href: Optional[str] = element.attrib.get('href')
