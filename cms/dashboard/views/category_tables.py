@@ -22,7 +22,7 @@ CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_
 
 
 class CategoryTableMixin(BaseDashboardMixin):
-    queryset: CategoryTableQuerySet = CategoryTable.objects.published()
+    queryset: CategoryTableQuerySet = CategoryTable.objects.published().order_by('name')
 
     def get_queryset(self) -> CategoryTableQuerySet:
         return self.queryset.for_user(self.request.user)
