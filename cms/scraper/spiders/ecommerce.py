@@ -31,12 +31,12 @@ class EcommerceSpider(scrapy.Spider):
         for element in response.css(self.website.selectors.filter(selector_type=PAGINATION).first().css_selector):
             href: Optional[str] = element.attrib.get('href')
             if href:
-                yield response.follow(href, self.parse, cb_kwargs={'category': category})
+                yield response.follow(response.urljoin(href), self.parse, cb_kwargs={'category': category})
 
         for element in response.css(self.website.selectors.filter(selector_type=LINK).first().css_selector):
             href: Optional[str] = element.attrib.get('href')
             if href:
-                yield response.follow(href, self.parse_product, cb_kwargs={'category': category})
+                yield response.follow(response.urljoin(href), self.parse_product, cb_kwargs={'category': category})
 
     def parse_product(self, response, category: Category = None, **kwargs) -> Iterator[ProductPageItem]:
         for model_selector in self.website.selectors.filter(selector_type=MODEL):
