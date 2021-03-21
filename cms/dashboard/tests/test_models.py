@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from model_mommy import mommy
 
+from cms.accounts.models import Company
 from cms.dashboard.models import CategoryTable
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute, AttributeType, Category
 
@@ -40,9 +41,16 @@ class TestModels(TestCase):
         self.assertNotIn(product_5, products)
 
     def test_category_table_for_user(self):
-        user: User = mommy.make(User, profile__company__name="test company")
+        company: Company = mommy.make(Company, name="test company")
+        user: User = mommy.make(User)
+        user.profile.company = company
+        user.save()
         owned_table: CategoryTable = mommy.make(CategoryTable, user=user)
-        colleagues_table: CategoryTable = mommy.make(CategoryTable, user__profile__company=user.profile.company)
+
+        colleague: User = mommy.make(User)
+        colleague.profile.company = company
+        colleague.save()
+        colleagues_table: CategoryTable = mommy.make(CategoryTable, user=colleague)
         unowned_table: CategoryTable = mommy.make(CategoryTable)
         tables = CategoryTable.objects.for_user(user)
         self.assertIn(owned_table, tables)
