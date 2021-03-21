@@ -25,7 +25,7 @@ class TestViews(TestCase):
             response: TemplateResponse = self.client.get(reverse('dashboard:category-tables'))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "No category tables")
-            self.assertContains(response, "Create")
+            self.assertContains(response, "New")
 
         with self.subTest("tables"):
             mommy.make(CategoryTable, name="test 1")
