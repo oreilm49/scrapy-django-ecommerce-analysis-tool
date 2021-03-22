@@ -149,8 +149,8 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
 SENDGRID_API_KEY = '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'
 SENDGRID_SANDBOX_MODE_IN_DEBUG = True
-DEFAULT_FROM_EMAIL = 'mark@specr.ie'
-SERVER_EMAIL = 'mark@specr.ie'
+DEFAULT_FROM_EMAIL = 'info@specr.ie'
+SERVER_EMAIL = 'info@specr.ie'
 
 # Logging
 LOGGING = {
