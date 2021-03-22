@@ -1,3 +1,7 @@
+import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
+
 from cms.settings import *
 
 DEBUG = False
@@ -10,3 +14,10 @@ SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', True)
 CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', True)
 
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+sentry_sdk.init(
+    dsn='https://d7219358ffd142488ed74e36e642608e@o556601.ingest.sentry.io/5687819',
+    integrations=[CeleryIntegration(), DjangoIntegration()],
+    # associates users to errors
+    send_default_pii=True
+)
