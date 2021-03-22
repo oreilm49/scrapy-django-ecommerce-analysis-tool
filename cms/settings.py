@@ -176,7 +176,7 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'logfile': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, "specr.log"),
             'maxBytes': 50000,
@@ -185,20 +185,15 @@ LOGGING = {
             'delay': True,
         },
         'console': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         }
     },
     'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
         'python_http_client.client': {
             'handlers': ['console', 'logfile'],
-            'level': 'DEBUG',
+            'level': 'ERROR',
         },
     }
 }
