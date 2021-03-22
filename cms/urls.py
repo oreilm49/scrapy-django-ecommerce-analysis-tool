@@ -12,8 +12,8 @@ urlpatterns = [
 ]
 
 
-def my_test_500_view(request):
-    return HttpResponseServerError()
+def trigger_500(request):
+    return 1 / 0
 
 
-urlpatterns += [path('trigger_500/', my_test_500_view)]
+urlpatterns += [path('trigger_500/', trigger_500)]
