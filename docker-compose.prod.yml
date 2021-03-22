@@ -27,7 +27,7 @@ services:
       - .:/app
       - cms-media:/app/cms/media
     ports:
-      - "80:80"
+      - "8000:8000"
     depends_on:
       - db
 
