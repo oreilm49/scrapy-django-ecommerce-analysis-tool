@@ -1,0 +1,12 @@
+{% load i18n %}
+{% load bootstrap4 %}
+
+<button class="feedback-button btn-circle btn-primary btn-lg text-white" onclick="showDialog('{% trans 'Can we do better?' %}', 'form#feedback-form', null, BTN_CANCEL, btnSave(function() {
+            $('form#feedback-form').submit();
+        }))">
+    <i class="fa fa-comment" aria-hidden="true"></i>
+</button>
+<form id="feedback-form" class="hidden" method="post" action="{% url 'dashboard:feedback' %}">
+    {% csrf_token %}
+    {% bootstrap_form feedback_form layout='inline' %}
+</form>
