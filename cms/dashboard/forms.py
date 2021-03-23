@@ -111,3 +111,7 @@ class ProductsFilterForm(forms.Form):
                 'css/select2.min.css',
             ),
         }
+
+
+class FeedbackForm(forms.Form):
+    feedback = forms.CharField(widget=forms.Textarea, label=_('How can we improve?'), help_text=_('Please provide as much context as possible'))
