@@ -15,4 +15,4 @@ def crawl_website(pk: int):
 
 @shared_task
 def crawl_websites():
-    group(crawl_website.s(website.pk) for website in Website.objects.filter(publish=True))()
+    group(crawl_website.s(website.pk) for website in Website.objects.filter(publish=True)).apply_async()
