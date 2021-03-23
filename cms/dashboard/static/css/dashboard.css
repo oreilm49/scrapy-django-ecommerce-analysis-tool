@@ -38,3 +38,13 @@ table .image img {
     font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     text-transform: uppercase;
 }
+
+.feedback-button {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+}
+
+.hidden {
+    display: none;
+}
