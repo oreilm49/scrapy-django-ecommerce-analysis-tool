@@ -1,4 +1,5 @@
 from celery import shared_task
+from multiprocessing import Process
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
@@ -15,4 +16,6 @@ def crawl_website(website: Website):
 @shared_task
 def crawl_websites():
     for website in Website.objects.filter(publish=True):
-        crawl_website(website)
+        p = Process(target=crawl_website, args=(website, ))
+        p.start()
+        p.join()
