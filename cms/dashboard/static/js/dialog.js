@@ -33,7 +33,18 @@ function showDialog(title, body, btnSuccess, btnPrimary, btnDanger) {
         return;
     }
     dialog.find('.modal-title').text(title);
-    dialog.find('.modal-body>p').html(body);
+    try {
+        if($(body + '.hidden').length > 0){
+            dialog.find('.modal-body').html('');
+            $(body + '.hidden').appendTo(dialog.find('.modal-body'));
+            $(body + '.hidden').removeClass('hidden');
+        } else {
+            dialog.find('.modal-body>p').html(body);
+        }
+    } catch (e) {
+        dialog.find('.modal-body>p').html(body);
+    }
+
 
     [
         ['button#btn-danger', btnDanger],
