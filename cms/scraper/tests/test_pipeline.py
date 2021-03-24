@@ -90,3 +90,5 @@ class TestPipeline(TestCase):
         item['images'] = [{'path': 'full/testimage2.jpg'}]
         self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=MAIN, image='product_images/full/testimage2.jpg').exists())
         self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=THUMBNAIL, image='product_images/thumbs/big/testimage2.jpg').exists())
+        item: ProductPageItem = ProductPageItem(product=self.product, images=[])
+        self.assertEqual(ProductImagePipeline().process_item(item, {}), item)
