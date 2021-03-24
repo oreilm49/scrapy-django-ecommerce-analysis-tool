@@ -116,8 +116,8 @@ class Category(BaseModel):
         return self.name
 
     @cached_property
-    def top_attribute_types(self) -> 'AttributeTypeQuerySet':
-        return AttributeType.objects.filter(productattributes__product__category=self).annotate(num=Count('productattributes')).order_by('-num')
+    def top_attribute_types(self) -> QuerySet['AttributeType']:
+        return AttributeType.objects.filter(pk__in=self.category_attribute_configs.values_list('attribute_type', flat=True))
 
 
 class Selector(BaseModel):
