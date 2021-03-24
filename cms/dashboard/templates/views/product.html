@@ -41,6 +41,9 @@
             {% include 'includes/card_header.html' %}
         {% endwith %}
         <div class="card-body">
+            {% with field_col_class='col-xs-12 col-sm-2' %}
+                {% include 'includes/filter_form.html' %}
+            {% endwith %}
             <div class="table-responsive">
                 <table class="table table-bordered scrollable-table">
                     <thead>
