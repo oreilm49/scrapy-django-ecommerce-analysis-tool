@@ -30,7 +30,6 @@ class CategoryAttributeConfigInlineAdmin(admin.TabularInline):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'parent', 'alternate_names',
-    list_editable = 'name', 'parent', 'alternate_names',
     list_filter = 'parent',
     inlines = CategoryAttributeConfigInlineAdmin,
 
@@ -38,35 +37,33 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Selector)
 class SelectorAdmin(admin.ModelAdmin):
     list_display = 'id', 'selector_type', 'css_selector', 'website', 'regex', 'parent',
-    list_editable = 'selector_type', 'css_selector', 'website', 'regex', 'parent',
-    list_filter = 'selector_type', 'website', 'parent',
+    list_editable = 'css_selector', 'regex', 'parent',
+    list_filter = 'website',
 
 
 @admin.register(Unit)
 class UnitAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'alternate_names', 'widget', 'repeat',
-    list_editable = 'name', 'alternate_names', 'widget', 'repeat',
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = 'id', 'model', 'category', 'alternate_models',
-    list_editable = 'model', 'category', 'alternate_models',
     list_filter = 'category',
-    list_per_page = 50
+    list_per_page = 25
 
 
 @admin.register(ProductAttribute)
 class ProductAttributeAdmin(admin.ModelAdmin):
     list_display = 'id', 'attribute_type', 'data', 'product',
-    list_editable = 'attribute_type', 'data', 'product',
+    list_editable = 'data',
     list_filter = 'product', 'product__category', 'attribute_type',
 
 
 @admin.register(WebsiteProductAttribute)
 class WebsiteProductAttributeAdmin(admin.ModelAdmin):
     list_display = 'id', 'website', 'attribute_type', 'data', 'product',
-    list_editable = 'website', 'attribute_type', 'data', 'product',
+    list_editable = 'data',
     list_filter = 'website', 'product', 'product__category', 'attribute_type',
 
 
