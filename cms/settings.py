@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_extensions',
+    'bootstrap_daterangepicker',
     'cms.accounts',
     'cms',
     'cms.scraper',
