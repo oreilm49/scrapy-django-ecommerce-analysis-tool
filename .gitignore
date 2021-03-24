@@ -7,3 +7,4 @@ google-cloud-service-account-private-key.json
 cms/sitestatic
 *.env
 *specr.log*
+cms/media
