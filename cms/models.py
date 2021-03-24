@@ -115,6 +115,7 @@ class Category(BaseModel):
     def __str__(self):
         return self.name
 
+
 class Selector(BaseModel):
     selector_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=SELECTOR_TYPES)
     css_selector = models.CharField(verbose_name=_("CSS Selector"), max_length=MAX_LENGTH, help_text=_("The CSS selector used to find page data."))
