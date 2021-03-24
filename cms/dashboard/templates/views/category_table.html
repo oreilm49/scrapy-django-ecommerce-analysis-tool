@@ -4,6 +4,7 @@
 {% load static %}
 
 {% block extrahead %}
+    {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/pivot-table.css' %}">
 {% endblock %}
 
