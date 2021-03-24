@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views.generic import ListView
 
 from cms.models import Product, ProductQuerySet, WebsiteProductAttributeQuerySet, WebsiteProductAttribute
-from cms.dashboard.forms import ProductsFilterForm
+from cms.dashboard.forms import ProductsFilterForm, ProductPriceFilterForm
 from cms.dashboard.views.base import Breadcrumb, BaseDashboardMixin
 
 
@@ -41,7 +41,14 @@ class ProductDetail(BaseDashboardMixin, ListView):
     queryset: WebsiteProductAttributeQuerySet = WebsiteProductAttribute.objects.published()
 
     def get_queryset(self):
-        return super().get_queryset().filter(product=self.product, attribute_type__name="price")
+        qs = super().get_queryset().filter(product=self.product, attribute_type__name="price")
+        form: ProductPriceFilterForm = self.get_form()
+        if form.is_valid():
+            qs = form.search(qs)
+        return qs
+
+    def get_form(self):
+        return ProductPriceFilterForm(self.request.GET or None)
 
     @property
     def product(self) -> Product:
@@ -55,5 +62,5 @@ class ProductDetail(BaseDashboardMixin, ListView):
 
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
-        data.update(product=self.product)
+        data.update(product=self.product, filter_form=self.get_form())
         return data
