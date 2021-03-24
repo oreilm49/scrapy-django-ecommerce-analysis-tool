@@ -1,14 +1,17 @@
 from typing import List
 
+from bootstrap_daterangepicker.fields import DateRangeField
+from bootstrap_daterangepicker.widgets import DateRangeWidget
 from django import forms
 from django.contrib.postgres.forms import SimpleArrayField
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils.translation import gettext as _
+from django.utils import timezone
 
 from cms.dashboard.models import CategoryTable, CategoryTableQuerySet
 from cms.dashboard.utils import get_brands
-from cms.models import AttributeType, Category, ProductQuerySet
+from cms.models import AttributeType, Category, ProductQuerySet, Website, WebsiteProductAttributeQuerySet
 from cms.utils import serialized_values_for_attribute_type, is_value_numeric
 
 
@@ -115,3 +118,31 @@ class ProductsFilterForm(forms.Form):
 
 class FeedbackForm(forms.Form):
     feedback = forms.CharField(widget=forms.Textarea, label=_('How can we improve?'), help_text=_('Please provide as much context as possible'))
+
+
+class ProductPriceFilterForm(forms.Form):
+    website = forms.ModelChoiceField(label=_('Website'), queryset=Website.objects.published(), required=False)
+    price_low = forms.FloatField(label=_('Price: low'), required=False)
+    price_high = forms.FloatField(label=_('Price: high'), required=False)
+    date_range = DateRangeField(widget=DateRangeWidget(
+        picker_options={
+            'showDropdowns': True,
+            'autoUpdateInput': True,
+            'minYear': 2010,
+            'maxYear': timezone.now().year + 1,
+            'linkedCalendars': False,
+        },
+        format='%Y-%m-%d',
+    ), label=_('Date range'))
+
+    def search(self, queryset: WebsiteProductAttributeQuerySet) -> WebsiteProductAttributeQuerySet:
+        if self.cleaned_data.get('website'):
+            queryset = queryset.filter(website=self.cleaned_data['website'])
+        if self.cleaned_data.get('price_low'):
+            queryset = queryset.filter(attribute_type__name='price', data__value__gte=self.cleaned_data['price_low'])
+        if self.cleaned_data.get('price_high'):
+            queryset = queryset.filter(attribute_type__name='price', data__value__lte=self.cleaned_data['price_high'])
+        if self.cleaned_data.get('date_range'):
+            start, end = self.cleaned_data['date_range']
+            queryset = queryset.filter(created__gte=start, created__lte=end)
+        return queryset
