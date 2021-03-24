@@ -40,9 +40,12 @@ table .image img {
 }
 
 .feedback-button {
-    position: absolute;
-    bottom: 50px;
-    right: 50px;
+    position: fixed;
+    bottom: 30px;
+    right: 40px;
+    height: 56px;
+    width: 56px;
+    z-index: 2000;
 }
 
 .hidden {
