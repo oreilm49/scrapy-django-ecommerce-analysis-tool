@@ -277,3 +277,16 @@ class ProductImage(BaseModel):
 
     def __str__(self):
         return f"{self.product} | {self.image}"
+
+
+class CategoryAttributeConfig(BaseModel):
+    attribute_type = models.ForeignKey(to=AttributeType, verbose_name=_("Attribute"), on_delete=CASCADE, related_name="category_attribute_configs")
+    category = models.ForeignKey(to=Category, verbose_name=_("Category"), on_delete=CASCADE, related_name="category_attribute_configs")
+    weight = models.IntegerField(verbose_name=_('Weight'))
+    company = models.ForeignKey(to="accounts.Company", verbose_name=_("Company"), on_delete=CASCADE, related_name="category_attribute_configs", blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.category} | {self.attribute_type}"
+
+    class Meta:
+        unique_together = ['category', 'attribute_type', 'company']
