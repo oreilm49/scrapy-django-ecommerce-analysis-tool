@@ -115,11 +115,6 @@ class Category(BaseModel):
     def __str__(self):
         return self.name
 
-    @cached_property
-    def top_attribute_types(self) -> QuerySet['AttributeType']:
-        return AttributeType.objects.filter(pk__in=self.category_attribute_configs.values_list('attribute_type', flat=True))
-
-
 class Selector(BaseModel):
     selector_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=SELECTOR_TYPES)
     css_selector = models.CharField(verbose_name=_("CSS Selector"), max_length=MAX_LENGTH, help_text=_("The CSS selector used to find page data."))
