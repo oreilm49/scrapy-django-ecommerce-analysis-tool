@@ -27,7 +27,7 @@ class CategoryTable(BaseModel):
     x_axis_attribute = models.ForeignKey(
         "cms.AttributeType",
         verbose_name=_('X Axis Attribute'),
-        help_text=_('The attribute used to group products into rows on the table.'),
+        help_text=_('The attribute used to group products into columns on the table.'),
         on_delete=models.SET_NULL,
         null=True,
         related_name='category_tables_x_axis'
