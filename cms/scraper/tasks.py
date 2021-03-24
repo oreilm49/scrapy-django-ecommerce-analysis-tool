@@ -7,12 +7,8 @@ from cms.scraper.spiders.ecommerce import EcommerceSpider
 
 
 @shared_task
-def crawl_website(pk: int):
-    process = CrawlerProcess(get_project_settings())
-    process.crawl(EcommerceSpider, website=Website.objects.get(pk=pk))
-    process.start()
-
-
-@shared_task
 def crawl_websites():
-    group(crawl_website.s(website.pk) for website in Website.objects.filter(publish=True)).apply_async()
+    process = CrawlerProcess(get_project_settings())
+    for website in Website.objects.filter(publish=True):
+        process.crawl(EcommerceSpider, website=website)
+    process.start()
