@@ -1,13 +1,13 @@
 import datetime
-import os
 import uuid
 from statistics import mean
 from typing import Optional, Dict, Union, Type, Iterator
 
 from django import forms
+from django.contrib.humanize.templatetags import humanize
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q, Count
+from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext as _
@@ -251,7 +251,14 @@ class ProductAttribute(BaseProductAttribute):
 
     @property
     def display(self):
-        return f"{self.data['value']} " + f" {self.attribute_type.unit}" if self.attribute_type.unit else ""
+        return f"{self.formatted_value} " + f" {self.attribute_type.unit}" if self.attribute_type.unit else ""
+
+    @property
+    def formatted_value(self):
+        try:
+            return humanize.intcomma(int(self.data['value']))
+        except Exception:
+            return self.data['value']
 
 
 class WebsiteProductAttributeQuerySet(BaseQuerySet):
