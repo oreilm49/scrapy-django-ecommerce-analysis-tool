@@ -31,7 +31,7 @@
                                 {% for product in products %}
                                     {% ifequal x_header product.x_axis_grouper %}
                                         <td>
-                                            <div class="model">{{ product.product.model }}</div>
+                                            <div class="model"><a href="{% url 'dashboard:product' pk=product.product.pk %}">{{ product.product.model }}</a></div>
                                             <div class="image"><img src="{{ product.product.image_thumb }}" alt=""></div>
                                             <div class="specs">{% product_specs product.product %}</div>
                                             <div class="price">
