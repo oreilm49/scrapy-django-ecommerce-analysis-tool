@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
-    ProductImage, AttributeType
+    ProductImage, AttributeType, CategoryAttributeConfig
 from cms.views.admin import ProductMapView, AttributeTypeMapView
 
 
@@ -20,11 +20,19 @@ class UrlAdmin(admin.ModelAdmin):
     exclude = 'last_scanned',
 
 
+class CategoryAttributeConfigInlineAdmin(admin.TabularInline):
+    model = CategoryAttributeConfig
+    extra = 0
+    fields = 'order', 'attribute_type', 'weight', 'publish',
+    show_change_link = True
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'parent', 'alternate_names',
     list_editable = 'name', 'parent', 'alternate_names',
     list_filter = 'parent',
+    inlines = CategoryAttributeConfigInlineAdmin,
 
 
 @admin.register(Selector)
