@@ -71,6 +71,8 @@ class ProductImagePipeline:
     @transaction.atomic
     def process_item(self, item, spider):
         if isinstance(item, ProductPageItem):
+            if not item['images']:
+                return item
             path: str = item['images'][0]['path']
             if item['product'].image_main_required:
                 ProductImage.objects.create(
