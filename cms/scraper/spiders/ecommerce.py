@@ -46,7 +46,7 @@ class EcommerceSpider(scrapy.Spider):
             model: Optional[str] = response.css(model_selector.css_selector).get()
             if model:
                 page_item = ProductPageItem()
-                page_item['model'] = model
+                page_item['model'] = model.strip().lower()
                 page_item['website'] = self.website
                 page_item['attributes'] = []
                 page_item['website_attributes'] = []
