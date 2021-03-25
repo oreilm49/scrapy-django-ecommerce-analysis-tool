@@ -72,7 +72,7 @@ class CategoryTableFilterForm(forms.Form):
         return queryset
 
     class Media:
-        js = 'js/select2.min.js', 'js/duplicates.js',
+        js = 'js/select2.min.js', 'js/category_tables_filter.js',
         css = {
             'all': (
                 'css/select2.min.css',
@@ -82,7 +82,7 @@ class CategoryTableFilterForm(forms.Form):
 
 class ProductsFilterForm(forms.Form):
     q = forms.CharField(label=_('Search'), required=False)
-    category = forms.ModelChoiceField(label=_('Category'), queryset=Category.objects.published(), required=False)
+    category = forms.ModelChoiceField(label=_('Category'), empty_label=_('Category'), queryset=Category.objects.published(), required=False)
     price_low = forms.FloatField(label=_('Price: low'), required=False)
     price_high = forms.FloatField(label=_('Price: high'), required=False)
     brands = forms.MultipleChoiceField(label=_('Brands'), choices=(), required=False)
@@ -108,7 +108,7 @@ class ProductsFilterForm(forms.Form):
         return queryset
 
     class Media:
-        js = 'js/select2.min.js', 'js/duplicates.js',
+        js = 'js/select2.min.js', 'js/products_filter.js',
         css = {
             'all': (
                 'css/select2.min.css',
