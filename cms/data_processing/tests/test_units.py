@@ -5,7 +5,7 @@ from django.test import TestCase
 from pint import UnitRegistry, Quantity
 
 from cms.data_processing.constants import Value, UnitValue, RangeUnitValue
-from cms.data_processing.units import contains_number, is_range_value, UnitManager, widget_from_type
+from cms.data_processing.units import contains_number, is_range_value, UnitManager, widget_from_type, is_bool_value
 from cms.form_widgets import FloatInput
 from cms.models import Unit
 from cms.utils import get_dotted_path
@@ -25,6 +25,19 @@ class TestUnits(TestCase):
         self.assertTrue(is_range_value("200- 240"))
         self.assertFalse(is_range_value("200 240"))
         self.assertFalse(is_range_value("200"))
+
+    def test_is_bool_value(self):
+        self.assertTrue(is_bool_value("true"))
+        self.assertTrue(is_bool_value(" true "))
+        self.assertTrue(is_bool_value("True"))
+        self.assertTrue(is_bool_value("y"))
+        self.assertTrue(is_bool_value("Y"))
+        self.assertFalse(is_bool_value("No"))
+        self.assertFalse(is_bool_value("no"))
+        self.assertFalse(is_bool_value("N"))
+        self.assertFalse(is_bool_value("n"))
+        self.assertFalse(is_bool_value("false"))
+        self.assertFalse(is_bool_value("False"))
 
     def test_widget_from_type(self):
         self.assertEqual(widget_from_type("1"), get_dotted_path(forms.widgets.TextInput))
@@ -76,6 +89,12 @@ class TestUnits(TestCase):
             parsed_value: RangeUnitValue = units.get_processed_unit_and_value("200-240v")
             volt_unit: Unit = Unit.objects.get(name="volt", widget=get_dotted_path(FloatInput))
             self.assertEqual(parsed_value, RangeUnitValue(unit=volt_unit, value_low=200, value_high=240))
+
+        with self.subTest("bool value"):
+            for value in ["yes", "Y", "true", "True"]:
+                parsed_value: UnitValue = units.get_processed_unit_and_value(value)
+                unit: Unit = Unit.objects.get(name="bool", widget=get_dotted_path(forms.widgets.CheckboxInput))
+                self.assertEqual(parsed_value, UnitValue(unit=unit, value=True))
 
     def test_get_or_create_unit(self):
         units: UnitManager = UnitManager()
