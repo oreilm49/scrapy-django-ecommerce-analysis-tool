@@ -46,7 +46,6 @@ class UnitManager:
         self.ureg.define("@alias hertz = hz")
         self.ureg.define("@alias watt = w")
         self.ureg.define('programmes = 1 * program = programmes')
-        self.ureg.define("@alias programmes = program")
         self.regex_digit_patterns = [r"\d* year"]
 
     def get_processed_unit_and_value(self, value: str, unit: Optional[Unit] = None) -> Union[UnitValue, Value, RangeUnitValue]:
