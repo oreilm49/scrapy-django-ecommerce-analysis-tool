@@ -1,8 +1,10 @@
+import re
 from typing import Iterator, Optional
 
 import scrapy
 
-from cms.constants import CATEGORY, PAGINATION, LINK, TABLE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, PRICE, IMAGE
+from cms.constants import CATEGORY, PAGINATION, LINK, TABLE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, PRICE, \
+    IMAGE, TABLE_VALUE_COLUMN_BOOL
 from cms.models import Website, Url, Category, Selector
 
 from cms.scraper.exceptions import WebsiteNotProvidedInArguments
@@ -57,10 +59,14 @@ class EcommerceSpider(scrapy.Spider):
                     if selector.selector_type == TABLE:
                         for table_row in response.css(selector.css_selector):
                             table_row: scrapy.selector.unified.Selector
-                            value: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).get()
-                            label: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).get()
+                            value: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).get().strip().lower()
+                            label: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).get().strip().lower()
+                            if not value and selector.sub_selectors.filter(selector_type=TABLE_VALUE_COLUMN_BOOL).exists():
+                                bool_selector: Selector = selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN_BOOL)
+                                value = table_row.css(bool_selector.css_selector).get().strip().lower()
+                                value = "true" if re.search(bool_selector.regex, value) else None
                             if value and label:
-                                page_item['attributes'].append({'value': value.strip().lower(), 'label': label.strip().lower()})
+                                page_item['attributes'].append({'value': value, 'label': label})
                     elif selector.selector_type in [PRICE, LINK, IMAGE]:
                         value: Optional[str] = response.css(selector.css_selector).get()
                         if value and selector.selector_type == IMAGE:
