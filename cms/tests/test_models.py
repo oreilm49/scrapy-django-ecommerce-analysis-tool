@@ -92,7 +92,7 @@ class TestModels(TestCase):
         old_attrib: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, attribute_type=attribute, data={'value': 99.99}, product=product)
         old_attrib.created = datetime.datetime.now() - datetime.timedelta(hours=24)
         old_attrib.save()
-        self.assertEqual(product.current_average_price, statistics.mean([299.99, 249.99]))
+        self.assertEqual(product.current_average_price, str(int(statistics.mean([299.99, 249.99]))))
 
     def test_product_brand(self):
         product: Product = mommy.make(Product)
