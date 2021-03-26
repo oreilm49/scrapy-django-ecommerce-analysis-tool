@@ -25,6 +25,7 @@ IMAGE = "image"
 LINK = "link"
 PAGINATION = "pagination"
 TABLE_VALUE_COLUMN = "table_value_column"
+TABLE_VALUE_COLUMN_BOOL = "table_value_column_bool"
 TABLE_LABEL_COLUMN = "table_label_column"
 
 SELECTOR_TYPES = (
@@ -36,6 +37,7 @@ SELECTOR_TYPES = (
     (LINK, _("Link")),
     (PAGINATION, _("Pagination")),
     (TABLE_VALUE_COLUMN, _("Table Value Column")),
+    (TABLE_VALUE_COLUMN_BOOL, _("Table Value Column Bool")),
     (TABLE_LABEL_COLUMN, _("Table Label Column")),
 )
 
