@@ -96,6 +96,12 @@ class TestUnits(TestCase):
                 unit: Unit = Unit.objects.get(name="bool", widget=get_dotted_path(forms.widgets.CheckboxInput))
                 self.assertEqual(parsed_value, UnitValue(unit=unit, value=True))
 
+        with self.subTest("irregular string"):
+            string = "5 year full warranty and 10 year parts upon registration"
+            parsed_value: UnitValue = units.get_processed_unit_and_value(string)
+            unit: Unit = Unit.objects.get(name="year", widget=get_dotted_path(FloatInput))
+            self.assertEqual(parsed_value, UnitValue(value=5, unit=unit))
+
     def test_get_or_create_unit(self):
         units: UnitManager = UnitManager()
         self.assertEqual(units.get_or_create_unit("1"), Value(value=1))
