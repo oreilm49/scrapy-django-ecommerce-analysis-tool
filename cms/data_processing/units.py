@@ -58,6 +58,10 @@ class UnitManager:
                 return Value(value=value)
             return self.get_or_create_unit(value, unit=unit)
         except errors.UndefinedUnitError:
+            for pattern in self.regex_digit_patterns:
+                match: re.Match = re.search(pattern, value)
+                if match:
+                    return self.get_or_create_unit(match.group(), unit=unit)
             return Value(value=value)
         except AttributeError:
             return Value(value=value)
