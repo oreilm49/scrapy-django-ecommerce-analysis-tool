@@ -19,6 +19,10 @@ def is_range_value(value: str) -> bool:
     return len(value.split("-")) == 2
 
 
+def is_bool_value(value: str) -> bool:
+    return value.strip().lower() in ["true", "yes", "y"]
+
+
 def widget_from_type(data: Union[int, float, str, bool, datetime.datetime]):
     if isinstance(data, str):
         return get_dotted_path(forms.widgets.TextInput)
