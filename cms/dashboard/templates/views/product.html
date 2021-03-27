@@ -54,4 +54,21 @@
             {% include 'includes/table_pagination.html' %}
         </div>
     </div>
+    <div class="card shadow mb-4">
+        {% with 'Specification' as header %}
+            {% include 'includes/card_header.html' %}
+        {% endwith %}
+        <div class="card-body">
+            <table class="table table-striped">
+                <tbody>
+                    {% for attribute in product.productattributes.all %}
+                        <tr>
+                          <td>{{ attribute.attribute_type.name }}</td>
+                          <td>{% product_attribute attribute %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}
