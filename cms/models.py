@@ -77,6 +77,10 @@ class Unit(BaseModel):
         except ImportError:
             raise ValueError(_('"{}" is not a valid widget').format(self.widget))
 
+    @cached_property
+    def is_bool(self) -> bool:
+        return self.widget_class == forms.widgets.CheckboxInput
+
 
 class Website(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The website name"), unique=True)
