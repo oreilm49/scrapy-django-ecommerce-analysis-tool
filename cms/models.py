@@ -294,3 +294,13 @@ class CategoryAttributeConfig(BaseModel):
 
     class Meta:
         unique_together = ['category', 'attribute_type', 'company']
+
+
+class SpiderResult(BaseModel):
+    spider_name = models.CharField(verbose_name=_("spider name"), max_length=MAX_LENGTH)
+    website = models.ForeignKey(to="cms.Website", on_delete=SET_NULL, related_name="spider_results", blank=True, null=True)
+    category = models.ForeignKey(to="cms.Category", on_delete=SET_NULL, related_name="spider_results", blank=True, null=True)
+    items_scraped = models.IntegerField(verbose_name=_("items scraped"), default=0)
+
+    def __str__(self):
+        return f"{self.spider_name}: {self.website}: {self.category}"
