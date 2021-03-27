@@ -59,8 +59,11 @@ class EcommerceSpider(scrapy.Spider):
                     if selector.selector_type == TABLE:
                         for table_row in response.css(selector.css_selector):
                             table_row: scrapy.selector.unified.Selector
-                            value: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).get().strip().lower()
-                            label: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).get().strip().lower()
+                            value: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN).css_selector).get()
+                            label: Optional[str] = table_row.css(selector.sub_selectors.get(selector_type=TABLE_LABEL_COLUMN).css_selector).get()
+                            # strip whitespace so empty strings with only spacing aren't processed further.
+                            value = value.strip().lower() if value else None
+                            label = label.strip().lower() if label else None
                             if not value and selector.sub_selectors.filter(selector_type=TABLE_VALUE_COLUMN_BOOL).exists():
                                 bool_selector: Selector = selector.sub_selectors.get(selector_type=TABLE_VALUE_COLUMN_BOOL)
                                 value = table_row.css(bool_selector.css_selector).get().strip().lower()
