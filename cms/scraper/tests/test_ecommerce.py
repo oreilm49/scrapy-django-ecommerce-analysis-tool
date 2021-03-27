@@ -27,6 +27,7 @@ class TestEcommerce(TestCase):
 
     def test_start_requests(self):
         spider: EcommerceSpider = EcommerceSpider(website=self.website.name)
+        spider.results = {}
         requests = spider.start_requests()
         self.assertIsInstance(requests, Iterator)
         list(requests)
