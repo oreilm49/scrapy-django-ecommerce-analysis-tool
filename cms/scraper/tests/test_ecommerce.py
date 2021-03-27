@@ -1,8 +1,9 @@
 from collections import Iterator
 from django.test import TestCase
+from model_mommy import mommy
 
 from cms.constants import CATEGORY
-from cms.models import Website, Url, Category
+from cms.models import Website, Url, Category, SpiderResult
 from cms.scripts.load_cms import set_up_websites
 
 from cms.scraper.spiders.ecommerce import EcommerceSpider
