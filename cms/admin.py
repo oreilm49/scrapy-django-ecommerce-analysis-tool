@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
-    ProductImage, AttributeType, CategoryAttributeConfig
+    ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult
 from cms.views.admin import ProductMapView, AttributeTypeMapView
 
 
@@ -77,6 +77,11 @@ class ProductImageAdmin(admin.ModelAdmin):
 class AttributeTypeAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'alternate_names', 'unit',
     list_filter = 'name', 'alternate_names', 'unit',
+
+
+@admin.register(SpiderResult)
+class SpiderResultAdmin(admin.ModelAdmin):
+    list_display = 'spider_name', 'website', 'category', 'items_scraped',
 
 
 def get_admin_urls(urls):
