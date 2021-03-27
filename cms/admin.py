@@ -46,18 +46,28 @@ class UnitAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'alternate_names', 'widget', 'repeat',
 
 
+class ProductAttributeInlineAdmin(admin.TabularInline):
+    model = ProductAttribute
+    extra = 0
+    fields = 'attribute_type', 'data',
+    show_change_link = True
+    classes = ['collapse']
+
+
+class ProductImageInlineAdmin(admin.TabularInline):
+    model = ProductImage
+    extra = 0
+    fields = 'image_type', 'image',
+    show_change_link = True
+    classes = ['collapse']
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = 'id', 'model', 'category', 'alternate_models',
     list_filter = 'category',
     list_per_page = 25
-
-
-@admin.register(ProductAttribute)
-class ProductAttributeAdmin(admin.ModelAdmin):
-    list_display = 'id', 'attribute_type', 'data', 'product',
-    list_editable = 'data',
-    list_filter = 'product', 'product__category', 'attribute_type',
+    inlines = ProductAttributeInlineAdmin, ProductImageInlineAdmin,
 
 
 @admin.register(WebsiteProductAttribute)
@@ -65,12 +75,6 @@ class WebsiteProductAttributeAdmin(admin.ModelAdmin):
     list_display = 'id', 'website', 'attribute_type', 'data', 'product',
     list_editable = 'data',
     list_filter = 'website', 'product', 'product__category', 'attribute_type',
-
-
-@admin.register(ProductImage)
-class ProductImageAdmin(admin.ModelAdmin):
-    list_display = 'id', 'product', 'image_type', 'image',
-    list_filter = 'image_type', 'product',
 
 
 @admin.register(AttributeType)
