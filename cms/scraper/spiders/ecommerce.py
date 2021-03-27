@@ -1,11 +1,11 @@
 import re
-from typing import Iterator, Optional
+from typing import Iterator, Optional, Dict
 
 import scrapy
 
 from cms.constants import CATEGORY, PAGINATION, LINK, TABLE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, PRICE, \
     IMAGE, TABLE_VALUE_COLUMN_BOOL
-from cms.models import Website, Url, Category, Selector
+from cms.models import Website, Url, Category, Selector, SpiderResult
 
 from cms.scraper.exceptions import WebsiteNotProvidedInArguments
 from cms.scraper.items import ProductPageItem
@@ -15,6 +15,7 @@ class EcommerceSpider(scrapy.Spider):
     name = 'ecommerce'
     allowed_domains = []
     start_urls = []
+    results: Dict[Category, int] = {}
 
     def __init__(self, website: str = None, **kwargs):
         super().__init__(**kwargs)
@@ -26,6 +27,7 @@ class EcommerceSpider(scrapy.Spider):
     def start_requests(self):
         for url in self.website.urls.filter(url_type=CATEGORY):
             url: Url
+            self.results[url.category] = 0
             yield scrapy.Request(url.url, callback=self.parse, cb_kwargs={'category': url.category})
 
     def parse(self, response, category: Category = None, **kwargs) -> Iterator[scrapy.Request]:
@@ -77,5 +79,21 @@ class EcommerceSpider(scrapy.Spider):
                             page_item['image_urls'].append(response.urljoin(value.strip()))
                         elif value:
                             page_item['website_attributes'].append({'value': value.strip().lower(), 'selector': selector})
+                self.results[category] += 1
                 yield page_item
                 break
+
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super(EcommerceSpider, cls).from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(spider.handle_spider_closed, scrapy.spiders.signals.spider_closed)
+        return spider
+
+    def handle_spider_closed(self, reason):
+        for category, items_scraped in self.results.items():
+            SpiderResult.objects.create(
+                spider_name=self.name,
+                website=self.website,
+                category=category,
+                items_scraped=items_scraped
+            )
