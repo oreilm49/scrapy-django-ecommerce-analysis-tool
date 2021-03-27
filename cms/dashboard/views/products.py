@@ -38,10 +38,10 @@ class Products(BaseDashboardMixin, ListView):
 class ProductDetail(BaseDashboardMixin, ListView):
     paginate_by = 25
     template_name = 'views/product.html'
-    queryset: WebsiteProductAttributeQuerySet = WebsiteProductAttribute.objects.published()
+    queryset: WebsiteProductAttributeQuerySet = WebsiteProductAttribute.objects.published().filter(attribute_type__name="price").order_by('-created')
 
     def get_queryset(self):
-        qs = super().get_queryset().filter(product=self.product, attribute_type__name="price")
+        qs = super().get_queryset().filter(product=self.product)
         form: ProductPriceFilterForm = self.get_form()
         if form.is_valid():
             qs = form.search(qs)
