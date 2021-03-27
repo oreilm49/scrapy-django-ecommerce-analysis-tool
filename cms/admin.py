@@ -81,7 +81,7 @@ class AttributeTypeAdmin(admin.ModelAdmin):
 
 @admin.register(SpiderResult)
 class SpiderResultAdmin(admin.ModelAdmin):
-    list_display = 'spider_name', 'website', 'category', 'items_scraped',
+    list_display = 'created', 'spider_name', 'website', 'category', 'items_scraped',
 
 
 def get_admin_urls(urls):
