@@ -1,5 +1,5 @@
 $(document).ready(function() {
-   $('select[multiple]').select2({
+   $('select').select2({
       allowClear: true,
       closeOnSelect: false,
    });
