@@ -28,3 +28,16 @@ class TestEcommerce(TestCase):
         spider: EcommerceSpider = EcommerceSpider(website=self.website.name)
         requests = spider.start_requests()
         self.assertIsInstance(requests, Iterator)
+        list(requests)
+        self.assertEqual(spider.results, {self.url.category: 0})
+
+    def test_handle_spider_closed(self):
+        spider: EcommerceSpider = EcommerceSpider(website=self.website.name)
+        cat_1: Category = mommy.make(Category, name="cat_1")
+        cat_2: Category = mommy.make(Category, name="cat_2")
+        self.assertFalse(SpiderResult.objects.exists())
+        spider.results[cat_1] = 20
+        spider.results[cat_2] = 0
+        spider.handle_spider_closed("")
+        self.assertTrue(SpiderResult.objects.filter(spider_name='ecommerce', website=self.website, category=cat_1, items_scraped=20).exists())
+        self.assertTrue(SpiderResult.objects.filter(spider_name='ecommerce', website=self.website, category=cat_2, items_scraped=0).exists())
