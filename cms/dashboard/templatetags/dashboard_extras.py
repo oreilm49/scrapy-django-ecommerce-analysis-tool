@@ -22,7 +22,7 @@ def product_specs(context: dict, product: Product):
 def product_attribute(context: dict, product_attribute: ProductAttribute):
     if product_attribute.attribute_type.unit:
         if product_attribute.attribute_type.unit.is_bool:
-            html = '<i class="fa fa-check-circle success" aria-hidden="true"></i>'
+            html = '<i class="fa fa-check-circle text-success" aria-hidden="true"></i>'
         else:
             html = f'{product_attribute.data["value"]} {product_attribute.attribute_type.unit}'
     else:
