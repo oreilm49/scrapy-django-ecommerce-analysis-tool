@@ -8,13 +8,15 @@ from django.contrib.humanize.templatetags import humanize
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q
+from django.db.models.fields.json import KeyTextTransform
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext as _
 from django_extensions.db.fields import ModificationDateTimeField, CreationDateTimeField
+import pandas as pd
 
 from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN, \
-    THUMBNAIL, WIDGET_CHOICES, WIDGETS
+    THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN
 from cms.serializers import serializers, CustomValueSerializer
 
 
@@ -187,6 +189,19 @@ class Product(BaseModel):
         for attribute_config in self.category.category_attribute_configs.order_by('order').iterator():
             attribute_config: 'CategoryAttributeConfig'
             yield attribute_config.attribute_type.productattributes.filter(product__pk=self.pk).first()
+
+    def price_history(self, start_date: datetime.datetime, end_date: Optional[datetime.datetime] = datetime.datetime.now(),
+                      time_period: Optional[str] = DAILY, aggregation: Optional[str] = OPERATOR_MEAN, **kwargs) -> QuerySet:
+        assert time_period in PRICE_TIME_PERIODS_LIST, f"time period must be one of {PRICE_TIME_PERIODS_LIST}"
+        assert aggregation in OPERATORS, f"operator must be one of {OPERATORS}"
+        price_history = self.websiteproductattributes.published()\
+            .filter(created__range=[start_date, end_date], attribute_type__name="price")\
+            .annotate(price=KeyTextTransform('value', 'data'))
+        if kwargs:
+            price_history = price_history.filter(**kwargs)
+        df = pd.DataFrame(price_history.values('created', 'price'))
+        df = df['created'].dt.isocalendar().week if time_period == WEEKLY else getattr(df['created'].dt, time_period)
+        return getattr(df.groupby(by=df), aggregation)().to_dict().get('price')
 
 
 class AttributeTypeQuerySet(BaseQuerySet):
