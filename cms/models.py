@@ -200,8 +200,8 @@ class Product(BaseModel):
         if kwargs:
             price_history = price_history.filter(**kwargs)
         df = pd.DataFrame(price_history.values('created', 'price'))
-        df = df['created'].dt.isocalendar().week if time_period == WEEKLY else getattr(df['created'].dt, time_period)
-        return getattr(df.groupby(by=df), aggregation)().to_dict().get('price')
+        df_grouper = df['created'].dt.isocalendar().week if time_period == WEEKLY else getattr(df['created'].dt, time_period)
+        return getattr(df.groupby(by=df_grouper), aggregation)().to_dict().get('price')
 
 
 class AttributeTypeQuerySet(BaseQuerySet):
