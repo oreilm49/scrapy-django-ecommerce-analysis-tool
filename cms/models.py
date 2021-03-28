@@ -191,7 +191,7 @@ class Product(BaseModel):
             yield attribute_config.attribute_type.productattributes.filter(product__pk=self.pk).first()
 
     def price_history(self, start_date: datetime.datetime, end_date: Optional[datetime.datetime] = datetime.datetime.now(),
-                      time_period: Optional[str] = DAILY, aggregation: Optional[str] = OPERATOR_MEAN, **kwargs) -> QuerySet:
+                      time_period: Optional[str] = DAILY, aggregation: Optional[str] = OPERATOR_MEAN, **kwargs) -> Dict[int, float]:
         assert time_period in PRICE_TIME_PERIODS_LIST, f"time period must be one of {PRICE_TIME_PERIODS_LIST}"
         assert aggregation in OPERATORS, f"operator must be one of {OPERATORS}"
         price_history = self.websiteproductattributes.published()\
