@@ -47,6 +47,7 @@ HOURLY = 'hour'
 DAILY = 'day'
 WEEKLY = 'week'
 MONTHLY = 'month'
+YEARLY = 'year'
 
 TRACKING_FREQUENCIES = (
     (ONCE, _('Once')),
@@ -54,6 +55,7 @@ TRACKING_FREQUENCIES = (
     (DAILY, _('Daily')),
     (WEEKLY, _('Weekly')),
     (MONTHLY, _('Monthly')),
+    (YEARLY, _('Yearly')),
 )
 
 PRICE_TIME_PERIODS_LIST = [p[0] for p in TRACKING_FREQUENCIES[1:]]
