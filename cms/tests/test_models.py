@@ -101,6 +101,25 @@ class TestModels(TestCase):
         product_attribute.save()
         self.assertEqual(product.brand, "whirlpool")
 
+    def test_product_price_history(self):
+        product: Product = mommy.make(Product)
+        # today's prices
+        price_attribute: AttributeType = mommy.make(AttributeType, name='price')
+        mommy.make(WebsiteProductAttribute, product=product, data={'value': 100}, attribute_type=price_attribute)
+        mommy.make(WebsiteProductAttribute, product=product, data={'value': 150}, attribute_type=price_attribute)
+        # yesterday's prices
+        yesterday: datetime.datetime = datetime.datetime.now() - datetime.timedelta(days=1)
+        price = mommy.make(WebsiteProductAttribute, product=product, data={'value': 50}, attribute_type=price_attribute)
+        price2 = mommy.make(WebsiteProductAttribute, product=product, data={'value': 100}, attribute_type=price_attribute)
+        price.created = yesterday
+        price.save()
+        price2.created = yesterday
+        price2.save()
+        price_history = product.price_history(yesterday, end_date=datetime.datetime.now())
+        self.assertEqual(price_history[datetime.datetime.now().day], 125.0)
+        self.assertEqual(price_history[yesterday.day], 75)
+
+
     def test_custom_get_or_create__attribute_type(self):
         unit: Unit = mommy.make(Unit)
         attribute_created: AttributeType = AttributeType.objects.custom_get_or_create("test_attribute", unit)
