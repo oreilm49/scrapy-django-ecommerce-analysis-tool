@@ -14,6 +14,7 @@ from django.utils.module_loading import import_string
 from django.utils.translation import gettext as _
 from django_extensions.db.fields import ModificationDateTimeField, CreationDateTimeField
 import pandas as pd
+from pandas import DataFrame, Series
 
 from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN, \
     THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN
@@ -199,8 +200,8 @@ class Product(BaseModel):
             .annotate(price=KeyTextTransform('value', 'data'))
         if kwargs:
             price_history = price_history.filter(**kwargs)
-        df = pd.DataFrame(price_history.values('created', 'price'))
-        df_grouper = df['created'].dt.isocalendar().week if time_period == WEEKLY else getattr(df['created'].dt, time_period)
+        df: DataFrame = pd.DataFrame(price_history.values('created', 'price'))
+        df_grouper: Series = df['created'].dt.isocalendar().week if time_period == WEEKLY else getattr(df['created'].dt, time_period)
         return getattr(df.groupby(by=df_grouper), aggregation)().to_dict().get('price')
 
 
