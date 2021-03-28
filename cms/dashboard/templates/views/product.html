@@ -21,11 +21,13 @@
             </div>
         </div>
     </div>
-    <div class="card shadow mb-4" style="max-height: 830px;">
+    <div class="card shadow mb-4">
         {% with 'Price History' as header %}
             {% include 'includes/card_header.html' %}
         {% endwith %}
         <div class="card-body">
+            {{ price_chart.div|safe }}
+            <hr>
             {% with field_col_class='col-xs-12 col-sm-2' %}
                 {% include 'includes/filter_form.html' %}
             {% endwith %}
@@ -71,4 +73,9 @@
             </table>
         </div>
     </div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ price_chart.script|safe }}
 {% endblock %}
