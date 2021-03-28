@@ -5,7 +5,7 @@ from django import forms
 from django.test import TestCase
 from model_mommy import mommy
 
-from cms.constants import MAIN, THUMBNAIL
+from cms.constants import MAIN, THUMBNAIL, WEEKLY, MONTHLY, YEARLY
 from cms.form_widgets import FloatInput
 from cms.serializers import serializers
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute, json_data_default, Unit, AttributeType, \
@@ -111,13 +111,41 @@ class TestModels(TestCase):
         yesterday: datetime.datetime = datetime.datetime.now() - datetime.timedelta(days=1)
         price = mommy.make(WebsiteProductAttribute, product=product, data={'value': 50}, attribute_type=price_attribute)
         price2 = mommy.make(WebsiteProductAttribute, product=product, data={'value': 100}, attribute_type=price_attribute)
-        price.created = yesterday
-        price.save()
-        price2.created = yesterday
-        price2.save()
-        price_history = product.price_history(yesterday, end_date=datetime.datetime.now())
-        self.assertEqual(price_history[datetime.datetime.now().day], 125.0)
-        self.assertEqual(price_history[yesterday.day], 75)
+        with self.subTest("daily"):
+            price.created = yesterday
+            price.save()
+            price2.created = yesterday
+            price2.save()
+            price_history = product.price_history(yesterday, end_date=datetime.datetime.now())
+            self.assertEqual(price_history[datetime.datetime.now().day], 125.0)
+            self.assertEqual(price_history[yesterday.day], 75)
+        with self.subTest("weekly"):
+            last_week: datetime.datetime = datetime.datetime.now() - datetime.timedelta(days=7)
+            price.created = last_week
+            price.save()
+            price2.created = last_week
+            price2.save()
+            price_history = product.price_history(last_week, end_date=datetime.datetime.now(), time_period=WEEKLY)
+            self.assertEqual(price_history[datetime.datetime.now().isocalendar()[1]], 125.0)
+            self.assertEqual(price_history[last_week.isocalendar()[1]], 75)
+        with self.subTest("monthly"):
+            last_month: datetime.datetime = datetime.datetime.now() - datetime.timedelta(days=30)
+            price.created = last_month
+            price.save()
+            price2.created = last_month
+            price2.save()
+            price_history = product.price_history(last_month, end_date=datetime.datetime.now(), time_period=MONTHLY)
+            self.assertEqual(price_history[datetime.datetime.now().month], 125.0)
+            self.assertEqual(price_history[last_month.month], 75)
+        with self.subTest("yearly"):
+            last_year: datetime.datetime = datetime.datetime.now() - datetime.timedelta(days=365)
+            price.created = last_year
+            price.save()
+            price2.created = last_year
+            price2.save()
+            price_history = product.price_history(last_year, end_date=datetime.datetime.now(), time_period=YEARLY)
+            self.assertEqual(price_history[datetime.datetime.now().year], 125.0)
+            self.assertEqual(price_history[last_year.year], 75)
 
 
     def test_custom_get_or_create__attribute_type(self):
