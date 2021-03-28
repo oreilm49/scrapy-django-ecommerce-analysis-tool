@@ -1,4 +1,5 @@
-from typing import Optional, List
+import datetime
+from typing import Optional, List, Dict
 
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -7,6 +8,7 @@ from django.views.generic import ListView
 from cms.models import Product, ProductQuerySet, WebsiteProductAttributeQuerySet, WebsiteProductAttribute
 from cms.dashboard.forms import ProductsFilterForm, ProductPriceFilterForm
 from cms.dashboard.views.base import Breadcrumb, BaseDashboardMixin
+from cms.dashboard.utils import line_chart
 
 
 class Products(BaseDashboardMixin, ListView):
@@ -60,7 +62,17 @@ class ProductDetail(BaseDashboardMixin, ListView):
             Breadcrumb(name=self.product.model, url=reverse('dashboard:product', kwargs={'pk': self.product.pk}), active=True),
         ]
 
+    def get_price_chart(self) -> Dict:
+        return line_chart(
+            self.product.price_history(datetime.datetime.now() - datetime.timedelta(days=7)),
+            title="7 Day price history",
+            x_label='day',
+            x='created',
+            y_label='price',
+            y='price',
+        )
+
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
-        data.update(product=self.product, filter_form=self.get_form())
+        data.update(product=self.product, filter_form=self.get_form(), price_chart=self.get_price_chart())
         return data
