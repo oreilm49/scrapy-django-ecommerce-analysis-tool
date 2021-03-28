@@ -4,6 +4,7 @@ import statistics
 from django import forms
 from django.test import TestCase
 from model_mommy import mommy
+from pandas import DataFrame
 
 from cms.constants import MAIN, THUMBNAIL, WEEKLY, MONTHLY, YEARLY
 from cms.form_widgets import FloatInput
@@ -111,12 +112,13 @@ class TestModels(TestCase):
         yesterday: datetime.datetime = datetime.datetime.now() - datetime.timedelta(days=1)
         price = mommy.make(WebsiteProductAttribute, product=product, data={'value': 50}, attribute_type=price_attribute)
         price2 = mommy.make(WebsiteProductAttribute, product=product, data={'value': 100}, attribute_type=price_attribute)
+        self.assertIsInstance(product.price_history(yesterday, end_date=datetime.datetime.now()), DataFrame)
         with self.subTest("daily"):
             price.created = yesterday
             price.save()
             price2.created = yesterday
             price2.save()
-            price_history = product.price_history(yesterday, end_date=datetime.datetime.now())
+            price_history: dict = product.price_history(yesterday, end_date=datetime.datetime.now()).to_dict().get('price')
             self.assertEqual(price_history[datetime.datetime.now().day], 125.0)
             self.assertEqual(price_history[yesterday.day], 75)
         with self.subTest("weekly"):
@@ -125,7 +127,7 @@ class TestModels(TestCase):
             price.save()
             price2.created = last_week
             price2.save()
-            price_history = product.price_history(last_week, end_date=datetime.datetime.now(), time_period=WEEKLY)
+            price_history: dict = product.price_history(last_week, end_date=datetime.datetime.now(), time_period=WEEKLY).to_dict().get('price')
             self.assertEqual(price_history[datetime.datetime.now().isocalendar()[1]], 125.0)
             self.assertEqual(price_history[last_week.isocalendar()[1]], 75)
         with self.subTest("monthly"):
@@ -134,7 +136,7 @@ class TestModels(TestCase):
             price.save()
             price2.created = last_month
             price2.save()
-            price_history = product.price_history(last_month, end_date=datetime.datetime.now(), time_period=MONTHLY)
+            price_history: dict = product.price_history(last_month, end_date=datetime.datetime.now(), time_period=MONTHLY).to_dict().get('price')
             self.assertEqual(price_history[datetime.datetime.now().month], 125.0)
             self.assertEqual(price_history[last_month.month], 75)
         with self.subTest("yearly"):
@@ -143,7 +145,7 @@ class TestModels(TestCase):
             price.save()
             price2.created = last_year
             price2.save()
-            price_history = product.price_history(last_year, end_date=datetime.datetime.now(), time_period=YEARLY)
+            price_history: dict = product.price_history(last_year, end_date=datetime.datetime.now(), time_period=YEARLY).to_dict().get('price')
             self.assertEqual(price_history[datetime.datetime.now().year], 125.0)
             self.assertEqual(price_history[last_year.year], 75)
 
