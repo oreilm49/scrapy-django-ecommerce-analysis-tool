@@ -43,10 +43,10 @@ SELECTOR_TYPES = (
 
 
 ONCE = 'once'
-HOURLY = 'hourly'
-DAILY = 'daily'
-WEEKLY = 'weekly'
-MONTHLY = 'monthly'
+HOURLY = 'hour'
+DAILY = 'day'
+WEEKLY = 'week'
+MONTHLY = 'month'
 
 TRACKING_FREQUENCIES = (
     (ONCE, _('Once')),
@@ -55,6 +55,8 @@ TRACKING_FREQUENCIES = (
     (WEEKLY, _('Weekly')),
     (MONTHLY, _('Monthly')),
 )
+
+PRICE_TIME_PERIODS_LIST = [p[0] for p in TRACKING_FREQUENCIES[1:]]
 
 MAIN = "main"
 THUMBNAIL = "thumbnail"
@@ -85,3 +87,10 @@ WIDGET_NAMES = {
 }
 
 WIDGET_CHOICES = [(get_dotted_path(cls), WIDGET_NAMES.get(cls, cls.__name__)) for cls in WIDGETS.keys()]
+
+OPERATOR_MEAN = 'mean'
+OPERATOR_MAX = 'max'
+OPERATOR_MIN = 'min'
+OPERATOR_SUM = 'sum'
+
+OPERATORS = (OPERATOR_MEAN, OPERATOR_MAX, OPERATOR_MIN, OPERATOR_SUM)
