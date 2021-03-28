@@ -5,8 +5,6 @@
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.3.0.min.css" rel=”stylesheet” type=”text/css”>
-    <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.3.0.min.css" rel=”stylesheet” type=”text/css”>
 {% endblock %}
 
 {% block body_content %}
@@ -32,6 +30,6 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src="{% static 'js/dialog.js' %}"></script>
-    <script src="http://cdn.pydata.org/bokeh/release/bokeh-2.3.0.min.js"></script>
-    <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.3.0.min.js"></script>
+    <script src="{% static 'js/bokeh-2.3.0.min.js' %}"></script>
+    <script src="{% static 'js/bokeh-widgets-2.3.0.min.js' %}"></script>
 {% endblock %}
