@@ -1,9 +1,10 @@
 from django.test import TestCase
 from model_mommy import mommy
 
-from cms.dashboard.forms import CategoryTableForm, CategoryTableFilterForm
+from cms.dashboard.forms import CategoryTableForm, CategoryTableFilterForm, ProductsFilterForm
 from cms.dashboard.models import CategoryTable
-from cms.models import Product, AttributeType, Category
+from cms.dashboard.utils import get_brands
+from cms.models import Product, AttributeType, Category, ProductAttribute, WebsiteProductAttribute
 
 
 class TestForms(TestCase):
@@ -120,7 +121,67 @@ class TestForms(TestCase):
 
         with self.subTest("attribute_type"):
             cat_1: CategoryTable = mommy.make(CategoryTable, y_axis_attribute__name="test3")
+            cat_2: CategoryTable = mommy.make(CategoryTable, x_axis_attribute=cat_1.y_axis_attribute)
             form: CategoryTableFilterForm = CategoryTableFilterForm({'attribute_type': cat_1.y_axis_attribute})
             form.is_valid()
             tables = form.search(CategoryTable.objects.all())
             self.assertIn(cat_1, tables)
+            self.assertIn(cat_2, tables)
+
+    def test_products_filter_form(self):
+        with self.subTest("brands"):
+            brand_attr: ProductAttribute = mommy.make(ProductAttribute, attribute_type__name="brand", data={'value': 'whirlpool'})
+            form: ProductsFilterForm = ProductsFilterForm()
+            self.assertEqual(form.fields['brands'].choices, list((brand, brand) for brand in get_brands()))
+
+        with self.subTest("q"):
+            with self.subTest("model"):
+                prod_1: Product = mommy.make(Product, model="test")
+                prod_2: Product = mommy.make(Product, model="not found")
+                form: ProductsFilterForm = ProductsFilterForm({'q': 'test'})
+                form.is_valid()
+                tables = form.search(Product.objects.all())
+                self.assertIn(prod_1, tables)
+                self.assertNotIn(prod_2, tables)
+
+            with self.subTest("alternate_models"):
+                prod_1: Product = mommy.make(Product, alternate_models=["test"])
+                prod_2: Product = mommy.make(Product, alternate_models=["not found"])
+                form: ProductsFilterForm = ProductsFilterForm({'q': 'test'})
+                form.is_valid()
+                tables = form.search(Product.objects.all())
+                self.assertIn(prod_1, tables)
+                self.assertNotIn(prod_2, tables)
+
+            with self.subTest("category"):
+                prod_1: Product = mommy.make(Product, category__name="test")
+                prod_2: Product = mommy.make(Product, category__name="not found")
+                form: ProductsFilterForm = ProductsFilterForm({'q': 'test'})
+                form.is_valid()
+                tables = form.search(Product.objects.all())
+                self.assertIn(prod_1, tables)
+                self.assertNotIn(prod_2, tables)
+
+        with self.subTest("price_low"):
+            price_attr: AttributeType = mommy.make(AttributeType, name="price")
+            mommy.make(WebsiteProductAttribute, product=prod_1, attribute_type=price_attr, data={'value': 100})
+            mommy.make(WebsiteProductAttribute, product=prod_2, attribute_type=price_attr, data={'value': 50})
+            form: ProductsFilterForm = ProductsFilterForm({'price_low': 75})
+            form.is_valid()
+            tables = form.search(Product.objects.all())
+            self.assertIn(prod_1, tables)
+            self.assertNotIn(prod_2, tables)
+
+        with self.subTest("price_high"):
+            form: ProductsFilterForm = ProductsFilterForm({'price_high': 75})
+            form.is_valid()
+            tables = form.search(Product.objects.all())
+            self.assertNotIn(prod_1, tables)
+            self.assertIn(prod_2, tables)
+
+        with self.subTest("brands"):
+            form: ProductsFilterForm = ProductsFilterForm({'brands': ["whirlpool"]})
+            form.is_valid()
+            tables = form.search(Product.objects.all())
+            self.assertIn(brand_attr.product, tables)
+            self.assertNotIn(prod_1, tables)
