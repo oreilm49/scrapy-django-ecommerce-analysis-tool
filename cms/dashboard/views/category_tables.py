@@ -151,7 +151,7 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
         )
         table_data = {}
         for grouper, products in y_axis_groups:
-            table_data[grouper] = [product for product in products]
+            table_data[grouper] = sorted([product for product in products], key=lambda product: product.product.current_average_price)
         data.update(
             table=self.table,
             table_data=table_data,
