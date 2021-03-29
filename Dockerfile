@@ -30,6 +30,7 @@ COPY ./cms ./cms
 # DEV:
 #
 FROM base as dev
+RUN pip install --no-cache-dir -r requirements-dev.txt
 COPY --from=projectfiles /app/ ./
 COPY ./.git ./.git
 
