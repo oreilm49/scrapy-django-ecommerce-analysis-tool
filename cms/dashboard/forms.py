@@ -95,7 +95,7 @@ class ProductsFilterForm(forms.Form):
         if self.cleaned_data.get('q'):
             queryset = queryset.filter(Q(model__contains=self.cleaned_data['q']) |
                                        Q(alternate_models__contains=[self.cleaned_data['q']]) |
-                                       Q(category__name__contains=[self.cleaned_data['q']]))
+                                       Q(category__name__contains=self.cleaned_data['q']))
         if self.cleaned_data.get('price_low'):
             queryset = queryset.filter(websiteproductattributes__attribute_type__name='price',
                                        websiteproductattributes__data__value__gte=self.cleaned_data['price_low'])
