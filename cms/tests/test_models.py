@@ -175,6 +175,15 @@ class TestModels(TestCase):
         self.assertIn(attrib_1, attribs)
         self.assertNotIn(attrib_2, attribs)
 
+    def test_website_product_attributes__for_day(self):
+        attrib_1: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, website__name="site", attribute_type__name="test")
+        attrib_2: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, website=attrib_1.website, attribute_type=attrib_1.attribute_type)
+        attrib_2.created = datetime.datetime.now() - datetime.timedelta(hours=24)
+        attrib_2.save()
+        attribs: WebsiteProductAttributeQuerySet = WebsiteProductAttribute.objects.for_day(attrib_1.created.date())
+        self.assertIn(attrib_1, attribs)
+        self.assertNotIn(attrib_2, attribs)
+
     def test_custom_get_or_create__product_attribute(self):
         attribute_type: AttributeType = mommy.make(AttributeType, unit__widget=get_dotted_path(FloatInput))
         product: Product = mommy.make(Product)
