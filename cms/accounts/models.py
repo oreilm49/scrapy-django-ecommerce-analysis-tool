@@ -11,10 +11,16 @@ from cms.models import BaseModel
 class Company(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The company name"), unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Profile(BaseModel):
     user = models.OneToOneField(User, verbose_name=_("User"), on_delete=models.CASCADE)
     company = models.ForeignKey(Company, verbose_name=_('Company'), on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"{self.user}"
 
 
 @receiver(post_save, sender=User)
