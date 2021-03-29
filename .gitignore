@@ -8,3 +8,4 @@ cms/sitestatic
 *.env
 *specr.log*
 cms/media
+.coverage
