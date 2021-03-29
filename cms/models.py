@@ -284,6 +284,10 @@ class WebsiteProductAttributeQuerySet(BaseQuerySet):
         """returns attribs for the last 24 hours"""
         return self.filter(created__gte=datetime.datetime.now() - datetime.timedelta(hours=24))
 
+    def for_day(self, date: datetime.date) -> QuerySet:
+        """returns attribs for specific day"""
+        return self.filter(created__date=date)
+
 
 class WebsiteProductAttribute(BaseProductAttribute):
     website = models.ForeignKey(to=Website, verbose_name=_("Website"), on_delete=CASCADE, related_name="productattributes")
