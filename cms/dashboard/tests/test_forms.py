@@ -1,7 +1,8 @@
 from django.test import TestCase
 from model_mommy import mommy
 
-from cms.dashboard.forms import CategoryTableForm
+from cms.dashboard.forms import CategoryTableForm, CategoryTableFilterForm
+from cms.dashboard.models import CategoryTable
 from cms.models import Product, AttributeType, Category
 
 
@@ -34,3 +35,92 @@ class TestForms(TestCase):
             form: CategoryTableForm = CategoryTableForm(form_data)
             self.assertFalse(form.is_valid())
             self.assertIn("'attr_2' with value 'doesn't exist' does not exist.", form.errors['y_axis_values'])
+
+    def test_category_table_filter_form__search(self):
+        with self.subTest("name filter"):
+            cat_1: CategoryTable = mommy.make(CategoryTable, name="test")
+            cat_2: CategoryTable = mommy.make(CategoryTable, name="not found")
+            form: CategoryTableFilterForm = CategoryTableFilterForm({'q': 'test'})
+            form.is_valid()
+            tables = form.search(CategoryTable.objects.all())
+            self.assertIn(cat_1, tables)
+            self.assertNotIn(cat_2, tables)
+
+        with self.subTest("query filter"):
+            cat_1: CategoryTable = mommy.make(CategoryTable, query="test")
+            cat_2: CategoryTable = mommy.make(CategoryTable, query="not found")
+            form: CategoryTableFilterForm = CategoryTableFilterForm({'q': 'test'})
+            form.is_valid()
+            tables = form.search(CategoryTable.objects.all())
+            self.assertIn(cat_1, tables)
+            self.assertNotIn(cat_2, tables)
+
+        with self.subTest("x_axis_values filter"):
+            cat_1: CategoryTable = mommy.make(CategoryTable, x_axis_values=["test"])
+            cat_2: CategoryTable = mommy.make(CategoryTable, x_axis_values=["not found"])
+            form: CategoryTableFilterForm = CategoryTableFilterForm({'q': 'test'})
+            form.is_valid()
+            tables = form.search(CategoryTable.objects.all())
+            self.assertIn(cat_1, tables)
+            self.assertNotIn(cat_2, tables)
+
+        with self.subTest("y_axis_values filter"):
+            cat_1: CategoryTable = mommy.make(CategoryTable, y_axis_values=["test"])
+            cat_2: CategoryTable = mommy.make(CategoryTable, y_axis_values=["not found"])
+            form: CategoryTableFilterForm = CategoryTableFilterForm({'q': 'test'})
+            form.is_valid()
+            tables = form.search(CategoryTable.objects.all())
+            self.assertIn(cat_1, tables)
+            self.assertNotIn(cat_2, tables)
+
+        with self.subTest("x_axis_attribute filter"):
+            cat_1: CategoryTable = mommy.make(CategoryTable, x_axis_attribute__name="test")
+            cat_2: CategoryTable = mommy.make(CategoryTable, x_axis_attribute__name="not found")
+            form: CategoryTableFilterForm = CategoryTableFilterForm({'q': 'test'})
+            form.is_valid()
+            tables = form.search(CategoryTable.objects.all())
+            self.assertIn(cat_1, tables)
+            self.assertNotIn(cat_2, tables)
+
+        with self.subTest("y_axis_attribute filter"):
+            cat_1: CategoryTable = mommy.make(CategoryTable, y_axis_attribute__name="test2")
+            cat_2: CategoryTable = mommy.make(CategoryTable, y_axis_attribute__name="not found2")
+            form: CategoryTableFilterForm = CategoryTableFilterForm({'q': 'test'})
+            form.is_valid()
+            tables = form.search(CategoryTable.objects.all())
+            self.assertIn(cat_1, tables)
+            self.assertNotIn(cat_2, tables)
+
+        with self.subTest("x_axis_attribute__alternate_names filter"):
+            cat_1: CategoryTable = mommy.make(CategoryTable, x_axis_attribute__alternate_names=["test"])
+            cat_2: CategoryTable = mommy.make(CategoryTable, x_axis_attribute__alternate_names=["not found"])
+            form: CategoryTableFilterForm = CategoryTableFilterForm({'q': 'test'})
+            form.is_valid()
+            tables = form.search(CategoryTable.objects.all())
+            self.assertIn(cat_1, tables)
+            self.assertNotIn(cat_2, tables)
+
+        with self.subTest("y_axis_attribute__alternate_names filter"):
+            cat_1: CategoryTable = mommy.make(CategoryTable, y_axis_attribute__alternate_names=["test"])
+            cat_2: CategoryTable = mommy.make(CategoryTable, y_axis_attribute__alternate_names=["not found"])
+            form: CategoryTableFilterForm = CategoryTableFilterForm({'q': 'test'})
+            form.is_valid()
+            tables = form.search(CategoryTable.objects.all())
+            self.assertIn(cat_1, tables)
+            self.assertNotIn(cat_2, tables)
+
+        with self.subTest("category"):
+            cat_1: CategoryTable = mommy.make(CategoryTable, category__name="test")
+            cat_2: CategoryTable = mommy.make(CategoryTable, category__name="not found")
+            form: CategoryTableFilterForm = CategoryTableFilterForm({'category': cat_1.category})
+            form.is_valid()
+            tables = form.search(CategoryTable.objects.all())
+            self.assertIn(cat_1, tables)
+            self.assertNotIn(cat_2, tables)
+
+        with self.subTest("attribute_type"):
+            cat_1: CategoryTable = mommy.make(CategoryTable, y_axis_attribute__name="test3")
+            form: CategoryTableFilterForm = CategoryTableFilterForm({'attribute_type': cat_1.y_axis_attribute})
+            form.is_valid()
+            tables = form.search(CategoryTable.objects.all())
+            self.assertIn(cat_1, tables)
