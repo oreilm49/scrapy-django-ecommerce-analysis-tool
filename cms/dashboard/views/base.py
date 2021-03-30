@@ -48,6 +48,7 @@ class BaseDashboardMixin(LoginRequiredMixin, BreadcrumbMixin):
             nav_items=(
                 NavItem(label='Pivot', icon='fa fa-table', url=reverse('dashboard:category-tables'), active=reverse('dashboard:category-tables') in self.request.path),
                 NavItem(label='Products', icon='fa fa-shopping-cart', url=reverse('dashboard:products'), active=reverse('dashboard:products') in self.request.path),
+                NavItem(label='Gap Analysis', icon='fa fa-filter', url=reverse('dashboard:category-gap-reports'), active=reverse('dashboard:category-gap-reports') in self.request.path),
             ),
             feedback_form=FeedbackForm()
         )
