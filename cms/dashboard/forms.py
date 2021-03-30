@@ -9,7 +9,8 @@ from django.db.models import Q
 from django.utils.translation import gettext as _
 from django.utils import timezone
 
-from cms.dashboard.models import CategoryTable, CategoryTableQuerySet
+from cms.dashboard.models import CategoryTable, CategoryTableQuerySet, CategoryGapAnalysisReport, \
+    CategoryGapAnalysisQuerySet
 from cms.dashboard.utils import get_brands
 from cms.models import AttributeType, Category, ProductQuerySet, Website, WebsiteProductAttributeQuerySet
 from cms.utils import serialized_values_for_attribute_type, is_value_numeric
@@ -146,3 +147,48 @@ class ProductPriceFilterForm(forms.Form):
             start, end = self.cleaned_data['date_range']
             queryset = queryset.filter(created__gte=start, created__lte=end)
         return queryset
+
+
+class CategoryGapAnalysisForm(forms.ModelForm):
+    brand = forms.ChoiceField(label=_('Brand'), choices=(), required=True, help_text=_("The brand you'd like to use as the target for this analysis."))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['brand'].choices = ((brand, brand) for brand in get_brands())
+
+    class Meta:
+        model = CategoryGapAnalysisReport
+        fields = 'name', 'category', 'brand', 'websites',
+
+    class Media:
+        js = 'js/select2.min.js', 'js/category_gap_analysis_filter.js',
+        css = {
+            'all': (
+                'css/select2.min.css',
+            ),
+        }
+
+
+class CategoryGapAnalysisFilterForm(forms.Form):
+    q = forms.CharField(label=_('Search'), required=False)
+    category = forms.ModelChoiceField(label=_('Category'), empty_label=_('Category'), queryset=Category.objects.published(), required=False)
+    websites = forms.ModelMultipleChoiceField(label=_('Websites'), queryset=Website.objects.published(), required=False)
+
+    def search(self, queryset: CategoryGapAnalysisQuerySet) -> CategoryGapAnalysisQuerySet:
+        if self.cleaned_data.get('q'):
+            queryset = queryset.filter(Q(name__contains=self.cleaned_data['q']) |
+                                       Q(brand__contains=self.cleaned_data['q']) |
+                                       Q(websites__name__contains=[self.cleaned_data['q']]))
+        if self.cleaned_data.get('category'):
+            queryset = queryset.filter(category=self.cleaned_data['category'])
+        if self.cleaned_data.get('websites'):
+            queryset = queryset.filter(Q(websites__in=self.cleaned_data['websites']))
+        return queryset
+
+    class Media:
+        js = 'js/select2.min.js', 'js/category_gap_analysis_filter.js',
+        css = {
+            'all': (
+                'css/select2.min.css',
+            ),
+        }
