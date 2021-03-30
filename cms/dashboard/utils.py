@@ -1,4 +1,7 @@
-from typing import List, Optional, Dict
+from statistics import mean
+from typing import List, Optional, Dict, TYPE_CHECKING
+if TYPE_CHECKING:
+    from cms.models import Product
 
 from bokeh.embed import components
 from bokeh.plotting import figure, ColumnDataSource
@@ -16,3 +19,11 @@ def line_chart(df: DataFrame, title: str, x: str, x_label: str, y: str, y_label:
     plot.line(x=x, y=y, line_width=2, source=ColumnDataSource(df))
     script, div = components(plot)
     return {'script': script, 'div': div}
+
+
+def average_price_gap(products: List['Product']):
+    price_gaps = []
+    for index, product in enumerate(products, start=1):
+        if index < len(products):
+            price_gaps.append(products[index + 1].current_average_price - product.current_average_price)
+    return mean(price_gaps)
