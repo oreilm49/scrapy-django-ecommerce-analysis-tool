@@ -61,3 +61,25 @@ class CategoryTable(BaseModel):
         if self.query:
             queryset = queryset.filter(model__contains=self.query)
         return queryset.filter(pk__in=product_pks, category=self.category)
+
+
+class CategoryGapAnalysisQuerySet(BaseQuerySet):
+
+    def for_user(self, user: User):
+        """
+        Returns all category tables in the user's company.
+        """
+        return self.filter(Q(user=user) | Q(user__profile__company=user.profile.company))
+
+
+class CategoryGapAnalysisReport(BaseModel):
+    user = models.ForeignKey(User, verbose_name=_("User"), on_delete=models.SET_NULL, null=True)
+    name = models.CharField(verbose_name=_('Name'), max_length=100, help_text=_('The name for this dashboard'))
+    category = models.ForeignKey("cms.Category", verbose_name=_('Category'), help_text=_('The category products should belong to in order to appear in the table.'), on_delete=models.SET_NULL, null=True)
+    brand = models.CharField(verbose_name=_('Brand'), max_length=100, help_text=_('The brand analysed in the gap analysis report.'))
+    websites = models.ManyToManyField("cms.Website", verbose_name=_("Websites"), help_text=_('Limit gap analysis report to these websites.'))
+
+    objects = CategoryGapAnalysisQuerySet.as_manager()
+
+    def __str__(self):
+        return self.name
