@@ -1,0 +1,67 @@
+{% extends 'dashboard_base.html' %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ filter_form.media.css }}
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ filter_form.media.js }}
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4" style="max-height: 830px;">
+        {% with 'Category Gap Analysis Reports' as header %}
+            {% include 'includes/card_header.html' %}
+        {% endwith %}
+        <div class="card-body">
+            <div class="table-responsive">
+                {% with field_col_class='col-xs-12 col-sm-3' %}
+                    {% include 'includes/filter_form.html' %}
+                {% endwith %}
+                <table class="table table-bordered scrollable-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Brand</th>
+                            <th>Websites</th>
+                            <th>Modify</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in object_list %}
+                            <tr>
+                                <td><a href="{% url 'dashboard:category-gap-report' pk=report.pk %}">{{ report.name }}</a></td>
+                                <td>{{ report.category }}</td>
+                                <td>{{ report.brand }}</td>
+                                <td>{{ report.websites.all|join:',' }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'dashboard:category-report-update' pk=report.pk %}" class="btn"><i class="fa fa-pen"></i></a>
+                                        {% blocktrans asvar message with name=report.name %}Are you sure you want to remove {{ name }}?{% endblocktrans %}
+                                        <button class="btn text-danger" onclick="showDialog('{% trans 'Delete Report' %}', '{{ message }}', null, BTN_CANCEL, btnRemove(function() {
+                                                    $('form#delete-form').submit();
+                                                }))">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                        <form id="delete-form" method="post" action="{% url 'dashboard:category-report-update' pk=report.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="delete" value="save">
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" style="text-align: center">No category gap analysis reports</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% include 'includes/table_pagination.html' %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'dashboard_base.html' %}
+{% load bootstrap4 %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <div class="card shadow mb-4">
+            {% include 'includes/card_header.html' %}
+            <div class="card-body">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'dashboard:category-gap-reports' %}" class="btn btn-danger">Cancel</a>
+                {% bootstrap_button 'Save' 'submit' button_class='btn btn-primary'%}
+            </div>
+        </div>
+     </form>
+{% endblock content %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ form.media.js }}
+{% endblock %}
