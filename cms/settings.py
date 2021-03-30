@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_extensions',
     'bootstrap_daterangepicker',
+    'cms.api',
     'cms.accounts',
     'cms',
     'cms.scraper',
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     'bsmodals',
     'cms.dashboard',
     'sendgrid',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
