@@ -5,7 +5,8 @@ from django.db import models
 from django.db.models import QuerySet, Q
 from django.utils.translation import gettext as _
 
-from cms.models import BaseModel, BaseQuerySet
+from cms.dashboard.utils import average_price_gap
+from cms.models import BaseModel, BaseQuerySet, Product
 from cms.utils import is_value_numeric
 
 if TYPE_CHECKING:
@@ -83,3 +84,20 @@ class CategoryGapAnalysisReport(BaseModel):
 
     def __str__(self):
         return self.name
+
+    def get_products(self) -> List[Product]:
+        products = Product.objects.pubished().filter(category=self.category)
+        if self.websites:
+            products = products.filter(websiteproductattributes__website__in=self.websites)
+        return sorted([product for product in products], key=lambda product: product.current_average_price)
+
+    def cluster_products(self):
+        products: List[Product] = self.get_products()
+        max_gap: float = average_price_gap(products)
+        groups = [[products[0].current_average_price]]
+        for product in products[1:]:
+            if abs(product.current_average_price - groups[-1][-1]) <= max_gap:
+                groups[-1].append(product.current_average_price)
+            else:
+                groups.append([product.current_average_price])
+        return groups
