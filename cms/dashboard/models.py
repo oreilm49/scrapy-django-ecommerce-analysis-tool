@@ -91,9 +91,9 @@ class CategoryGapAnalysisReport(BaseModel):
             products = products.filter(websiteproductattributes__website__in=self.websites.all())
         return sorted([product for product in products], key=lambda product: product.current_average_price_int)
 
-    def cluster_products(self):
+    def cluster_products(self) -> List[List[Product]]:
         products: List[Product] = self.get_products()
-        max_gap: float = average_price_gap(products)
+        max_gap: int = average_price_gap(products)
         groups = [[products[0]]]
         for product in products[1:]:
             if abs(product.current_average_price_int - groups[-1][-1].current_average_price_int) <= max_gap:
