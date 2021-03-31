@@ -174,14 +174,20 @@ class Product(BaseModel):
         image: ProductImage = self.images.filter(image_type=THUMBNAIL).first()
         return image.image.url if image else None
 
-    @cached_property
-    def current_average_price(self) -> Optional[float]:
+    @property
+    def current_average_price_int(self):
         """avg price of product from most recent price"""
         most_recent_price = self.websiteproductattributes.published().order_by('-created').first()
         if not most_recent_price:
             return None
         prices = self.websiteproductattributes.published().filter(attribute_type__name="price").for_day(most_recent_price.created.date()).values_list('data__value', flat=True)
-        return humanize.intcomma(int(mean([float(price) for price in prices]))) if prices else None
+        return int(mean([float(price) for price in prices])) if prices else None
+
+    @cached_property
+    def current_average_price(self) -> Optional[float]:
+        """avg price of product from most recent price"""
+        price = self.current_average_price_int
+        return humanize.intcomma(price) if price else None
 
     @cached_property
     def brand(self) -> Optional[str]:
