@@ -86,10 +86,10 @@ class CategoryGapAnalysisReport(BaseModel):
         return self.name
 
     def get_products(self) -> List[Product]:
-        products = Product.objects.pubished().filter(category=self.category)
-        if self.websites:
-            products = products.filter(websiteproductattributes__website__in=self.websites)
-        return sorted([product for product in products], key=lambda product: product.current_average_price)
+        products = Product.objects.filter(category=self.category)
+        if self.websites.exists():
+            products = products.filter(websiteproductattributes__website__in=self.websites.all())
+        return sorted([product for product in products], key=lambda product: float(product.current_average_price))
 
     def cluster_products(self):
         products: List[Product] = self.get_products()

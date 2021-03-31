@@ -1,10 +1,12 @@
+from typing import List
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from model_mommy import mommy
 
 from cms.accounts.models import Company
-from cms.dashboard.models import CategoryTable
-from cms.models import Product, ProductAttribute, WebsiteProductAttribute, AttributeType, Category
+from cms.dashboard.models import CategoryTable, CategoryGapAnalysisReport
+from cms.models import Product, ProductAttribute, WebsiteProductAttribute, AttributeType, Category, Website
 
 
 class TestModels(TestCase):
@@ -56,3 +58,21 @@ class TestModels(TestCase):
         self.assertIn(owned_table, tables)
         self.assertIn(colleagues_table, tables)
         self.assertNotIn(unowned_table, tables)
+
+    def test_gap_analysis_get_products(self):
+        website: Website = mommy.make(Website)
+        report: CategoryGapAnalysisReport = mommy.make(CategoryGapAnalysisReport, category__name="washers", websites=[website])
+        price_attr: AttributeType = mommy.make(AttributeType, name="price")
+        mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 200})
+        mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 150})
+        mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 100})
+        mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 50})
+        different_category: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, website=website, data={'value': 50})
+        different_site: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, data={'value': 50})
+        products: List[Product] = report.get_products()
+        self.assertEqual(products[0].current_average_price, '50')
+        self.assertEqual(products[1].current_average_price, '100')
+        self.assertEqual(products[2].current_average_price, '150')
+        self.assertEqual(products[3].current_average_price, '200')
+        self.assertNotIn(different_category, products)
+        self.assertNotIn(different_site, products)
