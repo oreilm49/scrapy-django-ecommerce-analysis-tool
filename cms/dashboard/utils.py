@@ -25,5 +25,5 @@ def average_price_gap(products: List['Product']):
     price_gaps = []
     for index, product in enumerate(products, start=1):
         if index < len(products):
-            price_gaps.append(products[index + 1].current_average_price - product.current_average_price)
+            price_gaps.append(products[index].current_average_price_int - product.current_average_price_int)
     return mean(price_gaps)
