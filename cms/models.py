@@ -268,6 +268,9 @@ class ProductAttributeQuerySet(BaseQuerySet):
             value = attribute_type.unit.serializer.serializer(value)
         return self.create(product=product, attribute_type=attribute_type, data={'value': value})
 
+    def products(self) -> 'ProductAttributeQuerySet':
+        return Product.objects.filter(pk__in=[product_attribute.product.pk for product_attribute in self])
+
 
 class ProductAttribute(BaseProductAttribute):
 
