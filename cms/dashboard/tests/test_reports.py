@@ -3,6 +3,7 @@ from typing import Optional
 from django.test import TestCase
 from model_mommy import mommy
 
+from cms.constants import SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER
 from cms.dashboard.reports import ProductCluster
 from cms.models import Product, ProductAttribute, Category, CategoryAttributeConfig, AttributeType, \
     WebsiteProductAttribute, ProductQuerySet
@@ -15,9 +16,9 @@ class TestReports(TestCase):
         super().setUpTestData()
         # set up category
         cls.category: Category = mommy.make(Category, name="washers")
-        cls.cat_cfg_1: CategoryAttributeConfig = mommy.make(CategoryAttributeConfig, attribute_type__name="load size", order=1, category=cls.category)
-        cls.cat_cfg_2: CategoryAttributeConfig = mommy.make(CategoryAttributeConfig, attribute_type__name="spin", order=2, category=cls.category)
-        cls.cat_cfg_3: CategoryAttributeConfig = mommy.make(CategoryAttributeConfig, attribute_type__name="energy usage", order=3, category=cls.category)
+        cls.cat_cfg_1: CategoryAttributeConfig = mommy.make(CategoryAttributeConfig, attribute_type__name="load size", order=1, category=cls.category, scoring=SCORING_NUMERICAL_HIGHER)
+        cls.cat_cfg_2: CategoryAttributeConfig = mommy.make(CategoryAttributeConfig, attribute_type__name="spin", order=2, category=cls.category, scoring=SCORING_NUMERICAL_HIGHER)
+        cls.cat_cfg_3: CategoryAttributeConfig = mommy.make(CategoryAttributeConfig, attribute_type__name="energy usage", order=3, category=cls.category, scoring=SCORING_NUMERICAL_LOWER)
         cls.brand_attr: AttributeType = mommy.make(AttributeType, name="brand")
         cls.price_attr: AttributeType = mommy.make(AttributeType, name="price")
 
