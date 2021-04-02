@@ -5,6 +5,9 @@ from typing import List, Dict, Union, Optional
 
 from cms.models import Product, ProductQuerySet, Category, CategoryAttributeConfig, ProductAttribute
 
+DominantSpecs = Dict[CategoryAttributeConfig, Dict[str, Union[int, float, str]]]
+ProductSpecValues = List[Dict[CategoryAttributeConfig, Union[str, float, int, bool]]]
+
 
 class ProductCluster:
     """
@@ -16,9 +19,9 @@ class ProductCluster:
         self.products = Product.objects.filter(category=self.category, pk__in=[product.pk for product in products])
         self.target_range = target_range.filter(pk__in=self.products)
 
-    def get_product_spec_values(self) -> List[Dict[str, Union[str, float, int, bool]]]:
+    def get_product_spec_values(self) -> ProductSpecValues:
         """Returns a list of dicts of the spec values for each product."""
-        spec_values: List[Dict[str, Union[str, float, int, bool]]] = []
+        spec_values: ProductSpecValues = []
         for product in self.products:
             product_specs = {}
             for attribute_config in product.category.category_attribute_configs.order_by('order').iterator():
@@ -30,10 +33,10 @@ class ProductCluster:
                 spec_values.append(product_specs)
         return spec_values
 
-    def dominant_specs(self) -> Dict[str, Dict[str, Union[int, float, str]]]:
+    def dominant_specs(self) -> DominantSpecs:
         """Gets the most common spec combinations for this pricepoint"""
-        dominant_specs = {}
-        products_with_specs: List[Dict] = self.get_product_spec_values()
+        dominant_specs: DominantSpecs = {}
+        products_with_specs: ProductSpecValues = self.get_product_spec_values()
         if not products_with_specs:
             return dominant_specs
         for category_spec_config in products_with_specs[0].keys():
