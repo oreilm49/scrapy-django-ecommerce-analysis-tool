@@ -104,3 +104,9 @@ class TestReports(TestCase):
         with self.subTest("empty queryset"):
             cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none())
             self.assertEqual(cluster.average_price(), None)
+
+    def test_target_range_spec_gap(self):
+        spec_gap_analysis = self.cluster.target_range_spec_gap()
+        self.assertFalse(spec_gap_analysis[self.cat_cfg_1]['target_range_products'].exists())
+        self.assertIn(self.p1, spec_gap_analysis[self.cat_cfg_2]['target_range_products'])
+        self.assertIn(self.p1, spec_gap_analysis[self.cat_cfg_3]['target_range_products'])
