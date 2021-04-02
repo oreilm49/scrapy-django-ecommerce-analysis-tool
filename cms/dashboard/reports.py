@@ -33,6 +33,8 @@ class ProductCluster:
         """Gets the most common spec combinations for this pricepoint"""
         dominant_specs = {}
         products_with_specs: List[Dict] = self.get_product_spec_values()
+        if not products_with_specs:
+            return dominant_specs
         for spec_name in products_with_specs[0].keys():
             sorted_products = sorted(products_with_specs, key=lambda product: product[spec_name])
             ranked_spec_values = ((spec_value, sum(1 for _ in products)) for spec_value, products in
