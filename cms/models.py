@@ -332,11 +332,11 @@ class CategoryAttributeConfig(BaseModel):
 
     def product_attribute_data_filter_kwargs(self, value: Union[str, int, float, None]) -> Dict[str, Any]:
         if self.scoring == SCORING_NUMERICAL_HIGHER:
-            return {'productattributes__data__value__gte': value}
+            return {'data__value__gte': value}
         elif self.scoring == SCORING_NUMERICAL_LOWER:
-            return {'productattributes__data__value__lte': value}
+            return {'data__value__lte': value}
         elif self.scoring in [SCORING_BOOL_TRUE, SCORING_BOOL_FALSE]:
-            return {'productattributes__data__value': value}
+            return {'data__value': value}
 
     @property
     def product_attribute_data_filter_or_exclude(self) -> str:
