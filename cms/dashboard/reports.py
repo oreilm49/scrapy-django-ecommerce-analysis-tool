@@ -3,7 +3,8 @@ from operator import itemgetter
 from statistics import mean
 from typing import List, Dict, Union, Optional
 
-from cms.models import Product, ProductQuerySet, Category, CategoryAttributeConfig, ProductAttribute
+from cms.models import Product, ProductQuerySet, Category, CategoryAttributeConfig, ProductAttribute, \
+    ProductAttributeQuerySet
 
 DominantSpecs = Dict[CategoryAttributeConfig, Dict[str, Union[int, float, str]]]
 ProductSpecValues = List[Dict[CategoryAttributeConfig, Union[str, float, int, bool]]]
@@ -67,7 +68,8 @@ class ProductCluster:
         """
         dominant_specs: DominantSpecs = self.dominant_specs()
         for category_spec_config, spec_data in dominant_specs.items():
-            products = self.target_range.filter(productattributes__attribute_type=category_spec_config.attribute_type)
+            product_specs: ProductAttributeQuerySet = ProductAttribute.objects.filter(product__in=self.target_range, attribute_type=category_spec_config.attribute_type)
             filter_kwargs: Dict = category_spec_config.product_attribute_data_filter_kwargs(spec_data['value'])
-            dominant_specs[category_spec_config]['target_range_products'] = getattr(products, category_spec_config.product_attribute_data_filter_or_exclude)(**filter_kwargs)
+            product_specs: ProductAttributeQuerySet = getattr(product_specs, category_spec_config.product_attribute_data_filter_or_exclude)(**filter_kwargs)
+            dominant_specs[category_spec_config]['target_range_products'] = product_specs.products()
         return dominant_specs
