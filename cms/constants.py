@@ -68,6 +68,18 @@ IMAGE_TYPES = (
     (THUMBNAIL, _("Thumbnail")),
 )
 
+SCORING_NUMERICAL_HIGHER = 'higher'
+SCORING_NUMERICAL_LOWER = 'lower'
+SCORING_BOOL_TRUE = 'true'
+SCORING_BOOL_FALSE = 'false'
+
+SCORING_CHOICES = (
+    (SCORING_NUMERICAL_HIGHER, _("Higher number value")),
+    (SCORING_NUMERICAL_LOWER, _("Lower number value")),
+    (SCORING_BOOL_TRUE, _("True boolean value")),
+    (SCORING_BOOL_FALSE, _("False boolean value")),
+)
+
 # Dictionary of supported widgets mapped to form field class
 WIDGETS: Dict[Type[forms.Widget], Type[forms.Field]] = OrderedDict([
     (forms.widgets.TextInput, forms.CharField),
