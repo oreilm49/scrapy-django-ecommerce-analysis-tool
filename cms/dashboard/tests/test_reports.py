@@ -5,7 +5,7 @@ from model_mommy import mommy
 
 from cms.dashboard.reports import ProductCluster
 from cms.models import Product, ProductAttribute, Category, CategoryAttributeConfig, AttributeType, \
-    WebsiteProductAttribute
+    WebsiteProductAttribute, ProductQuerySet
 
 
 class TestReports(TestCase):
@@ -31,67 +31,75 @@ class TestReports(TestCase):
             mommy.make(WebsiteProductAttribute, product=product, attribute_type=cls.price_attr, data={'value': price})
             return product
 
-        make_product(299.99, 7, 1400, 50, 1, brand="whirlpool")
-        make_product(399.99, 8, 1400, 75, 2, brand="whirlpool")
-        make_product(349.99, 8, 1600, 100, 3, brand="hotpoint")
-        make_product(399.99, 6, 1200, 100, 4, brand="indesit")
+        cls.p1: Product = make_product(299.99, 7, 1400, 50, 1, brand="whirlpool")
+        cls.p2: Product = make_product(399.99, 8, 1400, 75, 2, brand="whirlpool")
+        cls.p3: Product = make_product(349.99, 8, 1600, 100, 3, brand="hotpoint")
+        cls.p4: Product = make_product(399.99, 6, 1200, 100, 4, brand="indesit")
+        cls.cluster: ProductCluster = ProductCluster(
+            cls.category,
+            [product for product in Product.objects.all()],
+            Product.objects.filter(pk=cls.p1.pk)
+        )
+
+    def test_product_cluster_init(self):
+        with self.subTest("target range"):
+            self.assertIn(self.p1, self.cluster.target_range)
+            self.assertNotIn(self.p2, self.cluster.target_range)
+            self.assertNotIn(self.p3, self.cluster.target_range)
+            self.assertNotIn(self.p4, self.cluster.target_range)
+        with self.subTest("products"):
+            self.assertIsInstance(self.cluster.products, ProductQuerySet)
 
     def test_product_cluster_get_product_spec_values(self):
         with self.subTest("incorrect category for products"):
-            cluster: ProductCluster = ProductCluster(mommy.make(Category), [mommy.make(Product, category__name="test")])
-            with self.assertRaises(AssertionError) as context:
-                cluster.get_product_spec_values()
-            self.assertEqual(str(context.exception), "Product used from incorrect category: test.")
-
+            wrong_product: Product = mommy.make(Product, category__name="test")
+            cluster: ProductCluster = ProductCluster(mommy.make(Category), [wrong_product], Product.objects.none())
+            self.assertNotIn(wrong_product, cluster.products)
         with self.subTest("empty product queryset"):
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none())
+            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none())
             product_spec_values = cluster.get_product_spec_values()
             self.assertEqual(product_spec_values, [])
 
         with self.subTest("spec values"):
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.filter(category=self.category).order_by('order'))
-            product_spec_values = cluster.get_product_spec_values()
+            product_spec_values = self.cluster.get_product_spec_values()
             self.assertIsInstance(product_spec_values, list)
-            self.assertEqual(product_spec_values[0], {
+            self.assertIn({
                 'load size': 7,
                 'spin': 1400,
                 'energy usage': 50,
-            })
-            self.assertEqual(product_spec_values[-1], {
+            }, product_spec_values)
+            self.assertIn({
                 'load size': 6,
                 'spin': 1200,
                 'energy usage': 100,
-            })
+            }, product_spec_values)
 
         with self.subTest("No spec values"):
             ProductAttribute.objects.all().delete()
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.filter(category=self.category).order_by('order'))
+            cluster: ProductCluster = ProductCluster(self.category, Product.objects.filter(category=self.category).order_by('order'), Product.objects.none())
             product_spec_values = cluster.get_product_spec_values()
             self.assertEqual(product_spec_values, [])
 
     def test_product_cluster_dominant_specs(self):
-        cluster: ProductCluster = ProductCluster(self.category, Product.objects.filter(category=self.category).order_by('order'))
-        dominant_specs = cluster.dominant_specs()
+        dominant_specs = self.cluster.dominant_specs()
         self.assertEqual(dominant_specs['load size'], {'value': 8, 'number_of_products': 2})
         self.assertEqual(dominant_specs['spin'], {'value': 1400, 'number_of_products': 2})
         self.assertEqual(dominant_specs['energy usage'], {'value': 100, 'number_of_products': 2})
 
         with self.subTest("empty queryset"):
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none())
+            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none())
             self.assertEqual(cluster.dominant_specs(), {})
 
     def test_product_cluster_dominant_brands(self):
-        cluster: ProductCluster = ProductCluster(self.category, Product.objects.filter(category=self.category).order_by('order'))
-        self.assertEqual(cluster.dominant_brands(), {'value': "whirlpool", 'number_of_products': 2})
+        self.assertEqual(self.cluster.dominant_brands(), {'value': "whirlpool", 'number_of_products': 2})
 
         with self.subTest("empty queryset"):
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none())
-            self.assertEqual(cluster.dominant_brands(), {})
+            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none())
+            self.assertEqual(cluster.dominant_brands(), None)
 
     def test_product_cluster_average_price(self):
-        cluster: ProductCluster = ProductCluster(self.category, Product.objects.filter(category=self.category).order_by('order'))
-        self.assertEqual(cluster.average_price(), 361)
+        self.assertEqual(self.cluster.average_price(), 361)
 
         with self.subTest("empty queryset"):
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none())
+            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none())
             self.assertEqual(cluster.average_price(), None)

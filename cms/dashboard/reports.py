@@ -11,15 +11,15 @@ class ProductCluster:
     Given a list of products, returns gap analysis
     """
 
-    def __init__(self, category: Category, products: Union[List[Product], ProductQuerySet]):
-        self.products = products
+    def __init__(self, category: Category, products: Union[List[Product], ProductQuerySet], target_range: ProductQuerySet):
         self.category = category
+        self.products = Product.objects.filter(category=self.category, pk__in=[product.pk for product in products])
+        self.target_range = target_range.filter(pk__in=self.products)
 
     def get_product_spec_values(self) -> List[Dict[str, Union[str, float, int, bool]]]:
         """Returns a list of dicts of the spec values for each product."""
         spec_values: List[Dict[str, Union[str, float, int, bool]]] = []
         for product in self.products:
-            assert product.category == self.category, f"Product used from incorrect category: {product.category}."
             product_specs = {}
             for attribute_config in product.category.category_attribute_configs.order_by('order').iterator():
                 attribute_config: 'CategoryAttributeConfig'
