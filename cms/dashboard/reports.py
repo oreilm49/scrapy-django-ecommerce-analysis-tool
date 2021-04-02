@@ -65,4 +65,9 @@ class ProductCluster:
         given the target range, are there any gaps
         vs the dominant specs for the category
         """
-        return
+        dominant_specs: DominantSpecs = self.dominant_specs()
+        for category_spec_config, spec_data in dominant_specs.items():
+            products = self.target_range.filter(productattributes__attribute_type=category_spec_config.attribute_type)
+            filter_kwargs: Dict = category_spec_config.product_attribute_data_filter_kwargs(spec_data['value'])
+            dominant_specs[category_spec_config]['target_range_products'] = getattr(products, category_spec_config.product_attribute_data_filter_or_exclude)(**filter_kwargs)
+        return dominant_specs
