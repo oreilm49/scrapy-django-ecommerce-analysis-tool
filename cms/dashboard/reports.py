@@ -31,11 +31,23 @@ class ProductCluster:
 
     def dominant_specs(self) -> Dict[str, Dict[str, Union[int, float, str]]]:
         """Gets the most common spec combinations for this pricepoint"""
-        return
+        dominant_specs = {}
+        products_with_specs: List[Dict] = self.get_product_spec_values()
+        for spec_name in products_with_specs[0].keys():
+            sorted_products = sorted(products_with_specs, key=lambda product: product[spec_name])
+            ranked_spec_values = ((spec_value, sum(1 for _ in products)) for spec_value, products in
+                                  groupby(sorted_products, key=lambda product: product[spec_name]))
+            dominant_spec = max(ranked_spec_values, key=itemgetter(1))
+            dominant_specs[spec_name] = {'value': dominant_spec[0], 'number_of_products': dominant_spec[1]}
+        return dominant_specs
 
     def dominant_brands(self):
         """Gets the most common brands for this pricepoint"""
-        return
+        sorted_products = sorted(self.products, key=lambda product: product.brand)
+        ranked_brands = ((brand, sum(1 for _ in products)) for brand, products in
+                              groupby(sorted_products, key=lambda product: product.brand))
+        dominant_brand = max(ranked_brands, key=itemgetter('brand'))
+        return {'value': dominant_brand[0], 'number_of_products': dominant_brand[1]}
 
     def pricepoint(self):
         """The common pricepoint that groups all products"""
