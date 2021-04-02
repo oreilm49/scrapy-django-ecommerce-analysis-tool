@@ -36,12 +36,12 @@ class ProductCluster:
         products_with_specs: List[Dict] = self.get_product_spec_values()
         if not products_with_specs:
             return dominant_specs
-        for spec_name in products_with_specs[0].keys():
-            sorted_products = sorted(products_with_specs, key=lambda product: product[spec_name])
+        for category_spec_config in products_with_specs[0].keys():
+            sorted_products = sorted(products_with_specs, key=lambda product: product[category_spec_config])
             ranked_spec_values = ((spec_value, sum(1 for _ in products)) for spec_value, products in
-                                  groupby(sorted_products, key=lambda product: product[spec_name]))
+                                  groupby(sorted_products, key=lambda product: product[category_spec_config]))
             dominant_spec = max(ranked_spec_values, key=itemgetter(1))
-            dominant_specs[spec_name] = {'value': dominant_spec[0], 'number_of_products': dominant_spec[1]}
+            dominant_specs[category_spec_config] = {'value': dominant_spec[0], 'number_of_products': dominant_spec[1]}
         return dominant_specs
 
     def dominant_brands(self) -> Optional[Dict[str, Union[str, int]]]:
