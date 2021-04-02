@@ -1,6 +1,8 @@
-from typing import List
+from itertools import groupby
+from operator import itemgetter
+from typing import List, Dict, Union
 
-from cms.models import Product, ProductQuerySet
+from cms.models import Product, ProductQuerySet, Category, CategoryAttributeConfig, ProductAttribute
 
 
 class ProductCluster:
@@ -8,9 +10,9 @@ class ProductCluster:
     Given a list of products, returns gap analysis
     """
 
-    def __init__(self, target_range: ProductQuerySet, products: List[Product]):
+    def __init__(self, category: Category, products: Union[List[Product], ProductQuerySet]):
         self.products = products
-        self.target_range = target_range
+        self.category = category
 
     def dominant_specs(self):
         """Gets the most common spec combinations for this pricepoint"""
