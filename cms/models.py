@@ -1,7 +1,7 @@
 import datetime
 import uuid
 from statistics import mean
-from typing import Optional, Dict, Union, Type, Iterator
+from typing import Optional, Dict, Union, Type, Iterator, Any
 
 from django import forms
 from django.contrib.humanize.templatetags import humanize
@@ -18,7 +18,7 @@ from pandas import DataFrame, Series
 
 from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN, \
     THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN, \
-    SCORING_CHOICES
+    SCORING_CHOICES, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER, SCORING_BOOL_TRUE, SCORING_BOOL_FALSE
 from cms.serializers import serializers, CustomValueSerializer
 
 
@@ -326,6 +326,20 @@ class CategoryAttributeConfig(BaseModel):
 
     def __str__(self):
         return f"{self.category} | {self.attribute_type}"
+
+    def product_attribute_data_filter_kwargs(self, value: Union[str, int, float, None]) -> Dict[str, Any]:
+        if self.scoring == SCORING_NUMERICAL_HIGHER:
+            return {'productattributes__data__value__gte': value}
+        elif self.scoring == SCORING_NUMERICAL_LOWER:
+            return {'productattributes__data__value__lte': value}
+        elif self.scoring in [SCORING_BOOL_TRUE, SCORING_BOOL_FALSE]:
+            return {'productattributes__data__value': value}
+
+    @property
+    def product_attribute_data_filter_or_exclude(self) -> str:
+        if self.scoring == SCORING_BOOL_FALSE:
+            return 'exclude'
+        return 'filter'
 
     class Meta:
         unique_together = ['category', 'attribute_type', 'company']
