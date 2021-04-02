@@ -1,5 +1,6 @@
 from itertools import groupby
 from operator import itemgetter
+from statistics import mean
 from typing import List, Dict, Union, Optional
 
 from cms.models import Product, ProductQuerySet, Category, CategoryAttributeConfig, ProductAttribute
@@ -52,9 +53,9 @@ class ProductCluster:
             dominant_brand = max(ranked_brands, key=itemgetter(0))
             return {'value': dominant_brand[0], 'number_of_products': dominant_brand[1]}
 
-    def pricepoint(self):
-        """The common pricepoint that groups all products"""
-        return
+    def average_price(self) -> Optional[int]:
+        prices: List[Optional[int]] = [product.current_average_price_int for product in self.products if product.current_average_price_int]
+        return int(mean(prices)) if prices else None
 
     def target_range_spec_gap(self):
         """
