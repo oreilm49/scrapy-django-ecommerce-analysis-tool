@@ -60,3 +60,14 @@ class TestReports(TestCase):
             cluster: ProductCluster = ProductCluster(self.category, Product.objects.filter(category=self.category).order_by('order'))
             product_spec_values = cluster.get_product_spec_values()
             self.assertEqual(product_spec_values, [])
+
+    def test_dominant_specs(self):
+        cluster: ProductCluster = ProductCluster(self.category, Product.objects.filter(category=self.category).order_by('order'))
+        dominant_specs = cluster.dominant_specs()
+        self.assertEqual(dominant_specs['load size'], {'value': 8, 'number_of_products': 2})
+        self.assertEqual(dominant_specs['spin'], {'value': 1400, 'number_of_products': 2})
+        self.assertEqual(dominant_specs['energy usage'], {'value': 100, 'number_of_products': 2})
+
+        with self.subTest("empty queryset"):
+            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none())
+            self.assertEqual(cluster.dominant_specs(), {})
