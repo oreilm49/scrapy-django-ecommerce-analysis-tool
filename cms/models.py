@@ -17,7 +17,8 @@ import pandas as pd
 from pandas import DataFrame, Series
 
 from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN, \
-    THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN
+    THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN, \
+    SCORING_CHOICES
 from cms.serializers import serializers, CustomValueSerializer
 
 
@@ -321,6 +322,7 @@ class CategoryAttributeConfig(BaseModel):
     category = models.ForeignKey(to=Category, verbose_name=_("Category"), on_delete=CASCADE, related_name="category_attribute_configs")
     weight = models.IntegerField(verbose_name=_('Weight'))
     company = models.ForeignKey(to="accounts.Company", verbose_name=_("Company"), on_delete=CASCADE, related_name="category_attribute_configs", blank=True, null=True)
+    scoring = models.CharField(verbose_name=_("Scoring"), max_length=MAX_LENGTH, choices=SCORING_CHOICES, help_text=_("The mechanism by which values for this attribute should be scored."), blank=True, null=True)
 
     def __str__(self):
         return f"{self.category} | {self.attribute_type}"
