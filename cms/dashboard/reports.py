@@ -25,7 +25,7 @@ class ProductCluster:
                 attribute_config: 'CategoryAttributeConfig'
                 product_attr: ProductAttribute = attribute_config.attribute_type.productattributes.filter(product__pk=product.pk).first()
                 if product_attr:
-                    product_specs[attribute_config.attribute_type.name] = product_attr.data['value']
+                    product_specs[attribute_config] = product_attr.data['value']
             if product_specs:
                 spec_values.append(product_specs)
         return spec_values
