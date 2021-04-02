@@ -1,6 +1,6 @@
 from itertools import groupby
 from operator import itemgetter
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 from cms.models import Product, ProductQuerySet, Category, CategoryAttributeConfig, ProductAttribute
 
@@ -48,8 +48,9 @@ class ProductCluster:
         sorted_products = sorted(self.products, key=lambda product: product.brand)
         ranked_brands = ((brand, sum(1 for _ in products)) for brand, products in
                               groupby(sorted_products, key=lambda product: product.brand))
-        dominant_brand = max(ranked_brands, key=itemgetter('brand'))
-        return {'value': dominant_brand[0], 'number_of_products': dominant_brand[1]}
+        if ranked_brands:
+            dominant_brand = max(ranked_brands, key=itemgetter(0))
+            return {'value': dominant_brand[0], 'number_of_products': dominant_brand[1]}
 
     def pricepoint(self):
         """The common pricepoint that groups all products"""
