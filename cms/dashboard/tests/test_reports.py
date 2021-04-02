@@ -65,14 +65,14 @@ class TestReports(TestCase):
             product_spec_values = self.cluster.get_product_spec_values()
             self.assertIsInstance(product_spec_values, list)
             self.assertIn({
-                'load size': 7,
-                'spin': 1400,
-                'energy usage': 50,
+                self.cat_cfg_1: 7,
+                self.cat_cfg_2: 1400,
+                self.cat_cfg_3: 50,
             }, product_spec_values)
             self.assertIn({
-                'load size': 6,
-                'spin': 1200,
-                'energy usage': 100,
+                self.cat_cfg_1: 6,
+                self.cat_cfg_2: 1200,
+                self.cat_cfg_3: 100,
             }, product_spec_values)
 
         with self.subTest("No spec values"):
@@ -83,9 +83,9 @@ class TestReports(TestCase):
 
     def test_product_cluster_dominant_specs(self):
         dominant_specs = self.cluster.dominant_specs()
-        self.assertEqual(dominant_specs['load size'], {'value': 8, 'number_of_products': 2})
-        self.assertEqual(dominant_specs['spin'], {'value': 1400, 'number_of_products': 2})
-        self.assertEqual(dominant_specs['energy usage'], {'value': 100, 'number_of_products': 2})
+        self.assertEqual(dominant_specs[self.cat_cfg_1], {'value': 8, 'number_of_products': 2})
+        self.assertEqual(dominant_specs[self.cat_cfg_2], {'value': 1400, 'number_of_products': 2})
+        self.assertEqual(dominant_specs[self.cat_cfg_3], {'value': 100, 'number_of_products': 2})
 
         with self.subTest("empty queryset"):
             cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none())
