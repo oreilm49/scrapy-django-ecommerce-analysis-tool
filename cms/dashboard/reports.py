@@ -43,7 +43,7 @@ class ProductCluster:
             dominant_specs[spec_name] = {'value': dominant_spec[0], 'number_of_products': dominant_spec[1]}
         return dominant_specs
 
-    def dominant_brands(self):
+    def dominant_brands(self) -> Optional[Dict[str, Union[str, int]]]:
         """Gets the most common brands for this pricepoint"""
         sorted_products = sorted(self.products, key=lambda product: product.brand)
         ranked_brands = ((brand, sum(1 for _ in products)) for brand, products in
