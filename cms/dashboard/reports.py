@@ -79,3 +79,21 @@ class ProductCluster:
             product_specs: ProductAttributeQuerySet = getattr(product_specs, category_spec_config.product_attribute_data_filter_or_exclude)(**filter_kwargs)
             dominant_specs[category_spec_config]['target_range_products'] = product_specs.products()
         return dominant_specs
+
+    @cached_property
+    def competitive_score(self):
+        """An overall competitive score for the target range within the cluster."""
+        dominant_specs_number = 0
+        matched_target_range = 0
+        for spec in self.target_range_spec_gap.items():
+            dominant_specs_number += 1
+            if self.target_range_spec_gap[spec]['target_range_products'].exists():
+                matched_target_range += 1
+        competitive_on_specs: bool = (matched_target_range / dominant_specs_number) == 1
+        dominant_brand_in_target_range: bool = self.dominant_brand in self.target_range.brands()
+        if competitive_on_specs and self.dominant_brand in self.target_range.brands():
+            return COMPETITIVE_SCORE_GOOD
+        elif not competitive_on_specs and not dominant_brand_in_target_range:
+            return COMPETITIVE_SCORE_BAD
+        else:
+            return COMPETITIVE_SCORE_ATTENTION
