@@ -4,6 +4,7 @@ from django.test import TestCase
 from model_mommy import mommy
 
 from cms.constants import SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER
+from cms.dashboard.constants import COMPETITIVE_SCORE_GOOD, COMPETITIVE_SCORE_BAD, COMPETITIVE_SCORE_ATTENTION
 from cms.dashboard.reports import ProductCluster
 from cms.models import Product, ProductAttribute, Category, CategoryAttributeConfig, AttributeType, \
     WebsiteProductAttribute, ProductQuerySet
