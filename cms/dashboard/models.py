@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models import QuerySet, Q
 from django.utils.translation import gettext as _
 
+from cms.dashboard.reports import ProductCluster
 from cms.dashboard.utils import average_price_gap
 from cms.models import BaseModel, BaseQuerySet, Product, ProductQuerySet, ProductAttributeQuerySet, ProductAttribute
 from cms.utils import is_value_numeric
@@ -109,3 +110,6 @@ class CategoryGapAnalysisReport(BaseModel):
             else:
                 groups.append([product])
         return groups
+
+    def gap_analysis_clusters(self) -> List[ProductCluster]:
+        return [ProductCluster(self.category, products, self.target_range) for products in self.cluster_products()]
