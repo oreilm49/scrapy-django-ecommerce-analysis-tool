@@ -194,3 +194,10 @@ class TestModels(TestCase):
 
         retrieved_attribute: ProductAttribute = ProductAttribute.objects.custom_get_or_create(product, attribute_type, "299")
         self.assertEqual(retrieved_attribute, created_attribute)
+
+    def test_product_queryset_brands(self):
+        attribute_type: AttributeType = mommy.make(AttributeType, name="brand")
+        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'whirlpool'})
+        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'whirlpool'})
+        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'hotpoint'})
+        self.assertEqual(sorted(list(Product.objects.brands())), ['hotpoint', 'whirlpool'])
