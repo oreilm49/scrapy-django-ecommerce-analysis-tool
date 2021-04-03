@@ -91,22 +91,22 @@ class TestReports(TestCase):
             cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none())
             self.assertEqual(cluster.dominant_specs(), {})
 
-    def test_product_cluster_dominant_brands(self):
-        self.assertEqual(self.cluster.dominant_brands(), {'value': "whirlpool", 'number_of_products': 2})
+    def test_product_cluster_dominant_brand(self):
+        self.assertEqual(self.cluster.dominant_brand, {'value': "whirlpool", 'number_of_products': 2})
 
         with self.subTest("empty queryset"):
             cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none())
-            self.assertEqual(cluster.dominant_brands(), None)
+            self.assertEqual(cluster.dominant_brand, None)
 
     def test_product_cluster_average_price(self):
-        self.assertEqual(self.cluster.average_price(), 361)
+        self.assertEqual(self.cluster.average_price, 361)
 
         with self.subTest("empty queryset"):
             cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none())
-            self.assertEqual(cluster.average_price(), None)
+            self.assertEqual(cluster.average_price, None)
 
     def test_target_range_spec_gap(self):
-        spec_gap_analysis = self.cluster.target_range_spec_gap()
+        spec_gap_analysis = self.cluster.target_range_spec_gap
         self.assertFalse(spec_gap_analysis[self.cat_cfg_1]['target_range_products'].exists())
         self.assertIn(self.p1, spec_gap_analysis[self.cat_cfg_2]['target_range_products'])
         self.assertIn(self.p1, spec_gap_analysis[self.cat_cfg_3]['target_range_products'])
