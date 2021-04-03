@@ -98,3 +98,15 @@ class TestModels(TestCase):
         self.assertIn(p3.product, groups[2])
         self.assertIn(p2.product, groups[3])
         self.assertIn(p1.product, groups[3])
+
+    def test_gap_analysis_products(self):
+        report: CategoryGapAnalysisReport = mommy.make(CategoryGapAnalysisReport, category__name="washers", brand="whirlpool")
+        brand_attr: AttributeType = mommy.make(AttributeType, name="brand")
+        p1 = mommy.make(ProductAttribute, attribute_type=brand_attr, product__category=report.category, data={'value': "whirlpool"})
+        p2 = mommy.make(ProductAttribute, attribute_type=brand_attr, product__category=report.category, data={'value': "bosch"})
+        with self.subTest("products"):
+            self.assertIn(p1.product, report.products)
+            self.assertIn(p1.product, report.products)
+        with self.subTest("target range"):
+            self.assertIn(p1.product, report.target_range)
+            self.assertNotIn(p2.product, report.target_range)
