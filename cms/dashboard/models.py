@@ -82,12 +82,21 @@ class CategoryGapAnalysisReport(BaseModel):
     def __str__(self):
         return self.name
 
-    def get_products(self) -> List[Product]:
-        """Retrieves and sorts products relevant to report."""
+    @property
+    def products(self) -> ProductQuerySet:
         products = Product.objects.filter(category=self.category)
         if self.websites.exists():
             products = products.filter(websiteproductattributes__website__in=self.websites.all())
-        return sorted([product for product in products], key=lambda product: product.current_average_price_int)
+        return products
+
+    @property
+    def target_range(self) -> ProductQuerySet:
+        brand_attributes: ProductAttributeQuerySet = ProductAttribute.objects.filter(attribute_type__name="brand", data__value=self.brand)
+        return self.products.filter(pk__in=[product_attribute.product.pk for product_attribute in brand_attributes])
+
+    def get_products(self) -> List[Product]:
+        """Retrieves and sorts products relevant to report."""
+        return sorted([product for product in self.products], key=lambda product: product.current_average_price_int)
 
     def cluster_products(self) -> List[List[Product]]:
         """Clusters products by pricepoint."""
