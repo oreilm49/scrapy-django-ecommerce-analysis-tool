@@ -6,6 +6,7 @@ from model_mommy import mommy
 
 from cms.accounts.models import Company
 from cms.dashboard.models import CategoryTable, CategoryGapAnalysisReport
+from cms.dashboard.reports import ProductCluster
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute, AttributeType, Category, Website
 
 
@@ -77,7 +78,7 @@ class TestModels(TestCase):
         self.assertNotIn(different_category, products)
         self.assertNotIn(different_site, products)
 
-    def test_cluster_products(self):
+    def test_cluster_analysis(self):
         website: Website = mommy.make(Website)
         report: CategoryGapAnalysisReport = mommy.make(CategoryGapAnalysisReport, category__name="washers", websites=[website])
         price_attr: AttributeType = mommy.make(AttributeType, name="price")
@@ -89,15 +90,20 @@ class TestModels(TestCase):
         p6 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 110})
         p7 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 50})
         p8 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 40})
-        groups: List[List[Product]] = report.cluster_products()
-        self.assertIn(p8.product, groups[0])
-        self.assertIn(p7.product, groups[0])
-        self.assertIn(p6.product, groups[1])
-        self.assertIn(p5.product, groups[1])
-        self.assertIn(p4.product, groups[2])
-        self.assertIn(p3.product, groups[2])
-        self.assertIn(p2.product, groups[3])
-        self.assertIn(p1.product, groups[3])
+        with self.subTest("cluster products"):
+            groups: List[List[Product]] = report.cluster_products()
+            self.assertIn(p8.product, groups[0])
+            self.assertIn(p7.product, groups[0])
+            self.assertIn(p6.product, groups[1])
+            self.assertIn(p5.product, groups[1])
+            self.assertIn(p4.product, groups[2])
+            self.assertIn(p3.product, groups[2])
+            self.assertIn(p2.product, groups[3])
+            self.assertIn(p1.product, groups[3])
+        with self.subTest("cluster analysis"):
+            analyzed_clusters: List[ProductCluster] = report.gap_analysis_clusters()
+            self.assertIsInstance(analyzed_clusters[0], ProductCluster)
+            self.assertEqual(len(analyzed_clusters), len(groups))
 
     def test_gap_analysis_products(self):
         report: CategoryGapAnalysisReport = mommy.make(CategoryGapAnalysisReport, category__name="washers", brand="whirlpool")
