@@ -6,11 +6,8 @@ from django.db.models import QuerySet, Q
 from django.utils.translation import gettext as _
 
 from cms.dashboard.utils import average_price_gap
-from cms.models import BaseModel, BaseQuerySet, Product
+from cms.models import BaseModel, BaseQuerySet, Product, ProductQuerySet, ProductAttributeQuerySet, ProductAttribute
 from cms.utils import is_value_numeric
-
-if TYPE_CHECKING:
-    from cms.models import ProductQuerySet
 
 
 class CategoryTableQuerySet(BaseQuerySet):
