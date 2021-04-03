@@ -111,3 +111,28 @@ class TestReports(TestCase):
         self.assertFalse(spec_gap_analysis[self.cat_cfg_1]['target_range_products'].exists())
         self.assertIn(self.p1, spec_gap_analysis[self.cat_cfg_2]['target_range_products'])
         self.assertIn(self.p1, spec_gap_analysis[self.cat_cfg_3]['target_range_products'])
+
+    def test_competitive_score(self):
+        with self.subTest("bad"):
+            cluster: ProductCluster = ProductCluster(
+                self.category,
+                [product for product in Product.objects.all()],
+                Product.objects.filter(pk=self.p4.pk)
+            )
+            self.assertEqual(cluster.competitive_score, COMPETITIVE_SCORE_BAD)
+
+        with self.subTest("attention"):
+            cluster: ProductCluster = ProductCluster(
+                self.category,
+                [product for product in Product.objects.all()],
+                Product.objects.filter(pk=self.p3.pk)
+            )
+            self.assertEqual(cluster.competitive_score, COMPETITIVE_SCORE_ATTENTION)
+
+        with self.subTest("good"):
+            cluster: ProductCluster = ProductCluster(
+                self.category,
+                [product for product in Product.objects.all()],
+                Product.objects.filter(pk=self.p2.pk)
+            )
+            self.assertEqual(cluster.competitive_score, COMPETITIVE_SCORE_GOOD)
