@@ -3,6 +3,9 @@ from operator import itemgetter
 from statistics import mean
 from typing import List, Dict, Union, Optional
 
+from django.utils.functional import cached_property
+
+from cms.dashboard.constants import COMPETITIVE_SCORE_GOOD, COMPETITIVE_SCORE_BAD, COMPETITIVE_SCORE_ATTENTION
 from cms.models import Product, ProductQuerySet, Category, CategoryAttributeConfig, ProductAttribute, \
     ProductAttributeQuerySet
 
@@ -48,7 +51,8 @@ class ProductCluster:
             dominant_specs[category_spec_config] = {'value': dominant_spec[0], 'number_of_products': dominant_spec[1]}
         return dominant_specs
 
-    def dominant_brands(self) -> Optional[Dict[str, Union[str, int]]]:
+    @cached_property
+    def dominant_brand(self) -> Optional[Dict[str, Union[str, int]]]:
         """Gets the most common brands for this pricepoint"""
         sorted_products = sorted(self.products, key=lambda product: product.brand)
         ranked_brands = tuple((brand, sum(1 for _ in products)) for brand, products in
@@ -57,10 +61,12 @@ class ProductCluster:
             dominant_brand = max(ranked_brands, key=itemgetter(0))
             return {'value': dominant_brand[0], 'number_of_products': dominant_brand[1]}
 
+    @cached_property
     def average_price(self) -> Optional[int]:
         prices: List[Optional[int]] = [product.current_average_price_int for product in self.products if product.current_average_price_int]
         return int(mean(prices)) if prices else None
 
+    @cached_property
     def target_range_spec_gap(self) -> DominantSpecs:
         """
         given the target range, are there any gaps
