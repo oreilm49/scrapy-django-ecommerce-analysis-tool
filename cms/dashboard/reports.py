@@ -61,7 +61,7 @@ class ProductCluster:
         prices: List[Optional[int]] = [product.current_average_price_int for product in self.products if product.current_average_price_int]
         return int(mean(prices)) if prices else None
 
-    def target_range_spec_gap(self):
+    def target_range_spec_gap(self) -> DominantSpecs:
         """
         given the target range, are there any gaps
         vs the dominant specs for the category
