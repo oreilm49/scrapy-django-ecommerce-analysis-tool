@@ -19,9 +19,9 @@ class ProductCluster:
     """
 
     def __init__(self, category: Category, products: Union[List[Product], ProductQuerySet], target_range: ProductQuerySet):
-        self.category = category
-        self.products = Product.objects.filter(category=self.category, pk__in=[product.pk for product in products])
-        self.target_range = target_range.filter(pk__in=self.products)
+        self.category: Category = category
+        self.products: ProductQuerySet = Product.objects.filter(category=self.category, pk__in=[product.pk for product in products])
+        self.target_range: ProductQuerySet = target_range.filter(pk__in=self.products)
 
     def get_product_spec_values(self) -> ProductSpecValues:
         """Returns a list of dicts of the spec values for each product."""
