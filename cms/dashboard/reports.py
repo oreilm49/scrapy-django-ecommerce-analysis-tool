@@ -55,7 +55,7 @@ class ProductCluster:
     @cached_property
     def dominant_brand(self) -> Optional[Dict[str, Union[str, int]]]:
         """Gets the most common brands for this pricepoint"""
-        sorted_products = sorted(self.products, key=lambda product: product.brand)
+        sorted_products = sorted([product for product in self.products], key=lambda product: product.brand)
         ranked_brands = tuple((brand, sum(1 for _ in products)) for brand, products in
                               groupby(sorted_products, key=lambda product: product.brand))
         if ranked_brands:
