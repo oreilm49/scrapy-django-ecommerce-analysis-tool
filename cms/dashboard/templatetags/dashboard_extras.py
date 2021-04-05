@@ -1,6 +1,9 @@
+from typing import Optional
+
 from django import template
 from django.utils.html import format_html
 
+from cms.dashboard.constants import COMPETITIVE_SCORE_GOOD, COMPETITIVE_SCORE_ATTENTION, COMPETITIVE_SCORE_BAD
 from cms.models import Product, ProductAttribute
 
 register = template.Library()
@@ -28,3 +31,13 @@ def product_attribute(context: dict, product_attribute: ProductAttribute):
     else:
         html = f'{product_attribute.data["value"]}'
     return format_html(html)
+
+
+@register.filter
+def cluster_score_icon(score: str) -> Optional[str]:
+    if score is COMPETITIVE_SCORE_GOOD:
+        return 'fa fa-check'
+    elif score is COMPETITIVE_SCORE_ATTENTION:
+        return 'fa fa-exclamation'
+    elif score is COMPETITIVE_SCORE_BAD:
+        return 'fa fa-times'
