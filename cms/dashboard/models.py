@@ -111,5 +111,6 @@ class CategoryGapAnalysisReport(BaseModel):
                 groups.append([product])
         return groups
 
+    @property
     def gap_analysis_clusters(self) -> List[ProductCluster]:
         return [ProductCluster(self.category, products, self.target_range) for products in self.cluster_products()]
