@@ -28,9 +28,44 @@
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Competitive Score
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><i class="{{ cluster.competitive_score | cluster_score_icon }} fa-2x text-gray-300"></i></div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><i class="{{ cluster.competitive_score | cluster_score_icon }} fa-2x text-{{ cluster.competitive_score | cluster_score_class }}"></i></div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div>
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Dominant Brand
+                        </div>
+                        <p>{{ cluster.dominant_brand.value }} has {{ cluster.dominant_brand.display_share }} display share compared to your range of {{ cluster.dominant_brand.target_range_display_share }}</p>
+                    </div>
+                </div>
+                <div class="row no-gutters">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        Spec Gap Analysis
+                    </div>
+                </div>
+                <div class="row no-gutters">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Spec</th>
+                                <th>Dominant Value</th>
+                                <th>Target Range</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for spec, data in cluster.target_range_spec_gap.items %}
+                                <tr>
+                                    <td>{{ spec }}</td>
+                                    <td>{{ data.value }}</td>
+                                    <td>{{ data.target_range_products|join:',' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
