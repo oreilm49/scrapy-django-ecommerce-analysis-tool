@@ -60,7 +60,14 @@ class ProductCluster:
                               groupby(sorted_products, key=lambda product: product.brand))
         if ranked_brands:
             dominant_brand = max(ranked_brands, key=itemgetter(0))
-            return {'value': dominant_brand[0], 'number_of_products': dominant_brand[1]}
+            display_share = '{:.0%}'.format(dominant_brand[1] / self.products.count()) if self.products.exists() else None
+            target_range_display_share = '{:.0%}'.format(self.target_range.count() / self.products.count()) if self.products.exists() else None
+            return {
+                'value': dominant_brand[0],
+                'number_of_products': dominant_brand[1],
+                'display_share': display_share,
+                'target_range_display_share': target_range_display_share,
+            }
 
     @cached_property
     def average_price(self) -> Optional[int]:
