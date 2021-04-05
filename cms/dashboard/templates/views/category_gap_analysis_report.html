@@ -17,6 +17,11 @@
         <div class="card shadow mb-4 p-4">
             <div class="row">
                 <div class="col">
+                    {% with single_stat_header="cluster price" single_stat=cluster.cluster_price  %}
+                        {% include "includes/single_stat.html" %}
+                    {% endwith %}
+                </div>
+                <div class="col">
                     {% with single_stat_header="average price" single_stat=cluster.average_price  %}
                         {% include "includes/single_stat.html" %}
                     {% endwith %}
