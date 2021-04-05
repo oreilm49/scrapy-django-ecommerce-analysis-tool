@@ -42,7 +42,7 @@
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                             Dominant Brand
                         </div>
-                        <p>{{ cluster.dominant_brand.value }} has {{ cluster.dominant_brand.display_share }} display share compared to your range of {{ cluster.dominant_brand.target_range_display_share }}</p>
+                        <p>{% if report.brand == cluster.dominant_brand.value %}{{ report.brand }} is the dominant brand{% else %}{{ cluster.dominant_brand.value }} has {{ cluster.dominant_brand.display_share }} display share compared to your range of {{ cluster.dominant_brand.target_range_display_share }}{% endif %}</p>
                     </div>
                 </div>
                 <div class="row no-gutters">
