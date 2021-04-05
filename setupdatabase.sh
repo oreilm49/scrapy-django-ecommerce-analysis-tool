@@ -8,4 +8,5 @@ set -e
 ./manage.py set_fake_passwords
 ./manage.py runscript --traceback load_accounts
 ./manage.py runscript --traceback load_cms
+./manage.py runscript --traceback load_dashboard
 exit 0
