@@ -97,7 +97,7 @@ class CategoryGapAnalysisReport(BaseModel):
 
     def get_products(self) -> List[Product]:
         """Retrieves and sorts products relevant to report."""
-        return sorted([product for product in self.products], key=lambda product: product.current_average_price_int)
+        return sorted([product for product in self.products if product.current_average_price_int], key=lambda product: product.current_average_price_int)
 
     def cluster_products(self) -> List[List[Product]]:
         """Clusters products by pricepoint."""
