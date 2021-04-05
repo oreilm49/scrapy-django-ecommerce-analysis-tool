@@ -41,3 +41,13 @@ def cluster_score_icon(score: str) -> Optional[str]:
         return 'fa fa-exclamation'
     elif score is COMPETITIVE_SCORE_BAD:
         return 'fa fa-times'
+
+
+@register.filter
+def cluster_score_class(score: str) -> Optional[str]:
+    if score is COMPETITIVE_SCORE_GOOD:
+        return 'success'
+    elif score is COMPETITIVE_SCORE_ATTENTION:
+        return 'warning'
+    elif score is COMPETITIVE_SCORE_BAD:
+        return 'danger'
