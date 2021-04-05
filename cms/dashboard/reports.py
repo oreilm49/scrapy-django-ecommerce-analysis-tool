@@ -46,8 +46,8 @@ class ProductCluster:
             return dominant_specs
         for category_spec_config in products_with_specs[0].keys():
             sorted_products = sorted([product for product in products_with_specs if product.get(category_spec_config)], key=lambda product: product[category_spec_config])
-            ranked_spec_values = ((spec_value, sum(1 for _ in products)) for spec_value, products in
-                                  groupby(sorted_products, key=lambda product: product[category_spec_config]))
+            ranked_spec_values = list((spec_value, sum(1 for _ in products)) for spec_value, products in
+                                      groupby(sorted_products, key=lambda product: product[category_spec_config]))
             if ranked_spec_values:
                 dominant_spec = max(ranked_spec_values, key=itemgetter(1))
                 dominant_specs[category_spec_config] = {'value': dominant_spec[0], 'number_of_products': dominant_spec[1]}
