@@ -41,14 +41,14 @@
                                 <td>{{ report.websites.all|join:',' }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{% url 'dashboard:category-report-update' pk=report.pk %}" class="btn"><i class="fa fa-pen"></i></a>
+                                        <a href="{% url 'dashboard:category-gap-report-update' pk=report.pk %}" class="btn"><i class="fa fa-pen"></i></a>
                                         {% blocktrans asvar message with name=report.name %}Are you sure you want to remove {{ name }}?{% endblocktrans %}
                                         <button class="btn text-danger" onclick="showDialog('{% trans 'Delete Report' %}', '{{ message }}', null, BTN_CANCEL, btnRemove(function() {
                                                     $('form#delete-form').submit();
                                                 }))">
                                             <i class="fa fa-trash"></i>
                                         </button>
-                                        <form id="delete-form" method="post" action="{% url 'dashboard:category-report-update' pk=report.pk %}">
+                                        <form id="delete-form" method="post" action="{% url 'dashboard:category-gap-report-update' pk=report.pk %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="delete" value="save">
                                         </form>
