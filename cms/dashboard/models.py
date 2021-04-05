@@ -106,7 +106,7 @@ class CategoryGapAnalysisReport(BaseModel):
 
         def product_price_grouper(product: Product):
             for price in self.price_clusters:
-                if product.current_average_price_int <= float(price):
+                if product.current_average_price_int <= price:
                     return price
         return itertools.groupby(products, key=lambda product: product_price_grouper(product))
 
