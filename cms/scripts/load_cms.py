@@ -41,7 +41,7 @@ def set_up_attributes():
     AttributeType.objects.get_or_create(name="price", unit=currency)
 
 
-def make_product(model: str, price: float, load_size: int, spin: int, energy: int, category: Category, brand: str) -> Product:
+def make_product(model: str, price: float, load_size: int, spin: int, energy: int, category: Category, brand: str) -> Optional[Product]:
     if Product.objects.filter(model=model).exists():
         return
     product = Product.objects.create(model=model, category=category)
