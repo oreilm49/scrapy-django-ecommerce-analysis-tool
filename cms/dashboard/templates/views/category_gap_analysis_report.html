@@ -22,6 +22,16 @@
                         {% include "includes/single_stat.html" %}
                     {% endwith %}
                 </div>
+                <div class="col">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Competitive Score
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><i class="{{ cluster.competitive_score | cluster_score_icon }} fa-2x text-gray-300"></i></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     {% endfor %}
