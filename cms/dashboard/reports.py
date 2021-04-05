@@ -18,10 +18,11 @@ class ProductCluster:
     Given a list of products, returns gap analysis
     """
 
-    def __init__(self, category: Category, products: Union[List[Product], ProductQuerySet], target_range: ProductQuerySet):
+    def __init__(self, category: Category, products: Union[List[Product], ProductQuerySet], target_range: ProductQuerySet, total_number_products: int):
         self.category: Category = category
         self.products: ProductQuerySet = Product.objects.filter(category=self.category, pk__in=[product.pk for product in products])
         self.target_range: ProductQuerySet = target_range.filter(pk__in=self.products)
+        self.cluster_size = "{size}%".format(size=int((len(products) / total_number_products)*100))
 
     def get_product_spec_values(self) -> ProductSpecValues:
         """Returns a list of dicts of the spec values for each product."""
