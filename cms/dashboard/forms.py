@@ -151,6 +151,7 @@ class ProductPriceFilterForm(forms.Form):
 
 class CategoryGapAnalysisForm(forms.ModelForm):
     brand = forms.ChoiceField(label=_('Brand'), choices=(), required=True, help_text=_("The brand you'd like to use as the target for this analysis."))
+    price_clusters = SimpleArrayField(base_field=forms.CharField())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -159,7 +160,7 @@ class CategoryGapAnalysisForm(forms.ModelForm):
 
     class Meta:
         model = CategoryGapAnalysisReport
-        fields = 'name', 'category', 'brand', 'websites',
+        fields = 'name', 'category', 'brand', 'websites', 'price_clusters',
 
     class Media:
         js = 'js/select2.min.js', 'js/category_gap_analysis_filter.js',
