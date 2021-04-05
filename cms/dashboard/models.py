@@ -77,6 +77,7 @@ class CategoryGapAnalysisReport(BaseModel):
     category = models.ForeignKey("cms.Category", verbose_name=_('Category'), help_text=_('The category products should belong to in order to appear in the table.'), on_delete=models.SET_NULL, null=True)
     brand = models.CharField(verbose_name=_('Brand'), max_length=100, help_text=_('The brand analysed in the gap analysis report.'))
     websites = models.ManyToManyField("cms.Website", verbose_name=_("Websites"), help_text=_('Limit gap analysis report to these websites.'))
+    price_clusters = models.JSONField(verbose_name=_('Price clusters'), help_text=_('Price levels used to cluster products.'), default=list)
 
     objects = CategoryGapAnalysisQuerySet.as_manager()
 
