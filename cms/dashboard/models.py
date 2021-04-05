@@ -1,4 +1,5 @@
-from typing import List, TYPE_CHECKING
+import itertools
+from typing import List, Iterator, Any
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -6,7 +7,6 @@ from django.db.models import QuerySet, Q
 from django.utils.translation import gettext as _
 
 from cms.dashboard.reports import ProductCluster
-from cms.dashboard.utils import average_price_gap
 from cms.models import BaseModel, BaseQuerySet, Product, ProductQuerySet, ProductAttributeQuerySet, ProductAttribute
 from cms.utils import is_value_numeric
 
@@ -100,17 +100,15 @@ class CategoryGapAnalysisReport(BaseModel):
         """Retrieves and sorts products relevant to report."""
         return sorted([product for product in self.products if product.current_average_price_int], key=lambda product: product.current_average_price_int)
 
-    def cluster_products(self) -> List[List[Product]]:
+    def cluster_products(self) -> Iterator[tuple[Any, Iterator[Product]]]:
         """Clusters products by pricepoint."""
         products: List[Product] = self.get_products()
-        max_gap: int = average_price_gap(products)
-        groups = [[products[0]]]
-        for product in products[1:]:
-            if abs(product.current_average_price_int - groups[-1][-1].current_average_price_int) <= max_gap:
-                groups[-1].append(product)
-            else:
-                groups.append([product])
-        return groups
+
+        def product_price_grouper(product: Product):
+            for price in self.price_clusters:
+                if product.current_average_price_int <= float(price):
+                    return price
+        return itertools.groupby(products, key=lambda product: product_price_grouper(product))
 
     @property
     def gap_analysis_clusters(self) -> List[ProductCluster]:
