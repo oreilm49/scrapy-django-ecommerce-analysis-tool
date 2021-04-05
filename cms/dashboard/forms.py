@@ -155,6 +155,7 @@ class CategoryGapAnalysisForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['brand'].choices = ((brand, brand) for brand in get_brands())
+        self.fields['websites'].required = False
 
     class Meta:
         model = CategoryGapAnalysisReport
