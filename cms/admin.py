@@ -23,7 +23,7 @@ class UrlAdmin(admin.ModelAdmin):
 class CategoryAttributeConfigInlineAdmin(admin.TabularInline):
     model = CategoryAttributeConfig
     extra = 0
-    fields = 'order', 'attribute_type', 'weight', 'publish',
+    fields = 'order', 'attribute_type', 'weight', 'scoring', 'publish',
     show_change_link = True
 
 
