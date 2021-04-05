@@ -32,8 +32,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-xs-2">
+                    <i class="fa fa-chevron-left" type="button" data-toggle="collapse" id="cluster-{{ cluster.average_price }}-control" data-target="#cluster-{{ cluster.average_price }}-collapse" aria-expanded="false" aria-controls="cluster-{{ cluster.average_price }}-collapse"></i>
+                </div>
             </div>
-            <div>
+            <div class="collapse" id="cluster-{{ cluster.average_price }}-collapse">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
@@ -70,4 +73,21 @@
             </div>
         </div>
     {% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.collapse').on('shown.bs.collapse', function (e) {
+                var controlSelector = "#" + e.target.id.replace("collapse", "control")
+                $(controlSelector).removeClass("fa-chevron-left")
+                $(controlSelector).addClass("fa-chevron-down")
+            })
+            $('.collapse').on('hidden.bs.collapse', function (e) {
+                var controlSelector = "#" + e.target.id.replace("collapse", "control")
+                $(controlSelector).removeClass("fa-chevron-down")
+                $(controlSelector).addClass("fa-chevron-left")
+            })
+        })
+    </script>
 {% endblock %}
