@@ -24,6 +24,7 @@ class ProductCluster:
         self.products: ProductQuerySet = Product.objects.filter(category=self.category, pk__in=[product.pk for product in products])
         self.target_range: ProductQuerySet = target_range.filter(pk__in=self.products)
         self.cluster_size = "{size}%".format(size=int((len(products) / total_number_products)*100))
+        self.cluster_price = products_grouper[0]
 
     def get_product_spec_values(self) -> ProductSpecValues:
         """Returns a list of dicts of the spec values for each product."""
