@@ -10,7 +10,7 @@
 
 {% block content %}
     {% for cluster in report.gap_analysis_clusters %}
-        <div class="card shadow mb-4">
+        <div class="card shadow mb-4 p-4">
             <div class="row">
                 <div class="col">
                     {% with single_stat_header="average price" single_stat=cluster.average_price  %}
