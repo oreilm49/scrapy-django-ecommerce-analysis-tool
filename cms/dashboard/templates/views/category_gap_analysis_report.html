@@ -59,7 +59,7 @@
                         <tbody>
                             {% for spec, data in cluster.target_range_spec_gap.items %}
                                 <tr>
-                                    <td>{{ spec }}</td>
+                                    <td>{{ spec.attribute_type }}</td>
                                     <td>{{ data.value }}</td>
                                     <td>{{ data.target_range_products|join:',' }}</td>
                                 </tr>
