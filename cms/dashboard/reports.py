@@ -101,7 +101,7 @@ class ProductCluster:
         if not dominant_specs_number:
             return
         competitive_on_specs: bool = (matched_target_range / dominant_specs_number) == 1
-        dominant_brand_in_target_range: bool = self.dominant_brand['value'] in list(self.target_range.brands())
+        dominant_brand_in_target_range: bool = self.dominant_brand['value'] in list(self.target_range.brands()) if self.dominant_brand else False
         if competitive_on_specs and dominant_brand_in_target_range:
             return COMPETITIVE_SCORE_GOOD
         elif not competitive_on_specs and not dominant_brand_in_target_range:
