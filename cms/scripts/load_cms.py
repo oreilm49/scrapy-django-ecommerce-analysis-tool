@@ -3,10 +3,10 @@ from typing import Optional
 from django.db import transaction
 
 from cms.constants import CATEGORY, TABLE_LABEL_COLUMN, TABLE_VALUE_COLUMN, TABLE, LINK, PAGINATION, PRICE, MODEL, \
-    HOURLY, IMAGE
+    HOURLY, IMAGE, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER
 from cms.form_widgets import FloatInput
 from cms.models import Website, Category, Url, Selector, Unit, Product, ProductAttribute, AttributeType, \
-    WebsiteProductAttribute
+    WebsiteProductAttribute, CategoryAttributeConfig
 from cms.utils import get_dotted_path
 
 
@@ -37,10 +37,15 @@ def set_up_attributes():
     energy_unit, _ = Unit.objects.get_or_create(name="kwh", widget=get_dotted_path(FloatInput))
     currency, _ = Unit.objects.get_or_create(name="€", alternate_names=["euro"], widget=get_dotted_path(FloatInput), repeat=HOURLY)
     AttributeType.objects.get_or_create(name="brand")
-    AttributeType.objects.get_or_create(name="load size", unit=load_size_unit)
-    AttributeType.objects.get_or_create(name="spin speed", unit=spin_unit)
-    AttributeType.objects.get_or_create(name="energy usage", unit=energy_unit)
+    load_size, _ = AttributeType.objects.get_or_create(name="load size", unit=load_size_unit)
+    spin, _ = AttributeType.objects.get_or_create(name="spin speed", unit=spin_unit)
+    energy, _ = AttributeType.objects.get_or_create(name="energy usage", unit=energy_unit)
     AttributeType.objects.get_or_create(name="price", unit=currency)
+
+    washers = Category.objects.get(name="washing machines")
+    CategoryAttributeConfig.objects.create(attribute_type=load_size, category=washers, weight=5, order=1, scoring=SCORING_NUMERICAL_HIGHER)
+    CategoryAttributeConfig.objects.create(attribute_type=spin, category=washers, weight=4, order=2, scoring=SCORING_NUMERICAL_HIGHER)
+    CategoryAttributeConfig.objects.create(attribute_type=energy, category=washers, weight=3, order=3, scoring=SCORING_NUMERICAL_LOWER)
 
 
 def make_product(model: str, price: float, load_size: int, spin: int, energy: int, category: Category, brand: str) -> Optional[Product]:
