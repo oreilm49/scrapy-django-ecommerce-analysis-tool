@@ -122,7 +122,7 @@ class CategoryGapAnalysisReportUpdate(CategoryGapAnalysisReportMixin, SuccessMes
 
 
 class CategoryGapAnalysisReportDetail(CategoryGapAnalysisReportMixin, DetailView):
-    template_name = 'views/category_table.html'
+    template_name = 'views/category_gap_analysis_report.html'
 
     @property
     def report(self) -> CategoryGapAnalysisReport:
