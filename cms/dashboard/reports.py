@@ -82,7 +82,7 @@ class ProductCluster:
         return dominant_specs
 
     @cached_property
-    def competitive_score(self) -> str:
+    def competitive_score(self) -> Optional[str]:
         """An overall competitive score for the target range within the cluster."""
         dominant_specs_number = 0
         matched_target_range = 0
@@ -91,6 +91,8 @@ class ProductCluster:
             dominant_specs_number += 1
             if self.target_range_spec_gap[spec]['target_range_products'].exists():
                 matched_target_range += 1
+        if not dominant_specs_number:
+            return
         competitive_on_specs: bool = (matched_target_range / dominant_specs_number) == 1
         dominant_brand_in_target_range: bool = self.dominant_brand['value'] in list(self.target_range.brands())
         if competitive_on_specs and dominant_brand_in_target_range:
