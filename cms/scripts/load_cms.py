@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.db import transaction
 
 from cms.constants import CATEGORY, TABLE_LABEL_COLUMN, TABLE_VALUE_COLUMN, TABLE, LINK, PAGINATION, PRICE, MODEL, \
