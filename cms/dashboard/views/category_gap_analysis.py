@@ -117,7 +117,7 @@ class CategoryGapAnalysisReportUpdate(CategoryGapAnalysisReportMixin, SuccessMes
     def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
         return [
             Breadcrumb(name="Category Gap Analysis", url=reverse('dashboard:category-gap-reports'), active=False),
-            Breadcrumb(name="Update", url=reverse('dashboard:category-gap-report-update'), active=True),
+            Breadcrumb(name="Update", url=reverse('dashboard:category-gap-report-update', kwargs={'pk': self.report.pk}), active=True),
         ]
 
 
