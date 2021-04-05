@@ -101,7 +101,7 @@ class TestModels(TestCase):
             self.assertIn(p2.product, groups[3])
             self.assertIn(p1.product, groups[3])
         with self.subTest("cluster analysis"):
-            analyzed_clusters: List[ProductCluster] = report.gap_analysis_clusters()
+            analyzed_clusters: List[ProductCluster] = report.gap_analysis_clusters
             self.assertIsInstance(analyzed_clusters[0], ProductCluster)
             self.assertEqual(len(analyzed_clusters), len(groups))
 
