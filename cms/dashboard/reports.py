@@ -1,7 +1,7 @@
 from itertools import groupby
 from operator import itemgetter
 from statistics import mean
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Iterator, Tuple
 
 from django.utils.functional import cached_property
 
@@ -18,7 +18,8 @@ class ProductCluster:
     Given a list of products, returns gap analysis
     """
 
-    def __init__(self, category: Category, products: Union[List[Product], ProductQuerySet], target_range: ProductQuerySet, total_number_products: int):
+    def __init__(self, category: Category, products_grouper: Tuple[int, Iterator], target_range: ProductQuerySet, total_number_products: int):
+        products: List[Product] = list(products_grouper[1])
         self.category: Category = category
         self.products: ProductQuerySet = Product.objects.filter(category=self.category, pk__in=[product.pk for product in products])
         self.target_range: ProductQuerySet = target_range.filter(pk__in=self.products)
