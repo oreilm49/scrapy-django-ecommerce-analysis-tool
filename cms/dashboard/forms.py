@@ -29,6 +29,10 @@ class CategoryTableForm(forms.ModelForm):
         super().__init__(**kwargs)
         self.fields['x_axis_values'].widget = TagWidget()
         self.fields['y_axis_values'].widget = TagWidget()
+        self.fields['x_axis_attribute'].label = _('Horizontal label')
+        self.fields['x_axis_values'].label = _('Horizontal values')
+        self.fields['y_axis_attribute'].label = _('Vertical label')
+        self.fields['y_axis_values'].label = _('Vertical values')
 
     class Meta:
         model = CategoryTable
