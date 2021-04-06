@@ -146,7 +146,7 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
             product=product
         ) for product in self.table.products(Product.objects.published())]
         y_axis_groups: Iterator[Tuple] = itertools.groupby(
-            sorted([product for product in products if product.y_axis_grouper and product.x_axis_grouper], key=lambda product: product.y_axis_grouper),
+            sorted(products, key=lambda product: product.y_axis_grouper),
             key=lambda product: product.y_axis_grouper
         )
         table_data = {}
