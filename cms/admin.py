@@ -6,10 +6,18 @@ from cms.models import Website, Url, Category, Selector, Unit, Product, ProductA
 from cms.views.admin import ProductMapView, AttributeTypeMapView
 
 
+class SelectorInlineAdmin(admin.TabularInline):
+    model = Selector
+    extra = 0
+    fields = 'selector_type', 'css_selector', 'regex', 'parent',
+    show_change_link = True
+
+
 @admin.register(Website)
 class WebsiteAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'domain'
     list_editable = 'name', 'domain'
+    inlines = SelectorInlineAdmin,
 
 
 @admin.register(Url)
