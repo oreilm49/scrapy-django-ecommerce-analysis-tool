@@ -11,6 +11,7 @@ from cms.models import Product, ProductQuerySet, Category, CategoryAttributeConf
 
 DominantSpecs = Dict[CategoryAttributeConfig, Dict[str, Union[int, float, str]]]
 ProductSpecValues = List[Dict[CategoryAttributeConfig, Union[str, float, int, bool]]]
+Price = Union[float, int]
 
 
 class ProductCluster:
@@ -18,7 +19,7 @@ class ProductCluster:
     Given a list of products, returns gap analysis
     """
 
-    def __init__(self, category: Category, products_grouper: Tuple[int, Iterator], target_range: ProductQuerySet, total_number_products: int):
+    def __init__(self, category: Category, products_grouper: Tuple[Price, Iterator], target_range: ProductQuerySet, total_number_products: int):
         products: List[Product] = list(products_grouper[1])
         self.category: Category = category
         self.products: ProductQuerySet = Product.objects.filter(category=self.category, pk__in=[product.pk for product in products])
