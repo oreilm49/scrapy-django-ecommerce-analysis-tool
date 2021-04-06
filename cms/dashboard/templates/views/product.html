@@ -57,7 +57,7 @@
         </div>
     </div>
     <div class="card shadow mb-4">
-        {% with 'Specification' as header %}
+        {% with header='Specification' card_action_button=edit_spec_button %}
             {% include 'includes/card_header.html' %}
         {% endwith %}
         <div class="card-body">
