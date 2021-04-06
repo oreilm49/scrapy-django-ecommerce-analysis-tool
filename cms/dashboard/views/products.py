@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import ListView
 
+from cms.dashboard.toolbar import LinkButton
 from cms.models import Product, ProductQuerySet, WebsiteProductAttributeQuerySet, WebsiteProductAttribute
 from cms.dashboard.forms import ProductsFilterForm, ProductPriceFilterForm
 from cms.dashboard.views.base import Breadcrumb, BaseDashboardMixin
@@ -75,4 +76,11 @@ class ProductDetail(BaseDashboardMixin, ListView):
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
         data.update(product=self.product, filter_form=self.get_form(), price_chart=self.get_price_chart())
+        if self.request.user.is_superuser:
+            data.update(
+                edit_spec_button=LinkButton(
+                    url=reverse('admin:cms_product_change', kwargs={'object_id': self.product.pk}),
+                    icon='fas fa-pen fa-sm fa-fw text-gray-400',
+                )
+            )
         return data
