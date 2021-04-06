@@ -25,6 +25,11 @@ class CategoryTableForm(forms.ModelForm):
     x_axis_values = SimpleArrayField(base_field=forms.CharField())
     y_axis_values = SimpleArrayField(base_field=forms.CharField())
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fields['x_axis_values'].widget = TagWidget()
+        self.fields['y_axis_values'].widget = TagWidget()
+
     class Meta:
         model = CategoryTable
         fields = ['name', 'x_axis_attribute', 'x_axis_values', 'y_axis_attribute', 'y_axis_values', 'category', 'query']
