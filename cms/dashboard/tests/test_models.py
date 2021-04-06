@@ -91,7 +91,7 @@ class TestModels(TestCase):
         p7 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 50})
         p8 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 40})
         with self.subTest("cluster products"):
-            groups: List[List[Product]] = report.cluster_products()
+            groups: List[List[Product]] = list(report.cluster_products())
             self.assertIn(p8.product, groups[0])
             self.assertIn(p7.product, groups[0])
             self.assertIn(p6.product, groups[1])
