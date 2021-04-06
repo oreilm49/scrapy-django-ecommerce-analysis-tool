@@ -62,7 +62,7 @@ class ProductCluster:
         ranked_brands = tuple((brand, sum(1 for _ in products)) for brand, products in
                               groupby(sorted_products, key=lambda product: product.brand))
         if ranked_brands:
-            dominant_brand = max(ranked_brands, key=itemgetter(0))
+            dominant_brand = max(ranked_brands, key=itemgetter(1))
             display_share = '{:.0%}'.format(dominant_brand[1] / self.products.count()) if self.products.exists() else None
             target_range_display_share = '{:.0%}'.format(self.target_range.count() / self.products.count()) if self.products.exists() else None
             return {
