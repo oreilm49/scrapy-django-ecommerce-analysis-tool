@@ -25,8 +25,8 @@ class CategoryTableForm(forms.ModelForm):
     x_axis_values = SimpleArrayField(base_field=forms.CharField())
     y_axis_values = SimpleArrayField(base_field=forms.CharField())
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.fields['x_axis_values'].widget = TagWidget()
         self.fields['y_axis_values'].widget = TagWidget()
         self.fields['x_axis_attribute'].label = _('Horizontal label')
