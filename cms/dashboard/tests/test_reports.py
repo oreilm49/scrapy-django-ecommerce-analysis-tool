@@ -39,7 +39,7 @@ class TestReports(TestCase):
         cls.p4: Product = make_product(399.99, 6, 1200, 100, 4, brand="indesit")
         cls.cluster: ProductCluster = ProductCluster(
             cls.category,
-            [product for product in Product.objects.all()],
+            (1, [product for product in Product.objects.all()]),
             Product.objects.filter(pk=cls.p1.pk),
             Product.objects.count()
         )
@@ -56,10 +56,10 @@ class TestReports(TestCase):
     def test_product_cluster_get_product_spec_values(self):
         with self.subTest("incorrect category for products"):
             wrong_product: Product = mommy.make(Product, category__name="test")
-            cluster: ProductCluster = ProductCluster(mommy.make(Category), [wrong_product], Product.objects.none(), Product.objects.count())
+            cluster: ProductCluster = ProductCluster(mommy.make(Category), (1, [wrong_product]), Product.objects.none(), Product.objects.count())
             self.assertNotIn(wrong_product, cluster.products)
         with self.subTest("empty product queryset"):
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none(), Product.objects.count())
+            cluster: ProductCluster = ProductCluster(self.category, (1, Product.objects.none()), Product.objects.none(), Product.objects.count())
             product_spec_values = cluster.get_product_spec_values()
             self.assertEqual(product_spec_values, [])
 
@@ -79,7 +79,7 @@ class TestReports(TestCase):
 
         with self.subTest("No spec values"):
             ProductAttribute.objects.all().delete()
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.filter(category=self.category).order_by('order'), Product.objects.none(), Product.objects.count())
+            cluster: ProductCluster = ProductCluster(self.category, (1, Product.objects.filter(category=self.category).order_by('order')), Product.objects.none(), Product.objects.count())
             product_spec_values = cluster.get_product_spec_values()
             self.assertEqual(product_spec_values, [])
 
@@ -90,7 +90,7 @@ class TestReports(TestCase):
         self.assertEqual(dominant_specs[self.cat_cfg_3], {'value': 100, 'number_of_products': 2})
 
         with self.subTest("empty queryset"):
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none(), Product.objects.count())
+            cluster: ProductCluster = ProductCluster(self.category, (1, Product.objects.none()), Product.objects.none(), Product.objects.count())
             self.assertEqual(cluster.dominant_specs(), {})
 
     def test_product_cluster_dominant_brand(self):
@@ -102,14 +102,14 @@ class TestReports(TestCase):
         })
 
         with self.subTest("empty queryset"):
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none(), Product.objects.count())
+            cluster: ProductCluster = ProductCluster(self.category, (1, Product.objects.none()), Product.objects.none(), Product.objects.count())
             self.assertEqual(cluster.dominant_brand, None)
 
     def test_product_cluster_average_price(self):
         self.assertEqual(self.cluster.average_price, 361)
 
         with self.subTest("empty queryset"):
-            cluster: ProductCluster = ProductCluster(self.category, Product.objects.none(), Product.objects.none(), Product.objects.count())
+            cluster: ProductCluster = ProductCluster(self.category, (1, Product.objects.none()), Product.objects.none(), Product.objects.count())
             self.assertEqual(cluster.average_price, None)
 
     def test_target_range_spec_gap(self):
@@ -122,7 +122,7 @@ class TestReports(TestCase):
         with self.subTest("bad"):
             cluster: ProductCluster = ProductCluster(
                 self.category,
-                [product for product in Product.objects.all()],
+                (1, [product for product in Product.objects.all()]),
                 Product.objects.filter(pk=self.p4.pk),
                 Product.objects.count()
             )
@@ -131,7 +131,7 @@ class TestReports(TestCase):
         with self.subTest("attention"):
             cluster: ProductCluster = ProductCluster(
                 self.category,
-                [product for product in Product.objects.all()],
+                (1, [product for product in Product.objects.all()]),
                 Product.objects.filter(pk=self.p3.pk),
                 Product.objects.count()
             )
@@ -140,7 +140,7 @@ class TestReports(TestCase):
         with self.subTest("good"):
             cluster: ProductCluster = ProductCluster(
                 self.category,
-                [product for product in Product.objects.all()],
+                (1, [product for product in Product.objects.all()]),
                 Product.objects.filter(pk=self.p2.pk),
                 Product.objects.count()
             )
