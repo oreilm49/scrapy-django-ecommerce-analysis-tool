@@ -141,7 +141,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_URL = 'static/'
 STATIC_ROOT = 'cms/sitestatic'
 
-LOGIN_REDIRECT_URL = '/dashboard/home'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login'
 
 # Celery
