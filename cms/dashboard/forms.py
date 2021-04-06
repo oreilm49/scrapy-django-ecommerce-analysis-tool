@@ -169,6 +169,7 @@ class CategoryGapAnalysisForm(forms.ModelForm):
         self.fields['brand'].choices = ((brand, brand) for brand in get_brands())
         self.fields['websites'].required = False
         self.fields['price_clusters'].widget = TagWidget()
+        self.fields['price_clusters'].help_text = _('The price clusters used to group products.')
 
     def clean_price_clusters(self):
         return [to_float(price) for price in self.cleaned_data['price_clusters']]
