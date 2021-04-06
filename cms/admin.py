@@ -42,13 +42,6 @@ class CategoryAdmin(admin.ModelAdmin):
     inlines = CategoryAttributeConfigInlineAdmin,
 
 
-@admin.register(Selector)
-class SelectorAdmin(admin.ModelAdmin):
-    list_display = 'id', 'selector_type', 'css_selector', 'website', 'regex', 'parent',
-    list_editable = 'css_selector', 'regex', 'parent',
-    list_filter = 'website',
-
-
 @admin.register(Unit)
 class UnitAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'alternate_names', 'widget', 'repeat',
