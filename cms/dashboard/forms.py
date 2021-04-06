@@ -12,6 +12,7 @@ from django.utils import timezone
 from cms.dashboard.models import CategoryTable, CategoryTableQuerySet, CategoryGapAnalysisReport, \
     CategoryGapAnalysisQuerySet
 from cms.dashboard.utils import get_brands
+from cms.form_widgets import TagWidget
 from cms.models import AttributeType, Category, ProductQuerySet, Website, WebsiteProductAttributeQuerySet
 from cms.serializers import to_float
 from cms.utils import serialized_values_for_attribute_type, is_value_numeric
@@ -158,6 +159,7 @@ class CategoryGapAnalysisForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['brand'].choices = ((brand, brand) for brand in get_brands())
         self.fields['websites'].required = False
+        self.fields['price_clusters'].widget = TagWidget()
 
     def clean_price_clusters(self):
         return [to_float(price) for price in self.cleaned_data['price_clusters']]
