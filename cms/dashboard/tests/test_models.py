@@ -80,30 +80,25 @@ class TestModels(TestCase):
 
     def test_cluster_analysis(self):
         website: Website = mommy.make(Website)
-        report: CategoryGapAnalysisReport = mommy.make(CategoryGapAnalysisReport, category__name="washers", websites=[website])
+        report: CategoryGapAnalysisReport = mommy.make(CategoryGapAnalysisReport, category__name="washers", websites=[website], price_clusters=[99.99, 149.99, 199.99, 249.99])
         price_attr: AttributeType = mommy.make(AttributeType, name="price")
-        p1 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 200})
-        p2 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 210})
-        p3 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 150})
-        p4 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 140})
-        p5 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 100})
-        p6 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 110})
-        p7 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 50})
-        p8 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 40})
+        p1 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 99})
+        p2 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 149})
+        p3 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 199})
+        p4 = mommy.make(WebsiteProductAttribute, attribute_type=price_attr, product__category=report.category, website=website, data={'value': 249})
         with self.subTest("cluster products"):
-            groups: List[List[Product]] = list(report.cluster_products())
-            self.assertIn(p8.product, groups[0])
-            self.assertIn(p7.product, groups[0])
-            self.assertIn(p6.product, groups[1])
-            self.assertIn(p5.product, groups[1])
-            self.assertIn(p4.product, groups[2])
-            self.assertIn(p3.product, groups[2])
-            self.assertIn(p2.product, groups[3])
-            self.assertIn(p1.product, groups[3])
+            for grouper, group in report.cluster_products():
+                if grouper == 99.99:
+                    self.assertTrue(p1.product in group)
+                elif grouper == 149.99:
+                    self.assertTrue(p2.product in group)
+                elif grouper == 199.99:
+                    self.assertTrue(p3.product in group)
+                elif grouper == 249.99:
+                    self.assertTrue(p4.product in group)
         with self.subTest("cluster analysis"):
             analyzed_clusters: List[ProductCluster] = report.gap_analysis_clusters
             self.assertIsInstance(analyzed_clusters[0], ProductCluster)
-            self.assertEqual(len(analyzed_clusters), len(groups))
 
     def test_gap_analysis_products(self):
         report: CategoryGapAnalysisReport = mommy.make(CategoryGapAnalysisReport, category__name="washers", brand="whirlpool")
