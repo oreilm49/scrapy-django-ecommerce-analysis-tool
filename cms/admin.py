@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
-    ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult
+    ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult, ProductFile
 from cms.views.admin import ProductMapView, AttributeTypeMapView
 
 
@@ -63,12 +63,20 @@ class ProductImageInlineAdmin(admin.TabularInline):
     classes = ['collapse']
 
 
+class ProductFileInlineAdmin(admin.TabularInline):
+    model = ProductFile
+    extra = 0
+    fields = 'file_type', 'file',
+    show_change_link = True
+    classes = ['collapse']
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = 'id', 'model', 'category', 'alternate_models',
     list_filter = 'category',
     list_per_page = 25
-    inlines = ProductAttributeInlineAdmin, ProductImageInlineAdmin,
+    inlines = ProductAttributeInlineAdmin, ProductImageInlineAdmin, ProductFileInlineAdmin,
 
 
 @admin.register(WebsiteProductAttribute)
