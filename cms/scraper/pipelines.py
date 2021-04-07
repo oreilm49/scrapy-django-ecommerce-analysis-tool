@@ -3,12 +3,12 @@ from typing import Union, Dict
 from django.db import transaction
 from django.db.models import Q
 
-from cms.constants import PRICE, MAIN, THUMBNAIL
+from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_lABEL_PDF
 from cms.data_processing.constants import UnitValue, Value, RangeUnitValue
 from cms.data_processing.units import UnitManager
-from cms.models import Product, ProductAttribute, Selector, AttributeType, ProductImage
+from cms.models import Product, ProductAttribute, Selector, AttributeType, ProductImage, ProductFile
 from cms.scraper.items import ProductPageItem
-from cms.scraper.settings import IMAGES_FOLDER
+from cms.scraper.settings import IMAGES_FOLDER, FILES_FOLDER
 
 
 class ProductPipeline:
@@ -88,3 +88,21 @@ class ProductImagePipeline:
                     image=f"{IMAGES_FOLDER}/{thumb_path}",
                 )
         return item
+
+
+class ProductFilePipeline:
+
+    @transaction.atomic
+    def process_item(self, item, spider):
+        if isinstance(item, ProductPageItem):
+            if not item['files']:
+                return item
+            if item['product'].energy_label_required:
+                ProductFile.objects.create(
+                    product=item['product'],
+                    file_type=ENERGY_lABEL_PDF,
+                    file=f"{FILES_FOLDER}/{item['files'][0]['path']}",
+                )
+        return item
+
+
