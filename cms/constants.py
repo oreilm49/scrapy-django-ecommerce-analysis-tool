@@ -70,6 +70,10 @@ IMAGE_TYPES = (
     (THUMBNAIL, _("Thumbnail")),
 )
 
+FILE_TYPES = (
+    (ENERGY_lABEL_PDF, _("Energy Label PDF")),
+)
+
 SCORING_NUMERICAL_HIGHER = 'higher'
 SCORING_NUMERICAL_LOWER = 'lower'
 SCORING_BOOL_TRUE = 'true'
