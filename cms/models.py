@@ -18,7 +18,8 @@ from pandas import DataFrame, Series
 
 from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN, \
     THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN, \
-    SCORING_CHOICES, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER, SCORING_BOOL_TRUE, SCORING_BOOL_FALSE
+    SCORING_CHOICES, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER, SCORING_BOOL_TRUE, SCORING_BOOL_FALSE, \
+    FILE_TYPES
 from cms.serializers import serializers, CustomValueSerializer
 
 
@@ -321,6 +322,15 @@ class ProductImage(BaseModel):
 
     def __str__(self):
         return f"{self.product} | {self.image}"
+
+
+class ProductFile(BaseModel):
+    product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="files")
+    file_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=FILE_TYPES)
+    file = models.FileField(verbose_name=_("file"), upload_to='product_files/')
+
+    def __str__(self):
+        return f"{self.product} | {self.file}"
 
 
 class CategoryAttributeConfig(BaseModel):
