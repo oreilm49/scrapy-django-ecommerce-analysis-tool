@@ -60,14 +60,18 @@ COOKIES_ENABLED = False
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'scrapy.pipelines.images.ImagesPipeline': 100,
+   'scrapy.pipelines.files.FilesPipeline': 150,
    'scraper.pipelines.ProductPipeline': 200,
    'scraper.pipelines.ProductAttributePipeline': 300,
    'scraper.pipelines.WebsiteProductAttributePipeline': 400,
    'scraper.pipelines.ProductImagePipeline': 500,
+   'scraper.pipelines.ProductFilePipeline': 600,
 }
 
 IMAGES_FOLDER = 'product_images'
+FILES_FOLDER = 'product_files'
 IMAGES_STORE = os.path.join(settings.BASE_DIR, f'media/{IMAGES_FOLDER}')
+FILES_STORE = os.path.join(settings.BASE_DIR, f'media/{FILES_FOLDER}')
 IMAGES_THUMBS = {
     'big': (270, 270),
 }
