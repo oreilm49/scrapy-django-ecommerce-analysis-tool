@@ -4,7 +4,7 @@ from typing import Iterator, Optional, Dict
 import scrapy
 
 from cms.constants import CATEGORY, PAGINATION, LINK, TABLE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, PRICE, \
-    IMAGE, TABLE_VALUE_COLUMN_BOOL
+    IMAGE, TABLE_VALUE_COLUMN_BOOL, ENERGY_lABEL_PDF
 from cms.models import Website, Url, Category, Selector, SpiderResult
 
 from cms.scraper.exceptions import WebsiteNotProvidedInArguments
@@ -56,6 +56,7 @@ class EcommerceSpider(scrapy.Spider):
                 page_item['website_attributes'] = []
                 page_item['image_urls'] = []
                 page_item['category'] = category
+                page_item['file_urls'] = []
                 for selector in self.website.selectors.exclude(selector_type=MODEL).all():
                     selector: Selector
                     if selector.selector_type == TABLE:
@@ -72,11 +73,13 @@ class EcommerceSpider(scrapy.Spider):
                                 value = "true" if re.search(bool_selector.regex, value) else None
                             if value and label:
                                 page_item['attributes'].append({'value': value, 'label': label})
-                    elif selector.selector_type in [PRICE, LINK, IMAGE]:
+                    elif selector.selector_type in [PRICE, LINK, IMAGE, ENERGY_lABEL_PDF]:
                         value: Optional[str] = response.css(selector.css_selector).get()
                         if value and selector.selector_type == IMAGE:
                             # don't .lower() image urls, filename urls are case sensitive
                             page_item['image_urls'].append(response.urljoin(value.strip()))
+                        elif value and selector.selector_type == ENERGY_lABEL_PDF:
+                            page_item['file_urls'].append(response.urljoin(value.strip()))
                         elif value:
                             page_item['website_attributes'].append({'value': value.strip().lower(), 'selector': selector})
                 self.results[category] += 1
