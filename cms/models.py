@@ -169,6 +169,10 @@ class Product(BaseModel):
     def image_thumb_required(self) -> bool:
         return self.images.filter(image_type=THUMBNAIL).exists() is False
 
+    @cached_property
+    def energy_label_required(self) -> bool:
+        return self.files.filter(file_type=ENERGY_LABEL_PDF).exists() is False
+
     @property
     def image_main(self):
         image: ProductImage = self.images.filter(image_type=MAIN).first()
