@@ -22,7 +22,7 @@ PRICE = "price"
 TEXT = "text"
 TABLE = "table"
 IMAGE = "image"
-ENERGY_lABEL_PDF = 'energy_label_pdf'
+ENERGY_LABEL_PDF = 'energy_label_pdf'
 LINK = "link"
 PAGINATION = "pagination"
 TABLE_VALUE_COLUMN = "table_value_column"
@@ -35,7 +35,7 @@ SELECTOR_TYPES = (
     (TEXT, _("Text")),
     (TABLE, _("Table")),
     (IMAGE, _("Image")),
-    (ENERGY_lABEL_PDF, _("Energy Label PDF")),
+    (ENERGY_LABEL_PDF, _("Energy Label PDF")),
     (LINK, _("Link")),
     (PAGINATION, _("Pagination")),
     (TABLE_VALUE_COLUMN, _("Table Value Column")),
@@ -71,7 +71,7 @@ IMAGE_TYPES = (
 )
 
 FILE_TYPES = (
-    (ENERGY_lABEL_PDF, _("Energy Label PDF")),
+    (ENERGY_LABEL_PDF, _("Energy Label PDF")),
 )
 
 SCORING_NUMERICAL_HIGHER = 'higher'

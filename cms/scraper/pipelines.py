@@ -3,7 +3,7 @@ from typing import Union, Dict
 from django.db import transaction
 from django.db.models import Q
 
-from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_lABEL_PDF
+from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_PDF
 from cms.data_processing.constants import UnitValue, Value, RangeUnitValue
 from cms.data_processing.units import UnitManager
 from cms.models import Product, ProductAttribute, Selector, AttributeType, ProductImage, ProductFile
@@ -100,7 +100,7 @@ class ProductFilePipeline:
             if item['product'].energy_label_required:
                 ProductFile.objects.create(
                     product=item['product'],
-                    file_type=ENERGY_lABEL_PDF,
+                    file_type=ENERGY_LABEL_PDF,
                     file=f"{FILES_FOLDER}/{item['files'][0]['path']}",
                 )
         return item
