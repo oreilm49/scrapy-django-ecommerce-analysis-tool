@@ -3,12 +3,13 @@ from typing import Union, Dict
 from django.db import transaction
 from django.db.models import Q
 
-from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_PDF
+from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_IMAGE, ENERGY_LABEL_QR
 from cms.data_processing.constants import UnitValue, Value, RangeUnitValue
+from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr
 from cms.data_processing.units import UnitManager
-from cms.models import Product, ProductAttribute, Selector, AttributeType, ProductImage, ProductFile
+from cms.models import Product, ProductAttribute, Selector, AttributeType, ProductImage
 from cms.scraper.items import ProductPageItem
-from cms.scraper.settings import IMAGES_FOLDER, FILES_FOLDER
+from cms.scraper.settings import IMAGES_FOLDER, IMAGES_ENERGY_LABELS_FOLDER
 
 
 class ProductPipeline:
@@ -90,19 +91,25 @@ class ProductImagePipeline:
         return item
 
 
-class ProductFilePipeline:
+class PDFEnergyLabelConverterPipeline:
 
     @transaction.atomic
     def process_item(self, item, spider):
         if isinstance(item, ProductPageItem):
-            if not item['files']:
+            if not item['energy_label_urls']:
                 return item
             if item['product'].energy_label_required:
-                ProductFile.objects.create(
+                url = item['energy_label_urls'][0]
+                energy_label_image_path: str = small_pdf_2_image(url)
+                energy_label_qr_image_path: str = energy_label_cropped_2_qr(energy_label_image_path)
+                ProductImage.objects.create(
                     product=item['product'],
-                    file_type=ENERGY_LABEL_PDF,
-                    file=f"{FILES_FOLDER}/{item['files'][0]['path']}",
+                    image_type=ENERGY_LABEL_IMAGE,
+                    image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{energy_label_image_path}",
+                )
+                ProductImage.objects.create(
+                    product=item['product'],
+                    image_type=ENERGY_LABEL_QR,
+                    image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{energy_label_qr_image_path}",
                 )
         return item
-
-
