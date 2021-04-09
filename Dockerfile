@@ -9,7 +9,7 @@ EXPOSE 8000
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
         vim gettext libxml2-dev libxslt1-dev zlib1g-dev libffi-dev \
-        libssl-dev apache2 apache2-dev \
+        libssl-dev apache2 apache2-dev poppler-utils \
         && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
