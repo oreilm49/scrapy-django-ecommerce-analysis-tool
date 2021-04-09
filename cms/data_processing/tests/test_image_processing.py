@@ -1,22 +1,17 @@
 import shutil
 
 import requests
-import tempfile
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from cms.data_processing.image_processing import small_pdf_2_image
 from cms.scraper.settings import IMAGES_ENERGY_LABELS_STORE
 
 
-MEDIA_ROOT = tempfile.mkdtemp()
-
-
-@override_settings(MEDIA_ROOT=MEDIA_ROOT)
 class TestUnits(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(MEDIA_ROOT, ignore_errors=True)
+        shutil.rmtree(IMAGES_ENERGY_LABELS_STORE)
         super().tearDownClass()
 
     def test_small_pdf_2_image(self):
