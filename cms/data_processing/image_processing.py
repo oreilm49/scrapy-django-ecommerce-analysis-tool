@@ -20,7 +20,9 @@ def small_pdf_2_image(download_url: str) -> str:
     with tempfile.TemporaryDirectory() as path:
         images = convert_from_path(download_url, output_folder=path)
         for image in images:
-            return image.save(f"{IMAGES_ENERGY_LABELS_STORE}/{uuid.uuid4()}.png")
+            path: str = f"{IMAGES_ENERGY_LABELS_STORE}/{uuid.uuid4()}.png"
+            image.save(path)
+            return path
 
 
 def energy_label_cropped_2_qr(image_path: str) -> str:
