@@ -70,9 +70,9 @@ ITEM_PIPELINES = {
 IMAGES_FOLDER = 'product_images'
 IMAGES_ENERGY_LABELS_FOLDER = f'{IMAGES_FOLDER}/energy_labels'
 FILES_FOLDER = 'product_files'
-IMAGES_STORE = os.path.join(settings.BASE_DIR, f'media/{IMAGES_FOLDER}')
-IMAGES_ENERGY_LABELS_STORE = os.path.join(settings.BASE_DIR, f'media/{IMAGES_ENERGY_LABELS_FOLDER}')
-FILES_STORE = os.path.join(settings.BASE_DIR, f'media/{FILES_FOLDER}')
+IMAGES_STORE = os.path.join(settings.MEDIA_ROOT, f'{IMAGES_FOLDER}')
+IMAGES_ENERGY_LABELS_STORE = os.path.join(settings.MEDIA_ROOT, f'{IMAGES_ENERGY_LABELS_FOLDER}')
+FILES_STORE = os.path.join(settings.MEDIA_ROOT, f'{FILES_FOLDER}')
 IMAGES_THUMBS = {
     'big': (270, 270),
 }
