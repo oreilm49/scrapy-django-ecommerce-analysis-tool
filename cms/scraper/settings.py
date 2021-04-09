@@ -60,7 +60,6 @@ COOKIES_ENABLED = False
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'scrapy.pipelines.images.ImagesPipeline': 100,
-   'scrapy.pipelines.files.FilesPipeline': 150,
    'scraper.pipelines.ProductPipeline': 200,
    'scraper.pipelines.ProductAttributePipeline': 300,
    'scraper.pipelines.WebsiteProductAttributePipeline': 400,
