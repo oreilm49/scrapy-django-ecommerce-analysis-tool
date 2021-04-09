@@ -56,7 +56,7 @@ class EcommerceSpider(scrapy.Spider):
                 page_item['website_attributes'] = []
                 page_item['image_urls'] = []
                 page_item['category'] = category
-                page_item['file_urls'] = []
+                page_item['energy_label_urls'] = []
                 for selector in self.website.selectors.exclude(selector_type=MODEL).all():
                     selector: Selector
                     if selector.selector_type == TABLE:
@@ -79,7 +79,7 @@ class EcommerceSpider(scrapy.Spider):
                             # don't .lower() image urls, filename urls are case sensitive
                             page_item['image_urls'].append(response.urljoin(value.strip()))
                         elif value and selector.selector_type == ENERGY_LABEL_PDF:
-                            page_item['file_urls'].append(response.urljoin(value.strip()))
+                            page_item['energy_label_urls'].append(response.urljoin(value.strip()))
                         elif value:
                             page_item['website_attributes'].append({'value': value.strip().lower(), 'selector': selector})
                 self.results[category] += 1
