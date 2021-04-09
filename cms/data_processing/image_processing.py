@@ -14,9 +14,9 @@ def small_pdf_2_image(download_url: str) -> str:
     converts pdf url to image and saves in images folder
     returns path to image
     """
-    file_extension: str = download_url.split(".")[1]
+    file_extension: str = download_url[-3:]
     if file_extension != 'pdf':
-        raise Exception(f"Download url is not a pdf link: {download_url}")
+        raise Exception(f"Download url is not a pdf link: '{download_url}'")
     with tempfile.TemporaryDirectory() as path:
         images = convert_from_path(download_url, output_folder=path)
         for image in images:
