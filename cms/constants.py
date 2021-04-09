@@ -23,6 +23,8 @@ TEXT = "text"
 TABLE = "table"
 IMAGE = "image"
 ENERGY_LABEL_PDF = 'energy_label_pdf'
+ENERGY_LABEL_IMAGE = 'energy_label_img'
+ENERGY_LABEL_QR = 'energy_label_qr'
 LINK = "link"
 PAGINATION = "pagination"
 TABLE_VALUE_COLUMN = "table_value_column"
@@ -68,6 +70,8 @@ THUMBNAIL = "thumbnail"
 IMAGE_TYPES = (
     (MAIN, _("Main")),
     (THUMBNAIL, _("Thumbnail")),
+    (ENERGY_LABEL_IMAGE, _("Energy Label")),
+    (ENERGY_LABEL_QR, _("Energy Label QR")),
 )
 
 FILE_TYPES = (
