@@ -1,3 +1,5 @@
+import os
+
 import cv2 as cv
 from pdf2image import convert_from_path
 from PIL import Image
@@ -17,6 +19,9 @@ def small_pdf_2_image(download_url: str) -> str:
     file_extension: str = download_url[-3:]
     if file_extension != 'pdf':
         raise Exception(f"Download url is not a pdf link: '{download_url}'")
+    storage_folder_exists = os.path.isdir(IMAGES_ENERGY_LABELS_STORE)
+    if not storage_folder_exists:
+        os.makedirs(IMAGES_ENERGY_LABELS_STORE)
     with tempfile.TemporaryDirectory() as path:
         images = convert_from_path(download_url, output_folder=path)
         for image in images:
