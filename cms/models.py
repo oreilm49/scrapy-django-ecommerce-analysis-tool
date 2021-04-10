@@ -373,3 +373,14 @@ class SpiderResult(BaseModel):
 
     def __str__(self):
         return f"{self.spider_name}: {self.website}: {self.category}"
+
+
+class EprelCategory(BaseModel):
+    category = models.ForeignKey(to="cms.Category", on_delete=SET_NULL, related_name="eprel_names", blank=True, null=True)
+    name = models.CharField(verbose_name=_("category name"), max_length=MAX_LENGTH)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        unique_together = 'category', 'name',
