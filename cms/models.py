@@ -231,7 +231,7 @@ class Product(BaseModel):
             return
         if self.eprel_category:
             return f"{EPREL_API_ROOT_URL}{self.eprel_category.name}/{self.eprel_code}"
-        for eprel_category in self.category.eprel_names:
+        for eprel_category in self.category.eprel_names.all():
             url = f"{EPREL_API_ROOT_URL}{eprel_category.name}/{self.eprel_code}"
             response = requests.get(url)
             if response.status_code == 200:
