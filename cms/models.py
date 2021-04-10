@@ -9,7 +9,7 @@ import requests
 from django import forms
 from django.contrib.humanize.templatetags import humanize
 from django.contrib.postgres.fields import ArrayField
-from django.db import models, transaction
+from django.db import models
 from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q
 from django.db.models.fields.json import KeyTextTransform
 from django.utils.functional import cached_property
@@ -21,9 +21,6 @@ from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUE
     THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN, \
     SCORING_CHOICES, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER, SCORING_BOOL_TRUE, SCORING_BOOL_FALSE, \
     FILE_TYPES, ENERGY_LABEL_PDF, EPREL_API_ROOT_URL
-from cms.data_processing.constants import UnitValue, Value, RangeUnitValue
-from cms.data_processing.units import UnitManager
-from cms.data_processing.utils import camel_case_to_sentence
 from cms.serializers import serializers, CustomValueSerializer
 
 
@@ -241,42 +238,6 @@ class Product(BaseModel):
                 self.eprel_category = eprel_category
                 self.save()
                 return url
-
-    @transaction.atomic
-    def get_eprel_attribute_data(self) -> None:
-        url: Optional[str] = self.get_eprel_api_url()
-        if not url or self.eprel_scraped:
-            return
-        response = requests.get(url)
-        for attribute_label, attribute_value in response.json():
-            attribute_label: str = camel_case_to_sentence(attribute_label)
-            if isinstance(attribute_value, (int, float, str)):
-                self.create_product_attribute(attribute_label, attribute_value)
-        self.eprel_scraped = True
-        self.save()
-
-    def create_product_attribute(self, attribute_label: str, attribute_value: Union[str, int, float]) -> None:
-        attribute_type: AttributeType = AttributeType.objects.custom_get_or_create(attribute_label)
-        product_attribute_exists: bool = ProductAttribute.objects.filter(attribute_type=attribute_type, product=self).exists()
-        if product_attribute_exists:
-            return
-
-        processed_unit: Union[UnitValue, Value, RangeUnitValue] = UnitManager().get_processed_unit_and_value(attribute_value, unit=attribute_type.unit)
-        if not attribute_type.unit and isinstance(processed_unit, (UnitValue, RangeUnitValue)):
-            attribute_type.unit = processed_unit.unit
-            attribute_type.save()
-        if isinstance(processed_unit, RangeUnitValue):
-            name_low: str = f"{attribute_type.name} - low"
-            name_high: str = f"{attribute_type.name} - high"
-            if ProductAttribute.objects.filter(Q(attribute_type__name=name_low) | Q(attribute_type__name=name_high), product=self).exists():
-                return
-
-            attribute_type_low: AttributeType = AttributeType.objects.custom_get_or_create(f"{attribute_label} - low", unit=processed_unit.unit)
-            attribute_type_high: AttributeType = AttributeType.objects.custom_get_or_create(f"{attribute_label} - high", unit=processed_unit.unit)
-            ProductAttribute.objects.custom_get_or_create(product=self, attribute_type=attribute_type_low, value=processed_unit.value_low)
-            ProductAttribute.objects.custom_get_or_create(product=self, attribute_type=attribute_type_high, value=processed_unit.value_high)
-        else:
-            ProductAttribute.objects.custom_get_or_create(product=self, attribute_type=attribute_type, value=processed_unit.value)
 
 
 class AttributeTypeQuerySet(BaseQuerySet):
