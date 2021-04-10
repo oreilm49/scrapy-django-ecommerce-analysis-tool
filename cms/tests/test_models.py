@@ -10,7 +10,7 @@ from cms.constants import MAIN, THUMBNAIL, WEEKLY, MONTHLY, YEARLY, ENERGY_LABEL
 from cms.form_widgets import FloatInput
 from cms.serializers import serializers
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute, json_data_default, Unit, AttributeType, \
-    Website, Category, ProductImage, WebsiteProductAttributeQuerySet, ProductFile
+    Website, Category, ProductImage, WebsiteProductAttributeQuerySet, ProductFile, EprelCategory
 from cms.utils import get_dotted_path
 
 
