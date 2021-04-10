@@ -1,13 +1,11 @@
-from typing import Union, Dict
+from typing import Dict
 
 from django.db import transaction
-from django.db.models import Q
 
 from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_IMAGE, ENERGY_LABEL_QR
-from cms.data_processing.constants import UnitValue, Value, RangeUnitValue
 from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr
-from cms.data_processing.units import UnitManager
-from cms.models import Product, ProductAttribute, Selector, AttributeType, ProductImage
+from cms.data_processing.utils import create_product_attribute
+from cms.models import Product, Selector, AttributeType, ProductImage
 from cms.scraper.items import ProductPageItem
 from cms.scraper.settings import IMAGES_FOLDER, IMAGES_ENERGY_LABELS_FOLDER
 
@@ -29,7 +27,7 @@ class ProductAttributePipeline:
             product: Product = item['product']
             for attribute in item['attributes']:
                 attribute: Dict
-                product.create_product_attribute(attribute['label'], attribute['value'])
+                create_product_attribute(product, attribute['label'], attribute['value'])
         return item
 
 
