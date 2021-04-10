@@ -3,7 +3,8 @@ from typing import Dict, Optional
 from django.db import transaction
 
 from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_IMAGE, ENERGY_LABEL_QR
-from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr
+from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr, read_qr, \
+    extract_eprel_code_from_url
 from cms.data_processing.utils import create_product_attribute
 from cms.models import Product, Selector, AttributeType, ProductImage
 from cms.scraper.items import ProductPageItem
@@ -92,4 +93,11 @@ class PDFEnergyLabelConverterPipeline:
                     image_type=ENERGY_LABEL_QR,
                     image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{filename_from_path(energy_label_qr_image_path)}",
                 )
+                if not product.eprel_code:
+                    decoded_text = read_qr(energy_label_qr_image_path)
+                    if decoded_text:
+                        eprel_code: Optional[str] = extract_eprel_code_from_url(decoded_text)
+                        if eprel_code:
+                            product.eprel_code = eprel_code
+                            product.save()
         return item
