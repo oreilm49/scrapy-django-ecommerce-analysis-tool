@@ -1,8 +1,8 @@
-import os
-
 import cv2 as cv
+import os
 from pdf2image import convert_from_path
 from PIL import Image
+import re
 import tempfile
 from typing import Optional
 import uuid
@@ -47,10 +47,16 @@ def energy_label_cropped_2_qr(image_path: str) -> str:
 def read_qr(image_path: str) -> Optional[str]:
     """
     Reads data from a qr code image.
-    For energy labels the below url should be expected:
-    "https://eprel.ec.europa.eu/qr/298173"
     """
     image = cv.imread(image_path)
     detector = cv.QRCodeDetector()
     decoded_text, _, _ = detector.detectAndDecode(image)
     return decoded_text
+
+
+def extract_eprel_code_from_url(url: str) -> Optional[str]:
+    """
+    For energy labels the below url should be expected:
+    "https://eprel.ec.europa.eu/qr/298173"
+    """
+    return url[-6:] if re.match(r"^https:\/\/eprel\.ec\.europa\.eu\/qr\/\d{6}$", url) is not None else None
