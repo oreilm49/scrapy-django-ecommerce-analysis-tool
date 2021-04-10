@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from django.db import transaction
 
@@ -8,6 +8,7 @@ from cms.data_processing.utils import create_product_attribute
 from cms.models import Product, Selector, AttributeType, ProductImage
 from cms.scraper.items import ProductPageItem
 from cms.scraper.settings import IMAGES_FOLDER, IMAGES_ENERGY_LABELS_FOLDER
+from cms.utils import filename_from_path
 
 
 class ProductPipeline:
@@ -76,18 +77,19 @@ class PDFEnergyLabelConverterPipeline:
         if isinstance(item, ProductPageItem):
             if not item['energy_label_urls']:
                 return item
-            if item['product'].energy_label_required:
+            product: Product = item['product']
+            if product.energy_label_required:
                 url = item['energy_label_urls'][0]
                 energy_label_image_path: str = small_pdf_2_image(url)
                 energy_label_qr_image_path: str = energy_label_cropped_2_qr(energy_label_image_path)
                 ProductImage.objects.create(
                     product=item['product'],
                     image_type=ENERGY_LABEL_IMAGE,
-                    image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{energy_label_image_path}",
+                    image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{filename_from_path(energy_label_image_path)}",
                 )
                 ProductImage.objects.create(
                     product=item['product'],
                     image_type=ENERGY_LABEL_QR,
-                    image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{energy_label_qr_image_path}",
+                    image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{filename_from_path(energy_label_qr_image_path)}",
                 )
         return item
