@@ -118,3 +118,5 @@ OPERATOR_MIN = 'min'
 OPERATOR_SUM = 'sum'
 
 OPERATORS = (OPERATOR_MEAN, OPERATOR_MAX, OPERATOR_MIN, OPERATOR_SUM)
+
+EPREL_API_ROOT_URL = 'https://eprel.ec.europa.eu/api/products/'
