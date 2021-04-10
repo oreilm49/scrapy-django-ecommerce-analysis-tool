@@ -39,7 +39,7 @@ def energy_label_cropped_2_qr(image_path: str) -> str:
     image_width, image_height = image.size
     image.crop(box=(image_width / 2, 1, image_width, int(image_height * .25)))
     cropped = image.crop(box=(image_width / 2, 1, image_width, int(image_height * .25)))
-    path: str = f"{image_path.split('.')[1]}_qr.png"
+    path: str = f"{image_path.split('.')[0]}_qr.png"
     cropped.save(path)
     return path
 
