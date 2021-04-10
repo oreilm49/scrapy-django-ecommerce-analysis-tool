@@ -1,3 +1,4 @@
+import os
 from typing import List, Dict
 
 import requests
@@ -100,12 +101,14 @@ class TestPipeline(TestCase):
             self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=ENERGY_LABEL_QR).exists())
             self.assertIsNone(self.product.eprel_code)
 
-        pdf_url = "https://cc.isitetv.com/clients/wp/whirlpool/859991530490/documentation/eur/whirlpool-fwl71253wuk-energy-label-el859991530490.pdf"
+        pdf_url = "https://whirlpool-cdn.thron.com/static/7UO8OG_NEL859991596350_9DDFJI.pdf?xseo=&response-content-disposition=inline%3Bfilename%3D%22New-Energy-label.pdf"
         with self.subTest("url valid"):
             self.assertEqual(requests.get(pdf_url).status_code, 200)
 
         item: ProductPageItem = ProductPageItem(product=self.product, energy_label_urls=[pdf_url])
         PDFEnergyLabelConverterPipeline().process_item(item, {})
-        self.assertTrue(ProductImage.objects.filter(product=self.product, image_type=ENERGY_LABEL_IMAGE).exists())
-        self.assertTrue(ProductImage.objects.filter(product=self.product, image_type=ENERGY_LABEL_QR).exists())
-        self.assertEqual("298173", self.product.eprel_code)
+        img: ProductImage = ProductImage.objects.get(product=self.product, image_type=ENERGY_LABEL_IMAGE)
+        img_qr: ProductImage = ProductImage.objects.get(product=self.product, image_type=ENERGY_LABEL_QR)
+        self.assertEqual("258076", self.product.eprel_code)
+        os.remove(img.image.path)
+        os.remove(img_qr.image.path)
