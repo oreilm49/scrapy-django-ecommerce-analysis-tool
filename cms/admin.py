@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
-    ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult, ProductFile
+    ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult, ProductFile, EprelCategory
 from cms.views.admin import ProductMapView, AttributeTypeMapView
 
 
@@ -35,11 +35,18 @@ class CategoryAttributeConfigInlineAdmin(admin.TabularInline):
     show_change_link = True
 
 
+class EprelCategoryInlineAdmin(admin.TabularInline):
+    model = EprelCategory
+    extra = 0
+    fields = 'name',
+    show_change_link = True
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'parent', 'alternate_names',
     list_filter = 'parent',
-    inlines = CategoryAttributeConfigInlineAdmin,
+    inlines = CategoryAttributeConfigInlineAdmin, EprelCategoryInlineAdmin,
 
 
 @admin.register(Unit)
