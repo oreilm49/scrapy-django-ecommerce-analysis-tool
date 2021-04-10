@@ -345,15 +345,6 @@ class ProductImage(BaseModel):
         return f"{self.product} | {self.image}"
 
 
-class ProductFile(BaseModel):
-    product = models.ForeignKey(to=Product, verbose_name=_("Product"), on_delete=CASCADE, related_name="files")
-    file_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=FILE_TYPES)
-    file = models.FileField(verbose_name=_("file"), upload_to='product_files/')
-
-    def __str__(self):
-        return f"{self.product} | {self.file}"
-
-
 class CategoryAttributeConfig(BaseModel):
     attribute_type = models.ForeignKey(to=AttributeType, verbose_name=_("Attribute"), on_delete=CASCADE, related_name="category_attribute_configs")
     category = models.ForeignKey(to=Category, verbose_name=_("Category"), on_delete=CASCADE, related_name="category_attribute_configs")
