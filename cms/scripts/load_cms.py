@@ -43,9 +43,9 @@ def set_up_attributes():
     AttributeType.objects.get_or_create(name="price", unit=currency)
 
     washers = Category.objects.get(name="washing machines")
-    CategoryAttributeConfig.objects.create(attribute_type=load_size, category=washers, weight=5, order=1, scoring=SCORING_NUMERICAL_HIGHER)
-    CategoryAttributeConfig.objects.create(attribute_type=spin, category=washers, weight=4, order=2, scoring=SCORING_NUMERICAL_HIGHER)
-    CategoryAttributeConfig.objects.create(attribute_type=energy, category=washers, weight=3, order=3, scoring=SCORING_NUMERICAL_LOWER)
+    CategoryAttributeConfig.objects.get_or_create(attribute_type=load_size, category=washers, weight=5, order=1, scoring=SCORING_NUMERICAL_HIGHER)
+    CategoryAttributeConfig.objects.get_or_create(attribute_type=spin, category=washers, weight=4, order=2, scoring=SCORING_NUMERICAL_HIGHER)
+    CategoryAttributeConfig.objects.get_or_create(attribute_type=energy, category=washers, weight=3, order=3, scoring=SCORING_NUMERICAL_LOWER)
 
 
 def make_product(model: str, price: float, load_size: int, spin: int, energy: int, category: Category, brand: str) -> Optional[Product]:
