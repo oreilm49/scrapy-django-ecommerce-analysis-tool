@@ -4,7 +4,8 @@ import shutil
 import requests
 from django.test import TestCase
 
-from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr, read_qr
+from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr, read_qr, \
+    extract_eprel_code_from_url
 from cms.scraper.settings import IMAGES_ENERGY_LABELS_STORE
 
 
@@ -43,3 +44,10 @@ class TestImageProcessing(TestCase):
         decoded_text = read_qr(cropped_image_path)
         self.assertEqual("https://eprel.ec.europa.eu/qr/298173", decoded_text)
         os.remove(cropped_image_path)
+
+    def test_extract_eprel_code_from_url(self):
+        url = "https://eprel.ec.europa.eu/qr/298173"
+        self.assertEqual("298173", extract_eprel_code_from_url(url))
+        self.assertIsNone(extract_eprel_code_from_url("https://eprel.ec.europa.eu/qr/test"))
+        self.assertIsNone(extract_eprel_code_from_url("https://eprel.ec.europa.eu/test/298173"))
+        self.assertIsNone(extract_eprel_code_from_url("https://google.com/qr/298173"))
