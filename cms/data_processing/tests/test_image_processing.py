@@ -4,7 +4,7 @@ import shutil
 import requests
 from django.test import TestCase
 
-from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr
+from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr, read_qr
 from cms.scraper.settings import IMAGES_ENERGY_LABELS_STORE
 
 
@@ -36,4 +36,10 @@ class TestImageProcessing(TestCase):
         cropped_image_path = energy_label_cropped_2_qr(self.image_path)
         self.assertEqual("/app/cms/data_processing/tests/data/label_qr.png", cropped_image_path)
         open(cropped_image_path)
+        os.remove(cropped_image_path)
+
+    def test_read_qr(self):
+        cropped_image_path = energy_label_cropped_2_qr(self.image_path)
+        decoded_text = read_qr(cropped_image_path)
+        self.assertEqual("https://eprel.ec.europa.eu/qr/298173", decoded_text)
         os.remove(cropped_image_path)
