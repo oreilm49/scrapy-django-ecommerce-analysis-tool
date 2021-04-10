@@ -204,3 +204,22 @@ class TestModels(TestCase):
         mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'whirlpool'})
         mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'hotpoint'})
         self.assertEqual(sorted(list(Product.objects.brands())), ['hotpoint', 'whirlpool'])
+
+    def test_product_get_eprel_api_url(self):
+        category: Category = mommy.make(Category, name="washers")
+        product: Product = Product.objects.create(model="EWD 71452 W UK N", category=category, eprel_code=None, eprel_scraped=False, eprel_category=None)
+        with self.subTest("no code"):
+            self.assertIsNone(product.get_eprel_api_url())
+
+        with self.subTest("code added, no eprel category"):
+            product.eprel_code = "298173"
+            product.save()
+            self.assertIsNone(product.get_eprel_api_url())
+
+        with self.subTest("code added, eprel category"):
+            eprel_category: EprelCategory = EprelCategory.objects.create(category=category, name="washingmachines2019")
+            self.assertEqual("https://eprel.ec.europa.eu/api/products/washingmachines2019/298173", product.get_eprel_api_url())
+            self.assertEqual(product.eprel_category, eprel_category)
+
+        with self.subTest("eprel category added to product"):
+            self.assertEqual("https://eprel.ec.europa.eu/api/products/washingmachines2019/298173", product.get_eprel_api_url())
