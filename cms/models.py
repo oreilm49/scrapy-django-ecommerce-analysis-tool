@@ -20,7 +20,7 @@ from django_extensions.db.fields import ModificationDateTimeField, CreationDateT
 from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN, \
     THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN, \
     SCORING_CHOICES, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER, SCORING_BOOL_TRUE, SCORING_BOOL_FALSE, \
-    FILE_TYPES, ENERGY_LABEL_PDF, EPREL_API_ROOT_URL
+    EPREL_API_ROOT_URL, ENERGY_LABEL_IMAGE
 from cms.serializers import serializers, CustomValueSerializer
 
 
@@ -175,7 +175,7 @@ class Product(BaseModel):
 
     @cached_property
     def energy_label_required(self) -> bool:
-        return self.files.filter(file_type=ENERGY_LABEL_PDF).exists() is False
+        return self.images.filter(image_type=ENERGY_LABEL_IMAGE).exists() is False
 
     @property
     def image_main(self):
