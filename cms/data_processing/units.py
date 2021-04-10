@@ -12,7 +12,9 @@ from cms.models import Unit
 from cms.utils import get_dotted_path
 
 
-def contains_number(value: str) -> bool:
+def contains_number(value: Union[str, float, int]) -> bool:
+    if isinstance(value, (float, int)):
+        return True
     return True if next((character for character in value if character.isdigit()), None) else False
 
 
