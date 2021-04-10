@@ -2,6 +2,9 @@ import datetime
 import uuid
 from statistics import mean
 from typing import Optional, Dict, Union, Type, Iterator, Any
+import pandas as pd
+from pandas import DataFrame, Series
+import requests
 
 from django import forms
 from django.contrib.humanize.templatetags import humanize
@@ -13,13 +16,11 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext as _
 from django_extensions.db.fields import ModificationDateTimeField, CreationDateTimeField
-import pandas as pd
-from pandas import DataFrame, Series
 
 from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN, \
     THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN, \
     SCORING_CHOICES, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER, SCORING_BOOL_TRUE, SCORING_BOOL_FALSE, \
-    FILE_TYPES, ENERGY_LABEL_PDF
+    FILE_TYPES, ENERGY_LABEL_PDF, EPREL_API_ROOT_URL
 from cms.serializers import serializers, CustomValueSerializer
 
 
@@ -155,6 +156,9 @@ class Product(BaseModel):
     model = models.CharField(verbose_name=_("Model"), max_length=MAX_LENGTH, unique=True)
     category = models.ForeignKey(to=Category, verbose_name=_("Category"), on_delete=SET_NULL, blank=True, null=True)
     alternate_models = ArrayField(verbose_name=_("Alternate models"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True, default=list)
+    eprel_scraped = models.BooleanField(verbose_name=_("EPREL Scraped"), default=False, help_text=_("Has the EPREL database been scraped for this product?"))
+    eprel_code = models.CharField(verbose_name=_("EPREL Code"), max_length=MAX_LENGTH, unique=True)
+    eprel_category = models.ForeignKey(to="cms.EprelCategory", verbose_name=_("EPREL Category"), on_delete=SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return self.model
