@@ -6,11 +6,11 @@ from django.test import TestCase
 from model_mommy import mommy
 from pandas import DataFrame
 
-from cms.constants import MAIN, THUMBNAIL, WEEKLY, MONTHLY, YEARLY, ENERGY_LABEL_PDF
+from cms.constants import MAIN, THUMBNAIL, WEEKLY, MONTHLY, YEARLY, ENERGY_LABEL_IMAGE
 from cms.form_widgets import FloatInput
 from cms.serializers import serializers
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute, json_data_default, Unit, AttributeType, \
-    Website, Category, ProductImage, WebsiteProductAttributeQuerySet, ProductFile, EprelCategory
+    Website, Category, ProductImage, WebsiteProductAttributeQuerySet, EprelCategory
 from cms.utils import get_dotted_path
 
 
@@ -75,14 +75,14 @@ class TestModels(TestCase):
         self.assertEqual(product_created, product_retrieved)
         self.assertEqual(Product.objects.count(), 1)
 
-    def test_product_images_files_required(self):
+    def test_product_images_required(self):
         product: Product = mommy.make(Product)
         self.assertTrue(product.image_main_required)
         self.assertTrue(product.image_thumb_required)
         self.assertTrue(product.energy_label_required)
         ProductImage.objects.create(product=product, image_type=MAIN)
         ProductImage.objects.create(product=product, image_type=THUMBNAIL)
-        ProductFile.objects.create(product=product, file_type=ENERGY_LABEL_PDF)
+        ProductImage.objects.create(product=product, image_type=ENERGY_LABEL_IMAGE)
         product: Product = Product.objects.get(pk=product.pk)
         self.assertFalse(product.image_main_required)
         self.assertFalse(product.image_thumb_required)
