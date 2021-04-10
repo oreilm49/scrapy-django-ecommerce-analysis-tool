@@ -57,3 +57,7 @@ def is_value_numeric(value: Union[int, str, float]):
 
 def camel_case_to_sentence(string: str) -> str:
     return re.sub('([a-z]+)([A-Z])', r'\1 \2', string).lower()
+
+
+def filename_from_path(path: str) -> str:
+    return path.split("/")[-1]
