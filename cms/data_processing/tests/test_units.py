@@ -17,6 +17,8 @@ class TestUnits(TestCase):
         self.assertTrue(contains_number("test string 1"))
         self.assertTrue(contains_number("test string 1.00"))
         self.assertFalse(contains_number("test string"))
+        self.assertTrue(contains_number(1))
+        self.assertTrue(contains_number(1.00))
 
     def test_is_range_value(self):
         self.assertTrue(is_range_value("200-240"))
