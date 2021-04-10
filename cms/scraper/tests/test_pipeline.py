@@ -3,15 +3,15 @@ from typing import List, Dict
 from django.test import TestCase
 from model_mommy import mommy
 
-from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_PDF
+from cms.constants import PRICE, MAIN, THUMBNAIL
 from cms.form_widgets import FloatInput
 from cms.models import Category, Product, ProductAttribute, Unit, Website, Selector, WebsiteProductAttribute, \
-    AttributeType, ProductImage, ProductFile
+    AttributeType, ProductImage
 from cms.utils import get_dotted_path
 
 from cms.scraper.items import ProductPageItem
 from cms.scraper.pipelines import ProductPipeline, ProductAttributePipeline, WebsiteProductAttributePipeline, \
-    ProductImagePipeline, ProductFilePipeline
+    ProductImagePipeline
 
 
 class TestPipeline(TestCase):
@@ -92,12 +92,3 @@ class TestPipeline(TestCase):
         self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=THUMBNAIL, image='product_images/thumbs/big/testimage2.jpg').exists())
         item: ProductPageItem = ProductPageItem(product=self.product, images=[])
         self.assertEqual(ProductImagePipeline().process_item(item, {}), item)
-
-    def test_product_file_pipeline(self):
-        item: ProductPageItem = ProductPageItem(product=self.product, files=[{'path': 'energylabel.pdf'}])
-        ProductFilePipeline().process_item(item, {})
-        self.assertTrue(ProductFile.objects.filter(product=self.product, file_type=ENERGY_LABEL_PDF, file='product_files/energylabel.pdf').exists())
-        item['files'] = [{'path': 'energylabel2.pdf'}]
-        self.assertFalse(ProductFile.objects.filter(product=self.product, file_type=ENERGY_LABEL_PDF, file='product_files/energylabel2.pdf').exists())
-        item: ProductPageItem = ProductPageItem(product=self.product, files=[])
-        self.assertEqual(ProductFilePipeline().process_item(item, {}), item)
