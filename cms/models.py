@@ -226,6 +226,19 @@ class Product(BaseModel):
         df_grouper: Series = df['created'].dt.isocalendar().week if time_period == WEEKLY else getattr(df['created'].dt, time_period)
         return getattr(df.groupby(by=df_grouper), aggregation)()
 
+    def get_eprel_api_url(self) -> Optional[str]:
+        if not self.eprel_code:
+            return
+        if self.eprel_category:
+            return f"{EPREL_API_ROOT_URL}{self.eprel_category.name}/{self.eprel_code}"
+        for eprel_category in self.category.eprel_names:
+            url = f"{EPREL_API_ROOT_URL}{eprel_category.name}/{self.eprel_code}"
+            response = requests.get(url)
+            if response.status_code == 200:
+                self.eprel_category = eprel_category
+                self.save()
+                return url
+
 
 class AttributeTypeQuerySet(BaseQuerySet):
 
