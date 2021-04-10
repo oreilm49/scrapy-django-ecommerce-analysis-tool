@@ -9,7 +9,7 @@ import requests
 from django import forms
 from django.contrib.humanize.templatetags import humanize
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
+from django.db import models, transaction
 from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q
 from django.db.models.fields.json import KeyTextTransform
 from django.utils.functional import cached_property
@@ -21,6 +21,9 @@ from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUE
     THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN, \
     SCORING_CHOICES, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER, SCORING_BOOL_TRUE, SCORING_BOOL_FALSE, \
     FILE_TYPES, ENERGY_LABEL_PDF, EPREL_API_ROOT_URL
+from cms.data_processing.constants import UnitValue, Value, RangeUnitValue
+from cms.data_processing.units import UnitManager
+from cms.data_processing.utils import camel_case_to_sentence
 from cms.serializers import serializers, CustomValueSerializer
 
 
