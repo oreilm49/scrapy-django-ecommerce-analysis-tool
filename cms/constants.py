@@ -74,10 +74,6 @@ IMAGE_TYPES = (
     (ENERGY_LABEL_QR, _("Energy Label QR")),
 )
 
-FILE_TYPES = (
-    (ENERGY_LABEL_PDF, _("Energy Label PDF")),
-)
-
 SCORING_NUMERICAL_HIGHER = 'higher'
 SCORING_NUMERICAL_LOWER = 'lower'
 SCORING_BOOL_TRUE = 'true'
