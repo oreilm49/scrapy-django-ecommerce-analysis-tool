@@ -1,10 +1,11 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.forms import modelformset_factory
 from django.utils.translation import gettext as _
 
 from cms import constants
-from cms.models import Product, Category, ProductQuerySet, BaseModel, AttributeType
+from cms.models import Product, Category, ProductQuerySet, BaseModel, AttributeType, ProductAttribute
 
 
 class BaseMergeForm(forms.Form):
@@ -101,3 +102,21 @@ class ProductFilterForm(forms.Form):
                 'css/form-inline.css',
             ),
         }
+
+
+class ProductAttributeForm(forms.ModelForm):
+    data = forms.CharField(label=_('Data'), required=True)
+
+    class Meta:
+        model = ProductAttribute
+        fields = 'product', 'attribute_type', 'data'
+
+    def clean_data(self):
+        value = self.cleaned_data['data']
+        attribute_type: AttributeType = self.cleaned_data['attribute_type']
+        if attribute_type.unit:
+            value = attribute_type.unit.serializer.serializer(value)
+        return {'value': value}
+
+
+ProductAttributeFormSet = modelformset_factory(ProductAttribute, form=ProductAttributeForm)
