@@ -124,7 +124,10 @@ class ProductAttributeForm(forms.ModelForm):
         value = self.cleaned_data['data']
         attribute_type: AttributeType = self.cleaned_data['attribute_type']
         if attribute_type.unit:
-            value = attribute_type.unit.serializer.serializer(value)
+            try:
+                value = attribute_type.unit.serializer.serializer(value)
+            except Exception as e:
+                raise ValidationError(_("Unable to serialize data. Please ensure you're using the correct data type for this attribute: '{error}'").format(error=e))
         return {'value': value}
 
 
