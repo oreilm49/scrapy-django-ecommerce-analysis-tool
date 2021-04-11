@@ -107,6 +107,15 @@ class ProductFilterForm(forms.Form):
 class ProductAttributeForm(forms.ModelForm):
     data = forms.CharField(label=_('Data'), required=True)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['product'].disabled = True
+        self.fields['attribute_type'].disabled = True
+        if self.initial.get('attribute_type'):
+            attribute_type: AttributeType = self.initial['attribute_type']
+            if attribute_type.unit:
+                self.fields['data'] = attribute_type.unit.field_class(label=_('Data'), required=True)
+
     class Meta:
         model = ProductAttribute
         fields = 'product', 'attribute_type', 'data'
