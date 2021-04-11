@@ -131,4 +131,5 @@ class ProductAttributeForm(forms.ModelForm):
         return {'value': value}
 
 
-ProductAttributeFormSet = modelformset_factory(ProductAttribute, form=ProductAttributeForm)
+def get_product_attribute_formset(extra: int):
+    return modelformset_factory(ProductAttribute, form=ProductAttributeForm, extra=extra)
