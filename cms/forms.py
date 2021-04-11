@@ -1,10 +1,11 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.forms import modelformset_factory
 from django.utils.translation import gettext as _
 
 from cms import constants
-from cms.models import Product, Category, ProductQuerySet, BaseModel, AttributeType
+from cms.models import Product, Category, ProductQuerySet, BaseModel, AttributeType, ProductAttribute
 
 
 class BaseMergeForm(forms.Form):
@@ -101,3 +102,33 @@ class ProductFilterForm(forms.Form):
                 'css/form-inline.css',
             ),
         }
+
+
+class ProductAttributeForm(forms.ModelForm):
+    data = forms.CharField(label=_('Data'), required=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['product'].disabled = True
+        self.fields['attribute_type'].disabled = True
+        if self.initial.get('attribute_type'):
+            attribute_type: AttributeType = self.initial['attribute_type']
+            if attribute_type.unit:
+                self.fields['data'] = attribute_type.unit.field_class(label=_('Data'), required=True)
+
+    class Meta:
+        model = ProductAttribute
+        fields = 'product', 'attribute_type', 'data'
+
+    def clean_data(self):
+        value = self.cleaned_data['data']
+        attribute_type: AttributeType = self.cleaned_data['attribute_type']
+        if attribute_type.unit:
+            try:
+                value = attribute_type.unit.serializer.serializer(value)
+            except Exception as e:
+                raise ValidationError(_("Unable to serialize data. Please ensure you're using the correct data type for this attribute: '{error}'").format(error=e))
+        return {'value': value}
+
+
+ProductAttributeFormSet = modelformset_factory(ProductAttribute, form=ProductAttributeForm)

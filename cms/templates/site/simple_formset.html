@@ -1,0 +1,24 @@
+{% extends "site/base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block main_content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        {% for form in formset %}
+            <div class="row">{% for field in form %}<div class="col">{% bootstrap_field field %}</div>{% endfor %}</div>
+        {% endfor %}
+        {% bootstrap_button _('Save') button_type="submit" button_class='btn-success' %}
+    </form>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ form.media.js }}
+{% endblock %}
