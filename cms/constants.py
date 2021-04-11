@@ -22,6 +22,9 @@ PRICE = "price"
 TEXT = "text"
 TABLE = "table"
 IMAGE = "image"
+ENERGY_LABEL_PDF = 'energy_label_pdf'
+ENERGY_LABEL_IMAGE = 'energy_label_img'
+ENERGY_LABEL_QR = 'energy_label_qr'
 LINK = "link"
 PAGINATION = "pagination"
 TABLE_VALUE_COLUMN = "table_value_column"
@@ -34,6 +37,7 @@ SELECTOR_TYPES = (
     (TEXT, _("Text")),
     (TABLE, _("Table")),
     (IMAGE, _("Image")),
+    (ENERGY_LABEL_PDF, _("Energy Label PDF")),
     (LINK, _("Link")),
     (PAGINATION, _("Pagination")),
     (TABLE_VALUE_COLUMN, _("Table Value Column")),
@@ -66,6 +70,8 @@ THUMBNAIL = "thumbnail"
 IMAGE_TYPES = (
     (MAIN, _("Main")),
     (THUMBNAIL, _("Thumbnail")),
+    (ENERGY_LABEL_IMAGE, _("Energy Label")),
+    (ENERGY_LABEL_QR, _("Energy Label QR")),
 )
 
 SCORING_NUMERICAL_HIGHER = 'higher'
@@ -108,3 +114,5 @@ OPERATOR_MIN = 'min'
 OPERATOR_SUM = 'sum'
 
 OPERATORS = (OPERATOR_MEAN, OPERATOR_MAX, OPERATOR_MIN, OPERATOR_SUM)
+
+EPREL_API_ROOT_URL = 'https://eprel.ec.europa.eu/api/products/'

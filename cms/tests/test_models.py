@@ -6,11 +6,11 @@ from django.test import TestCase
 from model_mommy import mommy
 from pandas import DataFrame
 
-from cms.constants import MAIN, THUMBNAIL, WEEKLY, MONTHLY, YEARLY
+from cms.constants import MAIN, THUMBNAIL, WEEKLY, MONTHLY, YEARLY, ENERGY_LABEL_IMAGE
 from cms.form_widgets import FloatInput
 from cms.serializers import serializers
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute, json_data_default, Unit, AttributeType, \
-    Website, Category, ProductImage, WebsiteProductAttributeQuerySet
+    Website, Category, ProductImage, WebsiteProductAttributeQuerySet, EprelCategory
 from cms.utils import get_dotted_path
 
 
@@ -79,11 +79,14 @@ class TestModels(TestCase):
         product: Product = mommy.make(Product)
         self.assertTrue(product.image_main_required)
         self.assertTrue(product.image_thumb_required)
+        self.assertTrue(product.energy_label_required)
         ProductImage.objects.create(product=product, image_type=MAIN)
         ProductImage.objects.create(product=product, image_type=THUMBNAIL)
+        ProductImage.objects.create(product=product, image_type=ENERGY_LABEL_IMAGE)
         product: Product = Product.objects.get(pk=product.pk)
         self.assertFalse(product.image_main_required)
         self.assertFalse(product.image_thumb_required)
+        self.assertFalse(product.energy_label_required)
 
     def test_product_current_average_price(self):
         product: Product = mommy.make(Product)
@@ -201,3 +204,22 @@ class TestModels(TestCase):
         mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'whirlpool'})
         mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'hotpoint'})
         self.assertEqual(sorted(list(Product.objects.brands())), ['hotpoint', 'whirlpool'])
+
+    def test_product_get_eprel_api_url(self):
+        category: Category = mommy.make(Category, name="washers")
+        product: Product = Product.objects.create(model="EWD 71452 W UK N", category=category, eprel_code=None, eprel_scraped=False, eprel_category=None)
+        with self.subTest("no code"):
+            self.assertIsNone(product.get_eprel_api_url())
+
+        with self.subTest("code added, no eprel category"):
+            product.eprel_code = "298173"
+            product.save()
+            self.assertIsNone(product.get_eprel_api_url())
+
+        with self.subTest("code added, eprel category"):
+            eprel_category: EprelCategory = EprelCategory.objects.create(category=category, name="washingmachines2019")
+            self.assertEqual("https://eprel.ec.europa.eu/api/products/washingmachines2019/298173", product.get_eprel_api_url())
+            self.assertEqual(product.eprel_category, eprel_category)
+
+        with self.subTest("eprel category added to product"):
+            self.assertEqual("https://eprel.ec.europa.eu/api/products/washingmachines2019/298173", product.get_eprel_api_url())

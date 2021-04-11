@@ -6,7 +6,7 @@ from cms.constants import CATEGORY, TABLE_LABEL_COLUMN, TABLE_VALUE_COLUMN, TABL
     HOURLY, IMAGE, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER
 from cms.form_widgets import FloatInput
 from cms.models import Website, Category, Url, Selector, Unit, Product, ProductAttribute, AttributeType, \
-    WebsiteProductAttribute, CategoryAttributeConfig
+    WebsiteProductAttribute, CategoryAttributeConfig, EprelCategory
 from cms.utils import get_dotted_path
 
 
@@ -66,6 +66,8 @@ def set_up_websites():
     harvey_norman, _ = Website.objects.get_or_create(name="harvey_norman", domain="harveynorman.ie", currency=currency)
     laundry, _ = Category.objects.get_or_create(name="laundry")
     washing_machines, _ = Category.objects.get_or_create(name="washing machines", parent=laundry, alternate_names=["washers", "front loaders"])
+    EprelCategory.objects.get_or_create(category=washing_machines, name="washingmachines2019")
+    EprelCategory.objects.get_or_create(category=washing_machines, name="washingmachines")
     Url.objects.get_or_create(url="https://www.harveynorman.ie/home-appliances/appliances/washing-machines/", url_type=CATEGORY, website=harvey_norman, category=washing_machines)
 
     table_selector, _ = Selector.objects.get_or_create(selector_type=TABLE, css_selector="#content_features table.table-product-features tr", website=harvey_norman)

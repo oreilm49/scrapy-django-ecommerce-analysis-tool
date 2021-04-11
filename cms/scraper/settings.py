@@ -64,10 +64,13 @@ ITEM_PIPELINES = {
    'scraper.pipelines.ProductAttributePipeline': 300,
    'scraper.pipelines.WebsiteProductAttributePipeline': 400,
    'scraper.pipelines.ProductImagePipeline': 500,
+   'scraper.pipelines.PDFEnergyLabelConverterPipeline': 600,
 }
 
 IMAGES_FOLDER = 'product_images'
-IMAGES_STORE = os.path.join(settings.BASE_DIR, f'media/{IMAGES_FOLDER}')
+IMAGES_ENERGY_LABELS_FOLDER = f'{IMAGES_FOLDER}/energy_labels'
+IMAGES_STORE = os.path.join(settings.MEDIA_ROOT, f'{IMAGES_FOLDER}')
+IMAGES_ENERGY_LABELS_STORE = os.path.join(settings.MEDIA_ROOT, f'{IMAGES_ENERGY_LABELS_FOLDER}')
 IMAGES_THUMBS = {
     'big': (270, 270),
 }

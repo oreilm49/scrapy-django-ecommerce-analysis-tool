@@ -1,4 +1,5 @@
 import datetime
+import re
 from typing import List, Union, Optional
 
 from django.db.models import QuerySet
@@ -52,3 +53,11 @@ def is_value_numeric(value: Union[int, str, float]):
     if isinstance(value, datetime.datetime):
         return False
     return type(value) in [float, int] or value.replace('.', '', 1).isdigit()
+
+
+def camel_case_to_sentence(string: str) -> str:
+    return re.sub('([a-z]+)([A-Z])', r'\1 \2', string).lower()
+
+
+def filename_from_path(path: str) -> str:
+    return path.split("/")[-1]

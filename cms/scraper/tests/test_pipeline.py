@@ -1,9 +1,11 @@
+import os
 from typing import List, Dict
 
+import requests
 from django.test import TestCase
 from model_mommy import mommy
 
-from cms.constants import PRICE, MAIN, THUMBNAIL
+from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_IMAGE, ENERGY_LABEL_QR
 from cms.form_widgets import FloatInput
 from cms.models import Category, Product, ProductAttribute, Unit, Website, Selector, WebsiteProductAttribute, \
     AttributeType, ProductImage
@@ -11,7 +13,7 @@ from cms.utils import get_dotted_path
 
 from cms.scraper.items import ProductPageItem
 from cms.scraper.pipelines import ProductPipeline, ProductAttributePipeline, WebsiteProductAttributePipeline, \
-    ProductImagePipeline
+    ProductImagePipeline, PDFEnergyLabelConverterPipeline
 
 
 class TestPipeline(TestCase):
@@ -92,3 +94,21 @@ class TestPipeline(TestCase):
         self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=THUMBNAIL, image='product_images/thumbs/big/testimage2.jpg').exists())
         item: ProductPageItem = ProductPageItem(product=self.product, images=[])
         self.assertEqual(ProductImagePipeline().process_item(item, {}), item)
+
+    def test_pdf_energy_label_pipeline(self):
+        with self.subTest("sanity check"):
+            self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=ENERGY_LABEL_IMAGE).exists())
+            self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=ENERGY_LABEL_QR).exists())
+            self.assertIsNone(self.product.eprel_code)
+
+        pdf_url = "https://whirlpool-cdn.thron.com/static/7UO8OG_NEL859991596350_9DDFJI.pdf?xseo=&response-content-disposition=inline%3Bfilename%3D%22New-Energy-label.pdf"
+        with self.subTest("url valid"):
+            self.assertEqual(requests.get(pdf_url).status_code, 200)
+
+        item: ProductPageItem = ProductPageItem(product=self.product, energy_label_urls=[pdf_url])
+        PDFEnergyLabelConverterPipeline().process_item(item, {})
+        img: ProductImage = ProductImage.objects.get(product=self.product, image_type=ENERGY_LABEL_IMAGE)
+        img_qr: ProductImage = ProductImage.objects.get(product=self.product, image_type=ENERGY_LABEL_QR)
+        self.assertEqual("258076", self.product.eprel_code)
+        os.remove(img.image.path)
+        os.remove(img_qr.image.path)

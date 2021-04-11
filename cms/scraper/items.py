@@ -10,3 +10,4 @@ class ProductPageItem(scrapy.Item):
     website_attributes = scrapy.Field()
     image_urls = scrapy.Field()
     images = scrapy.Field()
+    energy_label_urls = scrapy.Field()

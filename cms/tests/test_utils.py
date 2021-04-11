@@ -4,7 +4,7 @@ from django.test import TestCase
 from model_mommy import mommy
 
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute
-from cms.utils import products_grouper, extract_grouper
+from cms.utils import products_grouper, extract_grouper, filename_from_path
 
 
 class TestUtils(TestCase):
@@ -33,3 +33,7 @@ class TestUtils(TestCase):
                 [0, 99, 199, 299]
             ))
             self.assertEqual(list(groups)[0][0], 199)
+
+    def test_filename_from_path(self):
+        path = "opt/project/cms/media/product_images/energy_labels/9d08fa81-ba1f-4c3c-9803-cbca5a2ed010.png"
+        self.assertEqual("9d08fa81-ba1f-4c3c-9803-cbca5a2ed010.png", filename_from_path(path))
