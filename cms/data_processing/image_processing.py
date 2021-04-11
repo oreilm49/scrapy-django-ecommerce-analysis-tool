@@ -1,5 +1,9 @@
+from urllib.parse import urlparse
+
 import cv2 as cv
 import os
+
+import requests
 from pdf2image import convert_from_path
 from PIL import Image
 import re
@@ -10,15 +14,24 @@ import uuid
 from cms.scraper.settings import IMAGES_ENERGY_LABELS_STORE
 
 
+def validate_pdf_url(download_url: str) -> str:
+    """
+    validates if download_url is a valid pdf.
+    """
+    response = requests.head(download_url)
+    if response.status_code != 200:
+        raise Exception(f"Download url return invalid response: '{download_url}' -> '{response.status_code}'")
+    if response.headers['Content-Type'] != 'application/pdf':
+        raise Exception(f"Download url is not a pdf link: '{download_url}'")
+    return download_url
+
+
 def small_pdf_2_image(download_url: str) -> str:
     """
-    validates if string pass is a valid pdf url
     converts pdf url to image and saves in images folder
     returns path to image
     """
-    file_extension: str = download_url[-3:]
-    if file_extension != 'pdf':
-        raise Exception(f"Download url is not a pdf link: '{download_url}'")
+    download_url: str = validate_pdf_url(download_url)
     storage_folder_exists = os.path.isdir(IMAGES_ENERGY_LABELS_STORE)
     if not storage_folder_exists:
         os.makedirs(IMAGES_ENERGY_LABELS_STORE)
