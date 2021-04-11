@@ -11,9 +11,26 @@
     <form method="post">
         {% csrf_token %}
         {{ formset.management_form }}
-        {% for form in formset %}
-            <div class="row">{% for field in form %}<div class="col">{% bootstrap_field field %}</div>{% endfor %}</div>
-        {% endfor %}
+        <table>
+            <thead>
+                {% for form in formset.forms %}
+                    {% if forloop.first %}
+                        {% for field in form %}
+                            {% if field.label != 'Id' %}
+                            <th>{{ field.label_tag }}</th>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+            </thead>
+            <tbody>
+                    <tr>
+                        {% for field in form %}
+                            <td>{% if field.field.disabled %}{{ field.initial }}{% else %}{{ field }}{% endif %}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         {% bootstrap_button _('Save') button_type="submit" button_class='btn-success' %}
     </form>
 {% endblock %}
