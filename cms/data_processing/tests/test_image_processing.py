@@ -5,7 +5,7 @@ import requests
 from django.test import TestCase
 
 from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr, read_qr, \
-    extract_eprel_code_from_url
+    extract_eprel_code_from_url, validate_pdf_url
 from cms.scraper.settings import IMAGES_ENERGY_LABELS_STORE
 
 
@@ -15,23 +15,31 @@ class TestImageProcessing(TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.image_path = "/app/cms/data_processing/tests/data/label.png"
+        cls.pdf_url = "https://cc.isitetv.com/clients/wp/whirlpool/859991530490/documentation/eur/whirlpool-fwl71253wuk-energy-label-el859991530490.pdf"
+
+    def test_validate_pdf_url(self):
+        with self.subTest("content type validation"):
+            with self.assertRaises(Exception) as context:
+                validate_pdf_url("https://www.specr.ie/images/pivot_table.png")
+            self.assertEqual(str(context.exception), "Download url is not a pdf link: 'https://www.specr.ie/images/pivot_table.png'")
+
+        with self.subTest("invalid http response"):
+            with self.assertRaises(Exception) as context:
+                validate_pdf_url("http://google.com")
+            self.assertEqual((str(context.exception)), "Download url return invalid response: 'http://google.com' -> '301'")
+
+        with self.subTest("valid pdf url"):
+            self.assertEqual(self.pdf_url, validate_pdf_url(self.pdf_url))
 
     def test_small_pdf_2_image(self):
-        pdf_url = "https://cc.isitetv.com/clients/wp/whirlpool/859991530490/documentation/eur/whirlpool-fwl71253wuk-energy-label-el859991530490.pdf"
         with self.subTest("url valid"):
-            self.assertEqual(requests.get(pdf_url).status_code, 200)
+            self.assertEqual(requests.get(self.pdf_url).status_code, 200)
 
         with self.subTest("valid pdf"):
-            image_path = small_pdf_2_image(pdf_url)
+            image_path = small_pdf_2_image(self.pdf_url)
             self.assertIn(IMAGES_ENERGY_LABELS_STORE, image_path)
             self.assertIn('.png', image_path)
             open(image_path)
-
-        with self.subTest("pdf file validation"):
-            with self.assertRaises(Exception) as context:
-                small_pdf_2_image("test.jpg")
-            self.assertEqual(str(context.exception), "Download url is not a pdf link: 'test.jpg'")
-        shutil.rmtree(IMAGES_ENERGY_LABELS_STORE)
 
     def test_energy_label_cropped_2_qr(self):
         cropped_image_path = energy_label_cropped_2_qr(self.image_path)
