@@ -1,5 +1,3 @@
-from urllib.parse import urlparse
-
 import cv2 as cv
 import os
 
