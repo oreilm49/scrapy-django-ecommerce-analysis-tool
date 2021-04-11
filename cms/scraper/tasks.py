@@ -21,7 +21,7 @@ def crawl_websites():
 
 @shared_task
 def crawl_eprel_data():
-    for product in Product.objects.published().filter(eprel_scraped=False, eprel_code__isnull=False, eprel_category__isnull=False):
+    for product in Product.objects.published().filter(eprel_scraped=False, eprel_code__isnull=False):
         url: Optional[str] = product.get_eprel_api_url()
         response = requests.get(url)
         for attribute_label, attribute_value in response.json().items():
