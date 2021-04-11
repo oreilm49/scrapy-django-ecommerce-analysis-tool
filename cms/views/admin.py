@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
-from cms.forms import ProductMergeForm, AttributeTypeMergeForm, ProductAttributeFormSet
+from cms.forms import ProductMergeForm, AttributeTypeMergeForm, get_product_attribute_formset
 from cms.models import CategoryAttributeConfig, Product, ProductAttribute
 
 
@@ -45,13 +45,14 @@ class AttributeTypeMapView(MapViewMixin):
 class ProductAttributeBulkCreateView(SuccessMessageMixin, FormView):
     template_name = 'site/simple_formset.html'
     success_message = _('Products attributes updated successfully')
-    form_class = ProductAttributeFormSet
 
     def get_success_url(self):
         return reverse('admin:map_product_attributes')
 
     def get_form(self, form_class=None):
-        return ProductAttributeFormSet(self.request.POST or None, initial=self.get_initial_data(), queryset=ProductAttribute.objects.none())
+        initial: List[dict] = self.get_initial_data()
+        ProductAttributeFormSet = get_product_attribute_formset(extra=len(initial))
+        return ProductAttributeFormSet(self.request.POST or None, initial=initial, queryset=ProductAttribute.objects.none())
 
     def get_initial_data(self):
         """
