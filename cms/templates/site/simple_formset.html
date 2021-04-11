@@ -12,7 +12,7 @@
         {% csrf_token %}
         {{ formset.management_form }}
         {% for form in formset %}
-        {% bootstrap_form form layout='inline' %}
+            <div class="row">{% for field in form %}<div class="col">{% bootstrap_field field %}</div>{% endfor %}</div>
         {% endfor %}
         {% bootstrap_button _('Save') button_type="submit" button_class='btn-success' %}
     </form>
