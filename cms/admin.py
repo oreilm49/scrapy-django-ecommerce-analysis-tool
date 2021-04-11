@@ -3,7 +3,7 @@ from django.urls import path
 
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
     ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult, EprelCategory
-from cms.views.admin import ProductMapView, AttributeTypeMapView
+from cms.views.admin import ProductMapView, AttributeTypeMapView, ProductAttributeBulkCreateView
 
 
 class SelectorInlineAdmin(admin.TabularInline):
@@ -101,6 +101,7 @@ def get_admin_urls(urls):
         return urls + [
             path('map_products/', admin.site.admin_view(ProductMapView.as_view()), name="map_products"),
             path('map_attribute_types/', admin.site.admin_view(AttributeTypeMapView.as_view()), name="map_attribute_types"),
+            path('map_product_attributes/', admin.site.admin_view(ProductAttributeBulkCreateView.as_view()), name="map_product_attributes"),
         ]
     return get_urls
 
