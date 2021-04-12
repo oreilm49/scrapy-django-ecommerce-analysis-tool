@@ -43,6 +43,11 @@ class CategoryTable(BaseModel):
     y_axis_values = models.JSONField(verbose_name=_('Y Axis Values'), help_text=_('The values products must have for the y axis attribute in order to appear in the table.'), default=list)
     category = models.ForeignKey("cms.Category", verbose_name=_('Category'), help_text=_('The category products should belong to in order to appear in the table.'), on_delete=models.SET_NULL, null=True)
     query = models.CharField(verbose_name=_('Search'), blank=True, null=True, max_length=100, help_text=_('General search text used to further filter products.'))
+    websites = models.ManyToManyField("cms.Website", verbose_name=_("Websites"), help_text=_('Only show products that are on these websites.'))
+    brands = models.JSONField(verbose_name=_('Brands'), help_text=_('Only show products for these brands.'), default=list, blank=True, null=True)
+    products = models.ManyToManyField("cms.Product", verbose_name=_("Products"), help_text=_('Only show these products.'))
+    price_low = models.FloatField(verbose_name=_("Price low"), help_text=_("Only show products above this price"), blank=True, null=True)
+    price_high = models.FloatField(verbose_name=_("Price high"), help_text=_("Only show products below this price"), blank=True, null=True)
 
     objects = CategoryTableQuerySet.as_manager()
 
