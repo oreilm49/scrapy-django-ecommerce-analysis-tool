@@ -54,7 +54,7 @@ class CategoryTable(BaseModel):
     def __str__(self):
         return self.name
 
-    def products(self, queryset: 'ProductQuerySet') -> 'QuerySet':
+    def get_products(self, queryset: 'ProductQuerySet') -> 'QuerySet':
         product_pks: List[int] = []
         if not is_value_numeric(self.x_axis_values[0]):
             products_from_attributes: 'ProductQuerySet' = self.x_axis_attribute.productattributes.filter(data__value__in=self.x_axis_values)
