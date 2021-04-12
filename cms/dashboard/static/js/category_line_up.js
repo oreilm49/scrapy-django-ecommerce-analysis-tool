@@ -6,4 +6,8 @@ $(document).ready(function() {
    $('document').on('click', '#category_line_up_submit', function (){
       $('#category_line_up_form').submit();
    });
+   $('select[multiple]').select2({
+      allowClear: true,
+      closeOnSelect: false,
+   });
 });
