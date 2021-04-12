@@ -65,7 +65,12 @@ class CategoryTableForm(forms.ModelForm):
         return serialized_values_for_attribute_type(values, attribute_type)
 
     class Media:
-        js = 'js/category_line_up.js',
+        js = 'js/select2.min.js', 'js/category_line_up.js',
+        css = {
+            'all': (
+                'css/select2.min.css',
+            ),
+        }
 
 
 class CategoryTableFilterForm(forms.Form):
