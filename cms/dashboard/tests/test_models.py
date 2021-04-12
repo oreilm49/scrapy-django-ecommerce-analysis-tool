@@ -12,7 +12,7 @@ from cms.models import Product, ProductAttribute, WebsiteProductAttribute, Attri
 
 class TestModels(TestCase):
 
-    def test_category_table_products(self):
+    def test_category_table_get_products(self):
         category: Category = mommy.make(Category)
         product_1: Product = mommy.make(Product, category=category, model="product_1")
         product_2: Product = mommy.make(Product, category=category, model="product_2")
@@ -36,12 +36,54 @@ class TestModels(TestCase):
             query="product_",
             name="test",
         )
-        products = table.products(Product.objects.published())
-        self.assertIn(product_1, products)
-        self.assertIn(product_2, products)
-        self.assertNotIn(product_3, products)
-        self.assertNotIn(product_4, products)
-        self.assertNotIn(product_5, products)
+        with self.subTest("attribute filtering"):
+            products = table.get_products(Product.objects.published())
+            self.assertIn(product_1, products)
+            self.assertIn(product_2, products)
+            self.assertNotIn(product_3, products)
+            self.assertNotIn(product_4, products)
+            self.assertNotIn(product_5, products)
+
+        table.x_axis_values = []
+        table.y_axis_values = []
+        table.save()
+
+        with self.subTest("websites filter"):
+            table.websites.add(price_attr.website)
+            mommy.make(WebsiteProductAttribute, product=product_1, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 150})
+            products = table.get_products(Product.objects.published())
+            self.assertIn(product_1, products)
+            self.assertNotIn(product_2, products)
+
+        with self.subTest("brands filter"):
+            table.brands = ["hotpoint"]
+            table.websites.remove(price_attr.website)
+            table.save()
+            products = table.get_products(Product.objects.published())
+            self.assertNotIn(product_1, products)
+            self.assertIn(product_2, products)
+
+        with self.subTest("products filter"):
+            product_4.category = category
+            product_4.save()
+            table.products.add(product_4)
+            table.save()
+            products = table.get_products(Product.objects.published())
+            self.assertNotIn(product_2, products)
+            self.assertIn(product_4, products)
+
+        with self.subTest("price filter"):
+            table.products.remove(product_4)
+            table.brands = []
+            table.price_low = 100
+            table.price_high = 200
+            table.save()
+            mommy.make(WebsiteProductAttribute, product=product_2, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 50})
+            mommy.make(WebsiteProductAttribute, product=product_3, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 250})
+            products = table.get_products(Product.objects.published())
+            self.assertIn(product_1, products)
+            self.assertNotIn(product_2, products)
+            self.assertNotIn(product_3, products)
 
     def test_category_table_for_user(self):
         company: Company = mommy.make(Company, name="test company")
