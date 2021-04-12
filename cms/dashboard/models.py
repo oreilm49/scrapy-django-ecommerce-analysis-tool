@@ -55,16 +55,31 @@ class CategoryTable(BaseModel):
         return self.name
 
     def get_products(self, queryset: 'ProductQuerySet') -> 'QuerySet':
-        product_pks: List[int] = []
-        if not is_value_numeric(self.x_axis_values[0]):
-            products_from_attributes: 'ProductQuerySet' = self.x_axis_attribute.productattributes.filter(data__value__in=self.x_axis_values)
-            product_pks.append(products_from_attributes.values_list('product', flat=True))
-        if not is_value_numeric(self.y_axis_values[0]):
-            products_from_attributes: 'ProductQuerySet' = self.y_axis_attribute.productattributes.filter(data__value__in=self.y_axis_values)
-            product_pks.append(products_from_attributes.values_list('product', flat=True))
         if self.query:
             queryset = queryset.filter(model__contains=self.query)
-        return queryset.filter(pk__in=product_pks, category=self.category)
+        if self.websites.exists():
+            queryset = queryset.filter(websiteproductattributes__website__in=self.websites.all())
+        if self.price_low:
+            queryset = queryset.filter(websiteproductattributes__attribute_type__name='price',
+                                       websiteproductattributes__data__value__gte=self.price_low)
+        if self.price_high:
+            queryset = queryset.filter(websiteproductattributes__attribute_type__name='price',
+                                       websiteproductattributes__data__value__lte=self.price_high)
+        if self.brands:
+            queryset = queryset.filter(productattributes__attribute_type__name='brand',
+                                       productattributes__data__value__in=self.brands)
+        if self.products.exists():
+            queryset = queryset.filter(pk__in=self.products.all())
+        product_pks: List[int] = []
+        if self.x_axis_values and not is_value_numeric(self.x_axis_values[0]):
+            products_from_attributes: 'ProductQuerySet' = self.x_axis_attribute.productattributes.filter(data__value__in=self.x_axis_values)
+            product_pks.append(products_from_attributes.values_list('product', flat=True))
+        if self.y_axis_values and not is_value_numeric(self.y_axis_values[0]):
+            products_from_attributes: 'ProductQuerySet' = self.y_axis_attribute.productattributes.filter(data__value__in=self.y_axis_values)
+            product_pks.append(products_from_attributes.values_list('product', flat=True))
+        if self.x_axis_values or self.y_axis_values:
+            queryset = queryset.filter(pk__in=product_pks)
+        return queryset.filter(category=self.category)
 
 
 class CategoryGapAnalysisQuerySet(BaseQuerySet):
