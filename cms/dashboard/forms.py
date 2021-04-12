@@ -13,7 +13,7 @@ from cms.dashboard.models import CategoryTable, CategoryTableQuerySet, CategoryG
     CategoryGapAnalysisQuerySet
 from cms.dashboard.utils import get_brands
 from cms.form_widgets import TagWidget
-from cms.models import AttributeType, Category, ProductQuerySet, Website, WebsiteProductAttributeQuerySet
+from cms.models import AttributeType, Category, ProductQuerySet, Website, WebsiteProductAttributeQuerySet, Product
 from cms.serializers import to_float
 from cms.utils import serialized_values_for_attribute_type, is_value_numeric
 
@@ -24,6 +24,7 @@ class CategoryTableForm(forms.ModelForm):
     """
     x_axis_values = SimpleArrayField(base_field=forms.CharField())
     y_axis_values = SimpleArrayField(base_field=forms.CharField())
+    brands = forms.MultipleChoiceField(label=_('Brands'), choices=(), required=False, help_text=_("Only show products for these brands."))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -33,10 +34,16 @@ class CategoryTableForm(forms.ModelForm):
         self.fields['x_axis_values'].label = _('Horizontal values')
         self.fields['y_axis_attribute'].label = _('Vertical label')
         self.fields['y_axis_values'].label = _('Vertical values')
+        self.fields['brands'].choices = ((brand, brand) for brand in get_brands())
+        self.fields['websites'].queryset = Website.objects.published()
+        self.fields['websites'].required = False
+        self.fields['products'].queryset = Product.objects.published()
+        self.fields['products'].required = False
 
     class Meta:
         model = CategoryTable
-        fields = ['name', 'x_axis_attribute', 'x_axis_values', 'y_axis_attribute', 'y_axis_values', 'category', 'query']
+        fields = ['name', 'x_axis_attribute', 'x_axis_values', 'y_axis_attribute', 'y_axis_values', 'category', 'query',
+                  'websites', 'brands', 'products', 'price_low', 'price_high']
 
     def clean_x_axis_values(self) -> List[str]:
         return self.clean_axis_attributes(self.cleaned_data['x_axis_values'], self.cleaned_data['x_axis_attribute'])
@@ -58,7 +65,12 @@ class CategoryTableForm(forms.ModelForm):
         return serialized_values_for_attribute_type(values, attribute_type)
 
     class Media:
-        js = 'js/category_line_up.js',
+        js = 'js/select2.min.js', 'js/category_line_up.js',
+        css = {
+            'all': (
+                'css/select2.min.css',
+            ),
+        }
 
 
 class CategoryTableFilterForm(forms.Form):

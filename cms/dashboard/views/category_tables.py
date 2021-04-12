@@ -144,7 +144,7 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
             x_axis_grouper=products_grouper(product, self.table.x_axis_attribute, self.table.x_axis_values),
             y_axis_grouper=products_grouper(product, self.table.y_axis_attribute, self.table.y_axis_values),
             product=product
-        ) for product in self.table.products(Product.objects.published())]
+        ) for product in self.table.get_products(Product.objects.published())]
         y_axis_groups: Iterator[Tuple] = itertools.groupby(
             sorted(products, key=lambda product: product.y_axis_grouper),
             key=lambda product: product.y_axis_grouper

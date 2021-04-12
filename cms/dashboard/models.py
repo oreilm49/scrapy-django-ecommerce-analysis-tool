@@ -43,23 +43,43 @@ class CategoryTable(BaseModel):
     y_axis_values = models.JSONField(verbose_name=_('Y Axis Values'), help_text=_('The values products must have for the y axis attribute in order to appear in the table.'), default=list)
     category = models.ForeignKey("cms.Category", verbose_name=_('Category'), help_text=_('The category products should belong to in order to appear in the table.'), on_delete=models.SET_NULL, null=True)
     query = models.CharField(verbose_name=_('Search'), blank=True, null=True, max_length=100, help_text=_('General search text used to further filter products.'))
+    websites = models.ManyToManyField("cms.Website", verbose_name=_("Websites"), help_text=_('Only show products that are on these websites.'))
+    brands = models.JSONField(verbose_name=_('Brands'), help_text=_('Only show products for these brands.'), default=list, blank=True, null=True)
+    products = models.ManyToManyField("cms.Product", verbose_name=_("Products"), help_text=_('Only show these products.'))
+    price_low = models.FloatField(verbose_name=_("Price low"), help_text=_("Only show products above this price"), blank=True, null=True)
+    price_high = models.FloatField(verbose_name=_("Price high"), help_text=_("Only show products below this price"), blank=True, null=True)
 
     objects = CategoryTableQuerySet.as_manager()
 
     def __str__(self):
         return self.name
 
-    def products(self, queryset: 'ProductQuerySet') -> 'QuerySet':
-        product_pks: List[int] = []
-        if not is_value_numeric(self.x_axis_values[0]):
-            products_from_attributes: 'ProductQuerySet' = self.x_axis_attribute.productattributes.filter(data__value__in=self.x_axis_values)
-            product_pks.append(products_from_attributes.values_list('product', flat=True))
-        if not is_value_numeric(self.y_axis_values[0]):
-            products_from_attributes: 'ProductQuerySet' = self.y_axis_attribute.productattributes.filter(data__value__in=self.y_axis_values)
-            product_pks.append(products_from_attributes.values_list('product', flat=True))
+    def get_products(self, queryset: 'ProductQuerySet') -> 'QuerySet':
         if self.query:
             queryset = queryset.filter(model__contains=self.query)
-        return queryset.filter(pk__in=product_pks, category=self.category)
+        if self.websites.exists():
+            queryset = queryset.filter(websiteproductattributes__website__in=self.websites.all())
+        if self.price_low:
+            queryset = queryset.filter(websiteproductattributes__attribute_type__name='price',
+                                       websiteproductattributes__data__value__gte=self.price_low)
+        if self.price_high:
+            queryset = queryset.filter(websiteproductattributes__attribute_type__name='price',
+                                       websiteproductattributes__data__value__lte=self.price_high)
+        if self.brands:
+            queryset = queryset.filter(productattributes__attribute_type__name='brand',
+                                       productattributes__data__value__in=self.brands)
+        if self.products.exists():
+            queryset = queryset.filter(pk__in=self.products.all())
+        product_pks: List[int] = []
+        if self.x_axis_values and not is_value_numeric(self.x_axis_values[0]):
+            products_from_attributes: 'ProductQuerySet' = self.x_axis_attribute.productattributes.filter(data__value__in=self.x_axis_values)
+            product_pks.append(products_from_attributes.values_list('product', flat=True))
+        if self.y_axis_values and not is_value_numeric(self.y_axis_values[0]):
+            products_from_attributes: 'ProductQuerySet' = self.y_axis_attribute.productattributes.filter(data__value__in=self.y_axis_values)
+            product_pks.append(products_from_attributes.values_list('product', flat=True))
+        if self.x_axis_values or self.y_axis_values:
+            queryset = queryset.filter(pk__in=product_pks)
+        return queryset.filter(category=self.category)
 
 
 class CategoryGapAnalysisQuerySet(BaseQuerySet):

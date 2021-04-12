@@ -1,4 +1,5 @@
 {% extends 'dashboard_base.html' %}
+{% load i18n %}
 {% load bootstrap4 %}
 
 {% block extrahead %}
@@ -11,8 +12,29 @@
         <div class="card shadow mb-4">
             {% include 'includes/card_header.html' %}
             <div class="card-body">
-                    {% csrf_token %}
-                    {% bootstrap_form form %}
+                {% csrf_token %}
+                {% bootstrap_form form exclude="x_axis_attribute,x_axis_values,y_axis_attribute,y_axis_values,category,query,websites,brands,products,price_low,price_high" %}
+                <div class="py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">{% trans "Pivot Config" %}</h6>
+                    <button type="button" class="btn btn-circle btn-sm btn-primary" id="pivot-control" data-toggle="collapse" data-target="#pivot-fields" aria-expanded="false" aria-controls="pivot-fields">
+                        <i class="fas fa-minus fa-sm fa-fw text-white-400"></i>
+                    </button>
+                </div>
+                <div id="pivot-fields" class="collapse show" aria-labelledby="pivot-control">
+                    <p>{% blocktrans %}Add horizontal or vertical grouping to your chart data.{% endblocktrans %}</p>
+                    {% bootstrap_form form exclude="name,category,query,websites,brands,products,price_low,price_high" %}
+                </div>
+                <hr>
+
+                <div class="py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">{% trans "Filter Config" %}</h6>
+                    <button type="button" class="btn btn-circle btn-sm btn-primary" id="filter-control" data-toggle="collapse" data-target="#filter-fields" aria-expanded="false" aria-controls="filter-fields">
+                        <i class="fas fa-minus fa-sm fa-fw text-white-400"></i>
+                    </button>
+                </div>
+                <div id="filter-fields" class="collapse show" aria-labelledby="filter-control">
+                    {% bootstrap_form form exclude="name,x_axis_attribute,x_axis_values,y_axis_attribute,y_axis_values" %}
+                </div>
             </div>
             <div class="card-footer">
                 <a href="{% url 'dashboard:category-tables' %}" class="btn btn-danger">Cancel</a>
