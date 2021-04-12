@@ -36,7 +36,9 @@ class CategoryTableForm(forms.ModelForm):
         self.fields['y_axis_values'].label = _('Vertical values')
         self.fields['brands'].choices = ((brand, brand) for brand in get_brands())
         self.fields['websites'].queryset = Website.objects.published()
+        self.fields['websites'].required = False
         self.fields['products'].queryset = Product.objects.published()
+        self.fields['products'].required = False
 
     class Meta:
         model = CategoryTable
