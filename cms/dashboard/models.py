@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext as _
 
-from cms.dashboard.constants import CategoryTableProduct
+from cms.dashboard.constants import CategoryTableProduct, CategoryTableEmpty
 from cms.dashboard.reports import ProductCluster
 from cms.models import BaseModel, BaseQuerySet, Product, ProductQuerySet, ProductAttributeQuerySet, ProductAttribute
 from cms.utils import is_value_numeric, products_grouper
@@ -97,14 +97,16 @@ class CategoryTable(BaseModel):
         latest_row_max_val = 0
         latest_row_max_val_grouper = None
 
-        def add_empty_cells_at_row_index(grouper_exception: Optional[str] = None) -> None:
+        def add_empty_cells_at_row_index(x_axis_grouper, grouper_exception: Optional[str] = None) -> None:
             for grouper, cell_list in products_grid.items():
                 if grouper == grouper_exception:
                     continue
                 try:
                     cell_list[latest_row_index]
                 except IndexError:
-                    products_grid[grouper].append(None)
+                    products_grid[grouper].append(
+                        CategoryTableEmpty(y_axis_grouper=grouper, x_axis_grouper=x_axis_grouper)
+                    )
 
         for product in products:
             product_grouper = product.y_axis_grouper
@@ -117,13 +119,13 @@ class CategoryTable(BaseModel):
             price_pc_vs_max_val: int = int(((product.product.current_average_price_int - latest_row_max_val) * 100) / latest_row_max_val)
             if price_pc_vs_max_val <= 5:
                 products_grid[product_grouper].append(product)
-                add_empty_cells_at_row_index(product_grouper)
+                add_empty_cells_at_row_index(product.x_axis_grouper, grouper_exception=product_grouper)
             elif price_pc_vs_max_val > 5:
                 if latest_row_max_val_grouper == product_grouper:
                     products_grid[product_grouper].append(product)
                 else:
-                    products_grid[product_grouper] += [None, product]
-                add_empty_cells_at_row_index()
+                    products_grid[product_grouper] += [CategoryTableEmpty(y_axis_grouper=product_grouper, x_axis_grouper=product.x_axis_grouper), product]
+                add_empty_cells_at_row_index(product.x_axis_grouper)
             latest_row_index += 1
             latest_row_max_val = product.product.current_average_price_int
             latest_row_max_val_grouper = product_grouper
