@@ -21,6 +21,11 @@ class TestModels(TestCase):
         product_5: Product = mommy.make(Product, category=category, model="filtered_by_search")
         brand_attr: AttributeType = mommy.make(AttributeType, name="brand")
         price_attr: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, attribute_type__name="price")
+        mommy.make(WebsiteProductAttribute, product=product_1, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 150})
+        mommy.make(WebsiteProductAttribute, product=product_2, attribute_type=price_attr.attribute_type, data={'value': 40})
+        mommy.make(WebsiteProductAttribute, product=product_3, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 250})
+        mommy.make(WebsiteProductAttribute, product=product_4, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 150})
+        mommy.make(WebsiteProductAttribute, product=product_5, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 150})
         mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_1, data={"value": "whirlpool"})
         mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_2, data={"value": "hotpoint"})
         mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_3, data={"value": "indesit"})
@@ -50,7 +55,6 @@ class TestModels(TestCase):
 
         with self.subTest("websites filter"):
             table.websites.add(price_attr.website)
-            mommy.make(WebsiteProductAttribute, product=product_1, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 150})
             products = table.get_products(Product.objects.published())
             self.assertIn(product_1, products)
             self.assertNotIn(product_2, products)
@@ -78,8 +82,6 @@ class TestModels(TestCase):
             table.price_low = 100
             table.price_high = 200
             table.save()
-            mommy.make(WebsiteProductAttribute, product=product_2, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 50})
-            mommy.make(WebsiteProductAttribute, product=product_3, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 250})
             products = table.get_products(Product.objects.published())
             self.assertIn(product_1, products)
             self.assertNotIn(product_2, products)
