@@ -8,6 +8,7 @@ from cms.accounts.models import Company
 from cms.dashboard.models import CategoryTable, CategoryGapAnalysisReport
 from cms.dashboard.reports import ProductCluster
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute, AttributeType, Category, Website
+from cms.scripts.load_cms import run as load_cms
 
 
 class TestModels(TestCase):
@@ -86,6 +87,22 @@ class TestModels(TestCase):
             self.assertIn(product_1, products)
             self.assertNotIn(product_2, products)
             self.assertNotIn(product_3, products)
+
+    def test_category_table_build_table(self):
+        load_cms()
+        table: CategoryTable = mommy.make(
+            CategoryTable,
+            x_axis_values=[0, 199, 299],
+            y_axis_values=["indesit", "beko", "candy"],
+            x_axis_attribute=AttributeType.objects.get(name="price"),
+            y_axis_attribute=AttributeType.objects.get(name="brand"),
+            category=Category.objects.get(name="washing machines"),
+            name="test",
+        )
+        table_dict: dict = table.build_table(Product.objects.all())
+        self.assertEqual(len(table_dict['indesit']), len(table_dict['beko']))
+        self.assertEqual(len(table_dict['candy']), len(table_dict['beko']))
+
 
     def test_category_table_for_user(self):
         company: Company = mommy.make(Company, name="test company")
