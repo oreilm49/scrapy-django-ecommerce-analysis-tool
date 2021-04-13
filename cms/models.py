@@ -214,7 +214,7 @@ class Product(BaseModel):
             yield attribute_config.attribute_type.productattributes.filter(product__pk=self.pk).first()
 
     def price_history(self, start_date: datetime.datetime, end_date: Optional[datetime.datetime] = datetime.datetime.now(),
-                      time_period: Optional[str] = DAILY, aggregation: Optional[str] = OPERATOR_MEAN, **kwargs) -> DataFrame:
+                      time_period: Optional[str] = DAILY, aggregation: Optional[str] = OPERATOR_MEAN, **kwargs) -> Optional[DataFrame]:
         assert time_period in PRICE_TIME_PERIODS_LIST, f"time period must be one of {PRICE_TIME_PERIODS_LIST}"
         assert aggregation in OPERATORS, f"operator must be one of {OPERATORS}"
         price_history = self.websiteproductattributes.published()\
@@ -223,6 +223,8 @@ class Product(BaseModel):
         if kwargs:
             price_history = price_history.filter(**kwargs)
         df: DataFrame = pd.DataFrame(price_history.values('created', 'price'))
+        if not df.get('created'):
+            return None
         df_grouper: Series = df['created'].dt.isocalendar().week if time_period == WEEKLY else getattr(df['created'].dt, time_period)
         return getattr(df.groupby(by=df_grouper), aggregation)()
 
