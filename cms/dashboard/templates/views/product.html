@@ -26,8 +26,10 @@
             {% include 'includes/card_header.html' %}
         {% endwith %}
         <div class="card-body">
+            {% if price_chart %}
             <div style="height: 350px">{{ price_chart.div|safe }}</div>
             <hr>
+            {% endif %}
             {% with field_col_class='col-xs-12 col-sm-2' %}
                 {% include 'includes/filter_form.html' %}
             {% endwith %}
