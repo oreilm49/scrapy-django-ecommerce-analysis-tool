@@ -15,7 +15,7 @@ def get_brands() -> List[Optional[str]]:
 
 
 def line_chart(df: DataFrame, title: str, x: str, x_label: str, y: str, y_label: str) -> Optional[Dict]:
-    if not df:
+    if df.empty:
         return None
     plot = figure(title=title, x_axis_label=x_label, y_axis_label=y_label, sizing_mode="stretch_both")
     plot.line(x=x, y=y, line_width=2, source=ColumnDataSource(df))
