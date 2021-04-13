@@ -42,3 +42,7 @@
 .category-table .specs {
     font-size: 12px;
 }
+
+.category-table .product-cell {
+    width: 150px;
+}
