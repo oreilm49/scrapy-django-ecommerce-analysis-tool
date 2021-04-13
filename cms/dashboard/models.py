@@ -79,7 +79,7 @@ class CategoryTable(BaseModel):
             product_pks.append(products_from_attributes.values_list('product', flat=True))
         if self.x_axis_values or self.y_axis_values:
             queryset = queryset.filter(pk__in=product_pks)
-        return queryset.filter(category=self.category, websiteproductattributes__data__value__isnull=False)
+        return queryset.filter(category=self.category, websiteproductattributes__data__value__isnull=False).distinct()
 
 
 class CategoryGapAnalysisQuerySet(BaseQuerySet):
