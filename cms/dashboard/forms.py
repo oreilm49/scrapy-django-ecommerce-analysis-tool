@@ -63,6 +63,10 @@ class CategoryTableForm(forms.ModelForm):
         products. If values are numeric, cleaned data is returned. Numeric data can be used for
         value ranges and an attribute doesn't need to exist with that exact value.
         """
+        if not values and not attribute_type:
+            return values
+        if (values and not attribute_type) or (attribute_type and not values):
+            raise ValidationError(_("Pivot values and labels must either be both selected or empty."))
         if is_value_numeric(values[0]):
             return serialized_values_for_attribute_type(values, attribute_type)
         for value in values:
