@@ -22,7 +22,7 @@ def extract_grouper(value: Union[str, float, int], grouper_values: List[Union[st
             return grouper_value
 
 
-def products_grouper(product: 'Product', attribute: 'AttributeType', attribute_values: List[Union[str, int]]) -> Optional[Union[str]]:
+def products_grouper(product: 'Product', attribute: Optional['AttributeType'], attribute_values: Optional[List[Union[str, int]]]) -> Optional[Union[str]]:
     """
     Extracts a grouper key for product by comparing attribute value against list of attribute_values.
     :param product: Product object.
@@ -30,6 +30,8 @@ def products_grouper(product: 'Product', attribute: 'AttributeType', attribute_v
     :param attribute_values: List of possible grouper values.
     :return: single grouper value from list of attribute_values
     """
+    if not attribute:
+        return None
     product_attribute: QuerySet = attribute.productattributes.filter(product=product)
     if product_attribute.exists():
         return extract_grouper(product_attribute.first().data['value'], attribute_values)
