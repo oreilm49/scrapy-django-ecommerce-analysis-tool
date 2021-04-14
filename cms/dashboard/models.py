@@ -91,7 +91,7 @@ class CategoryTable(BaseModel):
             y_axis_grouper=products_grouper(product, self.y_axis_attribute, self.y_axis_values),
             product=product
         ) for product in self.get_products(queryset)]
-        products = sorted([product for product in products if product.product.current_average_price_int], key=lambda product: product.product.current_average_price_int)
+        products = sorted([product for product in products], key=lambda product: product.product.current_average_price_int)
         if not self.y_axis_attribute:
             return {None: products}
         products_grid: Dict[str, List] = {y_axis_grouper: [] for y_axis_grouper in self.y_axis_values}
@@ -110,6 +110,8 @@ class CategoryTable(BaseModel):
 
         for product in products:
             product_grouper = product.y_axis_grouper
+            if not product_grouper:
+                continue
             if col_min_val == 0:
                 products_grid[product_grouper].append(product)
                 col_min_val = product.product.current_average_price_int
