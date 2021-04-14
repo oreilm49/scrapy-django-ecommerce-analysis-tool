@@ -29,11 +29,17 @@ class CategoryTableForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['x_axis_values'].widget = TagWidget()
-        self.fields['y_axis_values'].widget = TagWidget()
         self.fields['x_axis_attribute'].label = _('Horizontal label')
         self.fields['x_axis_values'].label = _('Horizontal values')
+        self.fields['x_axis_values'].required = False
+        self.fields['x_axis_attribute'].required = False
+
+        self.fields['y_axis_values'].widget = TagWidget()
         self.fields['y_axis_attribute'].label = _('Vertical label')
         self.fields['y_axis_values'].label = _('Vertical values')
+        self.fields['y_axis_values'].required = False
+        self.fields['y_axis_attribute'].required = False
+
         self.fields['brands'].choices = ((brand, brand) for brand in get_brands())
         self.fields['websites'].queryset = Website.objects.published()
         self.fields['websites'].required = False
