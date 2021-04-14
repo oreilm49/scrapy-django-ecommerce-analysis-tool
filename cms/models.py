@@ -197,7 +197,7 @@ class Product(BaseModel):
         return int(mean([float(price) for price in prices])) if prices else None
 
     @cached_property
-    def current_average_price(self) -> Optional[float]:
+    def current_average_price(self) -> Optional[str]:
         """avg price of product from most recent price"""
         price = self.current_average_price_int
         return humanize.intcomma(price) if price else None

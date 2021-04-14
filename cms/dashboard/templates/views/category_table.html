@@ -30,16 +30,20 @@
                                 <tr>
                                 {% for product in products %}
                                     {% ifequal x_header product.x_axis_grouper %}
-                                        <td>
-                                            <div class="model"><a href="{% url 'dashboard:product' pk=product.product.pk %}">{{ product.product.model }}</a></div>
-                                            <div class="image"><img src="{{ product.product.image_thumb }}" alt=""></div>
-                                            <div class="specs">{% product_specs product.product %}</div>
-                                            <div class="price">
-                                                {% with price=product.product.current_average_price %}
-                                                {% if  price %}€{{ product.product.current_average_price }}{% else %}No Price Data{% endif %}
-                                                {% endwith %}
-                                            </div>
-                                        </td>
+                                        {% if product|is_empty_cell %}
+                                            <td class="product-cell empty">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</td>
+                                        {% else %}
+                                            <td class="product-cell">
+                                                <div class="model"><a href="{% url 'dashboard:product' pk=product.product.pk %}">{{ product.product.model }}</a></div>
+                                                <div class="image"><img src="{{ product.product.image_thumb }}" alt=""></div>
+                                                <div class="specs">{% product_specs product.product %}</div>
+                                                <div class="price">
+                                                    {% with price=product.product.current_average_price %}
+                                                    {% if  price %}€{{ product.product.current_average_price }}{% else %}No Price Data{% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                            </td>
+                                        {% endif %}
                                     {% endifequal %}
                                 {% endfor %}
                                 </tr>

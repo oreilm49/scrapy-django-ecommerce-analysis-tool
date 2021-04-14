@@ -1,14 +1,15 @@
 import itertools
-from typing import List, Iterator, Any
+from typing import List, Iterator, Any, Optional, Dict
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import QuerySet, Q
+from django.db.models import Q
 from django.utils.translation import gettext as _
 
+from cms.dashboard.constants import CategoryTableProduct, CategoryTableEmpty
 from cms.dashboard.reports import ProductCluster
 from cms.models import BaseModel, BaseQuerySet, Product, ProductQuerySet, ProductAttributeQuerySet, ProductAttribute
-from cms.utils import is_value_numeric
+from cms.utils import is_value_numeric, products_grouper
 
 
 class CategoryTableQuerySet(BaseQuerySet):
@@ -54,7 +55,7 @@ class CategoryTable(BaseModel):
     def __str__(self):
         return self.name
 
-    def get_products(self, queryset: 'ProductQuerySet') -> 'QuerySet':
+    def get_products(self, queryset: 'ProductQuerySet') -> 'ProductQuerySet':
         if self.query:
             queryset = queryset.filter(model__contains=self.query)
         if self.websites.exists():
@@ -80,6 +81,53 @@ class CategoryTable(BaseModel):
         if self.x_axis_values or self.y_axis_values:
             queryset = queryset.filter(pk__in=product_pks)
         return queryset.filter(category=self.category, websiteproductattributes__data__value__isnull=False).distinct()
+
+    def build_table(self, queryset: ProductQuerySet):
+        """
+        Builds a dict of product lists, grouped by y_axis_grouper and ordered by price.
+        """
+        products: List[CategoryTableProduct] = [CategoryTableProduct(
+            x_axis_grouper=products_grouper(product, self.x_axis_attribute, self.x_axis_values),
+            y_axis_grouper=products_grouper(product, self.y_axis_attribute, self.y_axis_values),
+            product=product
+        ) for product in self.get_products(queryset)]
+        products = sorted([product for product in products], key=lambda product: product.product.current_average_price_int)
+        products_grid: Dict[str, List] = {y_axis_grouper: [] for y_axis_grouper in self.y_axis_values}
+        col_index: int = 0
+        col_min_val: int = 0
+        col_grouper: Optional[str] = None
+
+        def add_empty_cells_at_col_index(x_axis_grouper, grouper_exception: Optional[str] = None) -> None:
+            for grouper, cell_list in products_grid.items():
+                if grouper == grouper_exception:
+                    continue
+                try:
+                    cell_list[col_index]
+                except IndexError:
+                    products_grid[grouper].append(CategoryTableEmpty(y_axis_grouper=grouper, x_axis_grouper=x_axis_grouper))
+
+        for product in products:
+            product_grouper = product.y_axis_grouper
+            if col_min_val == 0:
+                products_grid[product_grouper].append(product)
+                col_min_val = product.product.current_average_price_int
+                col_grouper = product_grouper
+                continue
+
+            price_pc_vs_min_val: int = int(((product.product.current_average_price_int - col_min_val) * 100) / col_min_val)
+            if price_pc_vs_min_val <= 5:
+                products_grid[product_grouper].append(product)
+                if len(products_grid[product_grouper]) > (col_index + 1) and col_grouper == product_grouper:
+                    add_empty_cells_at_col_index(product.x_axis_grouper)
+                    col_index += 1
+                    col_min_val = product.product.current_average_price_int
+            elif price_pc_vs_min_val > 5:
+                add_empty_cells_at_col_index(product.x_axis_grouper)
+                products_grid[product_grouper].append(product)
+                col_index += 1
+                col_min_val = product.product.current_average_price_int
+                col_grouper = product_grouper
+        return products_grid
 
 
 class CategoryGapAnalysisQuerySet(BaseQuerySet):

@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Optional, Union
 
 from django import template
 from django.utils.html import format_html
 
-from cms.dashboard.constants import COMPETITIVE_SCORE_GOOD, COMPETITIVE_SCORE_ATTENTION, COMPETITIVE_SCORE_BAD
+from cms.dashboard.constants import COMPETITIVE_SCORE_GOOD, COMPETITIVE_SCORE_ATTENTION, COMPETITIVE_SCORE_BAD, \
+    CategoryTableProduct, CategoryTableEmpty
 from cms.models import Product, ProductAttribute
 
 register = template.Library()
@@ -51,3 +52,8 @@ def cluster_score_class(score: str) -> Optional[str]:
         return 'warning'
     elif score is COMPETITIVE_SCORE_BAD:
         return 'danger'
+
+
+@register.filter
+def is_empty_cell(product: Union[CategoryTableProduct, CategoryTableEmpty]) -> bool:
+    return isinstance(product, CategoryTableEmpty)

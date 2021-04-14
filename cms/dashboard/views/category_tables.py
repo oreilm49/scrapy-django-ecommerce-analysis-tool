@@ -1,5 +1,4 @@
 import itertools
-from collections import namedtuple
 from typing import Iterator, Tuple, List, Optional
 
 from django.contrib import messages
@@ -11,14 +10,13 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
+from cms.dashboard.constants import CategoryTableProduct
 from cms.dashboard.forms import CategoryTableFilterForm, CategoryTableForm
 from cms.dashboard.models import CategoryTableQuerySet, CategoryTable
 from cms.models import Product
 from cms.utils import products_grouper
 from cms.dashboard.toolbar import LinkButton
 from cms.dashboard.views.base import Breadcrumb, BaseDashboardMixin
-
-CategoryTableProduct = namedtuple('CategoryTableProduct', ['x_axis_grouper', 'y_axis_grouper', 'product'])
 
 
 class CategoryTableMixin(BaseDashboardMixin):
@@ -139,29 +137,16 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
         return get_object_or_404(self.queryset, pk=self.request.resolver_match.kwargs.get('pk'))
 
     def get_context_data(self, **kwargs):
-        data: dict = super().get_context_data(**kwargs)
-        products = [CategoryTableProduct(
-            x_axis_grouper=products_grouper(product, self.table.x_axis_attribute, self.table.x_axis_values),
-            y_axis_grouper=products_grouper(product, self.table.y_axis_attribute, self.table.y_axis_values),
-            product=product
-        ) for product in self.table.get_products(Product.objects.published())]
-        y_axis_groups: Iterator[Tuple] = itertools.groupby(
-            sorted([product for product in products if product.y_axis_grouper], key=lambda product: product.y_axis_grouper),
-            key=lambda product: product.y_axis_grouper
-        )
-        table_data = {}
-        for grouper, products in y_axis_groups:
-            table_data[grouper] = sorted([product for product in products], key=lambda product: product.product.current_average_price)
-        data.update(
+        return super().get_context_data(
             table=self.table,
-            table_data=table_data,
+            table_data=self.table.build_table(Product.objects.published()),
             x_axis_values=self.table.x_axis_values,
             card_action_button=LinkButton(
                 url=reverse('dashboard:category-table-update', kwargs={'pk': self.table.pk}),
                 icon='fas fa-pen fa-sm fa-fw text-gray-400',
             ),
+            **kwargs
         )
-        return data
 
     def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
         return [
