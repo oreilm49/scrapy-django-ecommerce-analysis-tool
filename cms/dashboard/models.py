@@ -95,6 +95,7 @@ class CategoryTable(BaseModel):
         products_grid = {y_axis_grouper: [] for y_axis_grouper in self.y_axis_values}
         latest_row_index = 0
         latest_row_min_val = 0
+        latest_row_grouper = None
 
         def add_empty_cells_at_row_index(x_axis_grouper, grouper_exception: Optional[str] = None) -> None:
             for grouper, cell_list in products_grid.items():
@@ -110,12 +111,13 @@ class CategoryTable(BaseModel):
             if latest_row_min_val == 0:
                 products_grid[product_grouper].append(product)
                 latest_row_min_val = product.product.current_average_price_int
+                latest_row_grouper = product_grouper
                 continue
 
             price_pc_vs_min_val: int = int(((product.product.current_average_price_int - latest_row_min_val) * 100) / latest_row_min_val)
             if price_pc_vs_min_val <= 5:
                 products_grid[product_grouper].append(product)
-                if len(products_grid[product_grouper]) > (latest_row_index + 1):
+                if len(products_grid[product_grouper]) > (latest_row_index + 1) and latest_row_grouper == product_grouper:
                     add_empty_cells_at_row_index(product.x_axis_grouper)
                     latest_row_index += 1
                     latest_row_min_val = product.product.current_average_price_int
@@ -124,6 +126,7 @@ class CategoryTable(BaseModel):
                 products_grid[product_grouper].append(product)
                 latest_row_index += 1
                 latest_row_min_val = product.product.current_average_price_int
+                latest_row_grouper = product_grouper
         return products_grid
 
 
