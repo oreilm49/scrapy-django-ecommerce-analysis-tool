@@ -78,7 +78,7 @@ class CategoryTable(BaseModel):
         if self.y_axis_values and not is_value_numeric(self.y_axis_values[0]):
             products_from_attributes: 'ProductQuerySet' = self.y_axis_attribute.productattributes.filter(data__value__in=self.y_axis_values)
             product_pks.append(products_from_attributes.values_list('product', flat=True))
-        if self.x_axis_values or self.y_axis_values:
+        if product_pks:
             queryset = queryset.filter(pk__in=product_pks)
         return queryset.filter(category=self.category, websiteproductattributes__data__value__isnull=False).distinct()
 
