@@ -31,7 +31,7 @@
                                 {% for product in products %}
                                     {% ifequal x_header product.x_axis_grouper %}
                                         {% if product|is_empty_cell %}
-                                            <td class="product-cell"></td>
+                                            <td class="product-cell empty">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias amet aspernatur aut cum, delectus labore maxime nostrum officiis qui, rem rerum vero voluptatibus. Id itaque laboriosam sed sint tenetur voluptatum.</td>
                                         {% else %}
                                             <td class="product-cell">
                                                 <div class="model"><a href="{% url 'dashboard:product' pk=product.product.pk %}">{{ product.product.model }}</a></div>

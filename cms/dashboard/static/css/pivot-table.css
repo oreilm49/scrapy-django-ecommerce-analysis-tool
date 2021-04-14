@@ -45,4 +45,10 @@
 
 .category-table .product-cell {
     width: 150px;
+    max-width: 150px;
+    overflow-x: hidden;
+}
+
+.category-table .product-cell.empty {
+    color: white;
 }
