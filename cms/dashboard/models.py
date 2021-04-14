@@ -78,7 +78,7 @@ class CategoryTable(BaseModel):
         if self.y_axis_values and not is_value_numeric(self.y_axis_values[0]):
             products_from_attributes: 'ProductQuerySet' = self.y_axis_attribute.productattributes.filter(data__value__in=self.y_axis_values)
             product_pks.append(products_from_attributes.values_list('product', flat=True))
-        if self.x_axis_values or self.y_axis_values:
+        if product_pks:
             queryset = queryset.filter(pk__in=product_pks)
         return queryset.filter(category=self.category, websiteproductattributes__data__value__isnull=False).distinct()
 
@@ -92,6 +92,8 @@ class CategoryTable(BaseModel):
             product=product
         ) for product in self.get_products(queryset)]
         products = sorted([product for product in products], key=lambda product: product.product.current_average_price_int)
+        if not self.y_axis_attribute:
+            return {None: products}
         products_grid: Dict[str, List] = {y_axis_grouper: [] for y_axis_grouper in self.y_axis_values}
         col_index: int = 0
         col_min_val: int = 0
