@@ -94,8 +94,7 @@ class CategoryTable(BaseModel):
         products = sorted([product for product in products], key=lambda product: product.product.current_average_price_int)
         products_grid = {y_axis_grouper: [] for y_axis_grouper in self.y_axis_values}
         latest_row_index = 0
-        latest_row_max_val = 0
-        latest_row_max_val_grouper = None
+        latest_row_min_val = 0
 
         def add_empty_cells_at_row_index(x_axis_grouper, grouper_exception: Optional[str] = None) -> None:
             for grouper, cell_list in products_grid.items():
@@ -104,31 +103,27 @@ class CategoryTable(BaseModel):
                 try:
                     cell_list[latest_row_index]
                 except IndexError:
-                    products_grid[grouper].append(
-                        CategoryTableEmpty(y_axis_grouper=grouper, x_axis_grouper=x_axis_grouper)
-                    )
+                    products_grid[grouper].append(CategoryTableEmpty(y_axis_grouper=grouper, x_axis_grouper=x_axis_grouper))
 
         for product in products:
             product_grouper = product.y_axis_grouper
-            if latest_row_max_val == 0:
+            if latest_row_min_val == 0:
                 products_grid[product_grouper].append(product)
-                latest_row_max_val = product.product.current_average_price_int
-                latest_row_max_val_grouper = product_grouper
+                latest_row_min_val = product.product.current_average_price_int
                 continue
 
-            price_pc_vs_max_val: int = int(((product.product.current_average_price_int - latest_row_max_val) * 100) / latest_row_max_val)
-            if price_pc_vs_max_val <= 5:
+            price_pc_vs_min_val: int = int(((product.product.current_average_price_int - latest_row_min_val) * 100) / latest_row_min_val)
+            if price_pc_vs_min_val <= 5:
                 products_grid[product_grouper].append(product)
-                add_empty_cells_at_row_index(product.x_axis_grouper, grouper_exception=product_grouper)
-            elif price_pc_vs_max_val > 5:
-                if latest_row_max_val_grouper == product_grouper:
-                    products_grid[product_grouper].append(product)
-                else:
-                    products_grid[product_grouper] += [CategoryTableEmpty(y_axis_grouper=product_grouper, x_axis_grouper=product.x_axis_grouper), product]
+                if len(products_grid[product_grouper]) > (latest_row_index + 1):
+                    add_empty_cells_at_row_index(product.x_axis_grouper)
+                    latest_row_index += 1
+                    latest_row_min_val = product.product.current_average_price_int
+            elif price_pc_vs_min_val > 5:
                 add_empty_cells_at_row_index(product.x_axis_grouper)
-            latest_row_index += 1
-            latest_row_max_val = product.product.current_average_price_int
-            latest_row_max_val_grouper = product_grouper
+                products_grid[product_grouper].append(product)
+                latest_row_index += 1
+                latest_row_min_val = product.product.current_average_price_int
         return products_grid
 
 
