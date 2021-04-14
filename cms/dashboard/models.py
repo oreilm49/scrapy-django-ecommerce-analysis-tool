@@ -92,6 +92,8 @@ class CategoryTable(BaseModel):
             product=product
         ) for product in self.get_products(queryset)]
         products = sorted([product for product in products], key=lambda product: product.product.current_average_price_int)
+        if not self.y_axis_attribute:
+            return {None: products}
         products_grid: Dict[str, List] = {y_axis_grouper: [] for y_axis_grouper in self.y_axis_values}
         col_index: int = 0
         col_min_val: int = 0
