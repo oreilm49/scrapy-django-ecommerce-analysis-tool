@@ -1,5 +1,5 @@
 import itertools
-from typing import List, Iterator, Any, Optional
+from typing import List, Iterator, Any, Optional, Dict
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -92,41 +92,41 @@ class CategoryTable(BaseModel):
             product=product
         ) for product in self.get_products(queryset)]
         products = sorted([product for product in products], key=lambda product: product.product.current_average_price_int)
-        products_grid = {y_axis_grouper: [] for y_axis_grouper in self.y_axis_values}
-        latest_row_index = 0
-        latest_row_min_val = 0
-        latest_row_grouper = None
+        products_grid: Dict[str, List] = {y_axis_grouper: [] for y_axis_grouper in self.y_axis_values}
+        col_index: int = 0
+        col_min_val: int = 0
+        col_grouper: Optional[str] = None
 
-        def add_empty_cells_at_row_index(x_axis_grouper, grouper_exception: Optional[str] = None) -> None:
+        def add_empty_cells_at_col_index(x_axis_grouper, grouper_exception: Optional[str] = None) -> None:
             for grouper, cell_list in products_grid.items():
                 if grouper == grouper_exception:
                     continue
                 try:
-                    cell_list[latest_row_index]
+                    cell_list[col_index]
                 except IndexError:
                     products_grid[grouper].append(CategoryTableEmpty(y_axis_grouper=grouper, x_axis_grouper=x_axis_grouper))
 
         for product in products:
             product_grouper = product.y_axis_grouper
-            if latest_row_min_val == 0:
+            if col_min_val == 0:
                 products_grid[product_grouper].append(product)
-                latest_row_min_val = product.product.current_average_price_int
-                latest_row_grouper = product_grouper
+                col_min_val = product.product.current_average_price_int
+                col_grouper = product_grouper
                 continue
 
-            price_pc_vs_min_val: int = int(((product.product.current_average_price_int - latest_row_min_val) * 100) / latest_row_min_val)
+            price_pc_vs_min_val: int = int(((product.product.current_average_price_int - col_min_val) * 100) / col_min_val)
             if price_pc_vs_min_val <= 5:
                 products_grid[product_grouper].append(product)
-                if len(products_grid[product_grouper]) > (latest_row_index + 1) and latest_row_grouper == product_grouper:
-                    add_empty_cells_at_row_index(product.x_axis_grouper)
-                    latest_row_index += 1
-                    latest_row_min_val = product.product.current_average_price_int
+                if len(products_grid[product_grouper]) > (col_index + 1) and col_grouper == product_grouper:
+                    add_empty_cells_at_col_index(product.x_axis_grouper)
+                    col_index += 1
+                    col_min_val = product.product.current_average_price_int
             elif price_pc_vs_min_val > 5:
-                add_empty_cells_at_row_index(product.x_axis_grouper)
+                add_empty_cells_at_col_index(product.x_axis_grouper)
                 products_grid[product_grouper].append(product)
-                latest_row_index += 1
-                latest_row_min_val = product.product.current_average_price_int
-                latest_row_grouper = product_grouper
+                col_index += 1
+                col_min_val = product.product.current_average_price_int
+                col_grouper = product_grouper
         return products_grid
 
 
