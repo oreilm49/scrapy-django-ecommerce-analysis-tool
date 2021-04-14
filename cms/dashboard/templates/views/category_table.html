@@ -22,7 +22,7 @@
             </thead>
             <tbody>
                 {% for header, products in table_data.items %}
-                    <tr>
+                    <tr class="{% if not table.x_axis_attribute and table.y_axis_attribute %}cell{% endif %}">
                         {% if table.y_axis_attribute %}<th class="cell">{{ header }}</th>{% endif %}
                         {% if not table.x_axis_attribute %}
                             {% for product in products %}
