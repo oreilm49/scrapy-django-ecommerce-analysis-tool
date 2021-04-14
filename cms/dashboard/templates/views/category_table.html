@@ -15,7 +15,7 @@
         {% endwith %}
         <table class="category-table">
             <thead>
-                <th class="cell"></th>
+                {% if table.y_axis_attribute %}<th class="cell"></th>{% endif %}
                 {% for x_axis_header in x_axis_values %}
                     <th class="cell">{{ x_axis_header }}</th>
                 {% endfor %}
@@ -23,33 +23,26 @@
             <tbody>
                 {% for header, products in table_data.items %}
                     <tr>
-                        <th class="cell">{{ header }}</th>
-                        {% for x_header in x_axis_values %}
-                            <td class="cell">
-                            <table>
-                                <tr>
-                                {% for product in products %}
-                                    {% ifequal x_header product.x_axis_grouper %}
-                                        {% if product|is_empty_cell %}
-                                            <td class="product-cell empty">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</td>
-                                        {% else %}
-                                            <td class="product-cell">
-                                                <div class="model"><a href="{% url 'dashboard:product' pk=product.product.pk %}">{{ product.product.model }}</a></div>
-                                                <div class="image"><img src="{{ product.product.image_thumb }}" alt=""></div>
-                                                <div class="specs">{% product_specs product.product %}</div>
-                                                <div class="price">
-                                                    {% with price=product.product.current_average_price %}
-                                                    {% if  price %}€{{ product.product.current_average_price }}{% else %}No Price Data{% endif %}
-                                                    {% endwith %}
-                                                </div>
-                                            </td>
-                                        {% endif %}
-                                    {% endifequal %}
-                                {% endfor %}
-                                </tr>
-                            </table>
-                            </td>
-                        {% endfor %}
+                        {% if table.y_axis_attribute %}<th class="cell">{{ header }}</th>{% endif %}
+                        {% if not table.x_axis_attribute %}
+                            {% for product in products %}
+                                {% include 'includes/product_table_cell.html' %}
+                            {% endfor %}
+                        {% else %}
+                            {% for x_header in x_axis_values %}
+                                <td class="cell">
+                                <table>
+                                    <tr>
+                                    {% for product in products %}
+                                        {% ifequal x_header product.x_axis_grouper %}
+                                            {% include 'includes/product_table_cell.html' %}
+                                        {% endifequal %}
+                                    {% endfor %}
+                                    </tr>
+                                </table>
+                                </td>
+                            {% endfor %}
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>
