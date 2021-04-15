@@ -180,7 +180,7 @@ class CategoryTableAttributeUpdate(CategoryTableMixin, SuccessMessageMixin, Upda
         formset = self.get_form()
         if not formset.is_valid():
             messages.error(request, _('There was an error processing product attributes'))
-            return render(request, self.template_name, {'formset': formset})
+            return self.form_invalid(formset)
         for form in formset.save(commit=False):
             form.table = self.table
             form.save()
