@@ -1,0 +1,47 @@
+{% extends 'dashboard_base.html' %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <div class="card shadow mb-4">
+            {% include 'includes/card_header.html' %}
+            {% csrf_token %}
+            {{ formset.management_form }}
+            <table class="table">
+                <thead>
+                    {% for form in formset.forms %}
+                        {% if forloop.first %}
+                            {% for field in form %}
+                                {% if field.label != 'Id' %}
+                                <th>{{ field.label_tag }}</th>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                </thead>
+                <tbody>
+                        <tr>
+                            {% for field in form %}
+                                <td style="{% if field.label == 'Id' %}display: none{% endif %}">{% bootstrap_field field layout="inline" %}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="card-footer">
+                <a href="{% url 'dashboard:category-table' pk=table.pk %}" class="btn btn-danger">Cancel</a>
+                {% bootstrap_button 'Save' 'submit' button_class='btn btn-primary'%}
+            </div>
+        </div>
+    </form>
+{% endblock content %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ form.media.js }}
+{% endblock %}
