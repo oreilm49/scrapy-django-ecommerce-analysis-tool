@@ -155,6 +155,7 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
 class CategoryTableAttributeUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
     template_name = 'views/category_table_specs_modify.html'
     success_message = _('Category table specs updated successfully')
+    object = None
 
     @property
     def table(self) -> CategoryTable:
