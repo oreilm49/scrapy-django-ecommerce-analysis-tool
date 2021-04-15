@@ -25,7 +25,7 @@
                         {% endif %}
                 </thead>
                 <tbody>
-                        <tr>
+                        <tr class="formset-row">
                             {% for field in form %}
                                 <td style="{% if field.label == 'Id' %}display: none{% endif %}">{% bootstrap_field field layout="inline" %}</td>
                             {% endfor %}
@@ -35,7 +35,8 @@
             </table>
             <div class="card-footer">
                 <a href="{% url 'dashboard:category-table' pk=table.pk %}" class="btn btn-danger">Cancel</a>
-                {% bootstrap_button 'Save' 'submit' button_class='btn btn-primary'%}
+                {% bootstrap_button 'Add Spec' 'button' button_class='btn btn-primary add-formset-row'%}
+                {% bootstrap_button 'Save' 'submit' button_class='btn btn-success'%}
             </div>
         </div>
     </form>
@@ -44,4 +45,63 @@
 {% block extra_js %}
     {{ block.super }}
     {{ form.media.js }}
+    <script type='text/javascript'>
+        function updateElementIndex(el, prefix, ndx) {
+            var id_regex = new RegExp('(' + prefix + '-\\d+)');
+            var replacement = prefix + '-' + ndx;
+            if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+            if (el.id) el.id = el.id.replace(id_regex, replacement);
+            if (el.name) el.name = el.name.replace(id_regex, replacement);
+        }
+        function cloneMore(selector, prefix) {
+            var newElement = $(selector).clone(true);
+            var total = $('#id_' + prefix + '-TOTAL_FORMS').val();
+            newElement.find(':input:not([type=button]):not([type=submit]):not([type=reset])').each(function() {
+                var name = $(this).attr('name').replace('-' + (total-1) + '-', '-' + total + '-');
+                var id = 'id_' + name;
+                $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+                $(this).addClass('remove-formset-row');
+            });
+            newElement.find('label').each(function() {
+                var forValue = $(this).attr('for');
+                if (forValue) {
+                  forValue = forValue.replace('-' + (total-1) + '-', '-' + total + '-');
+                  $(this).attr({'for': forValue});
+                }
+            });
+            total++;
+            $('#id_' + prefix + '-TOTAL_FORMS').val(total);
+            $(selector).after(newElement);
+            var conditionRow = $('.formset-row:not(:last)');
+            conditionRow.find('.btn.add-formset-row')
+            .removeClass('btn-success').addClass('btn-danger')
+            .removeClass('add-formset-row').addClass('remove-formset-row')
+            .html('<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>');
+            return false;
+        }
+        function deleteForm(prefix, btn) {
+            var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+            if (total > 1){
+                btn.closest('.formset-row').remove();
+                var forms = $('.formset-row');
+                $('#id_' + prefix + '-TOTAL_FORMS').val(forms.length);
+                for (var i=0, formCount=forms.length; i<formCount; i++) {
+                    $(forms.get(i)).find(':input').each(function() {
+                        updateElementIndex(this, prefix, i);
+                    });
+                }
+            }
+            return false;
+        }
+        $(document).on('click', '.add-formset-row', function(e){
+            e.preventDefault();
+            cloneMore('.formset-row:last', 'form');
+            return false;
+        });
+        $(document).on('click', '.remove-formset-row', function(e){
+            e.preventDefault();
+            deleteForm('form', $(this));
+            return false;
+        });
+    </script>
 {% endblock %}
