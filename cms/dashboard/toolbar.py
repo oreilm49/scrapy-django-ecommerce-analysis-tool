@@ -50,3 +50,43 @@ class NavItem:
             active='active' if self.active else '',
         )
 
+
+class DropdownItem:
+    def __init__(self, dropdown_icon, dropdown_id, items):
+        self.dropdown_icon = dropdown_icon
+        self.dropdown_id = dropdown_id
+        self.items = items
+
+    def render(self):
+        items = mark_safe(u'')
+        for item in self.items:
+            items += self.render_item(item)
+        return format_html(
+            """
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" id="{dropdown_id}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="{dropdown_icon}"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{dropdown_id}">
+                    {items}
+                </div>
+            </div>
+            """,
+            dropdown_icon=self.dropdown_icon,
+            dropdown_id=self.dropdown_id,
+            items=items
+        )
+
+    def render_item(self, item):
+        assert isinstance(item, LinkButton), 'Items must be instances of ToolbarItem: {}'.format(item.__class__)
+        return format_html(
+            """
+            <a class="dropdown-item" href="{url}">
+                <span class="glyphicon {icon}"></span> {label}
+            </a>
+            """,
+            url=item.url,
+            icon=item.icon,
+            label=item.label,
+        )
+
