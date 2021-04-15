@@ -134,6 +134,15 @@ class CategoryTable(BaseModel):
         return products_grid
 
 
+class CategoryTableAttribute(BaseModel):
+
+    table = models.ForeignKey(CategoryTable, verbose_name=_("Table"), on_delete=models.CASCADE, related_name='category_table_attributes')
+    attribute = models.ForeignKey("cms.AttributeType", verbose_name=_('Spec'), help_text=_('A spec to be displayed on the table.'), on_delete=models.SET_NULL, null=True, related_name='category_table_attributes')
+
+    def __str__(self):
+        return self.attribute
+
+
 class CategoryGapAnalysisQuerySet(BaseQuerySet):
 
     def for_user(self, user: User):
