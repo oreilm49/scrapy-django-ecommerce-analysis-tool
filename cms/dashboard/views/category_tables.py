@@ -135,14 +135,26 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(
+            **kwargs,
             table=self.table,
             table_data=self.table.build_table(Product.objects.published()),
             x_axis_values=self.table.x_axis_values,
-            card_action_button=LinkButton(
-                url=reverse('dashboard:category-table-update', kwargs={'pk': self.table.pk}),
-                icon='fas fa-pen fa-sm fa-fw text-gray-400',
-            ),
-            **kwargs
+            card_action_button=DropdownItem(
+                dropdown_icon='fas fa-pen fa-sm fa-fw text-gray-400',
+                dropdown_id='tableEditDropdown',
+                items=[
+                    LinkButton(
+                        url=reverse('dashboard:category-table-update', kwargs={'pk': self.table.pk}),
+                        icon='fas fa-pen fa-sm fa-fw text-gray-400',
+                        label=_('Table'),
+                    ),
+                    LinkButton(
+                        url=reverse('dashboard:category-table-specs', kwargs={'pk': self.table.pk}),
+                        icon='fas fa-pen fa-sm fa-fw text-gray-400',
+                        label=_('Specs'),
+                    ),
+                ]
+            )
         )
 
     def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
