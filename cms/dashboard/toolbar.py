@@ -1,6 +1,7 @@
 from typing import Optional
 
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 
 class LinkButton:
