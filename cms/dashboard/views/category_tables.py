@@ -12,7 +12,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from cms.dashboard.forms import CategoryTableFilterForm, CategoryTableForm, get_category_table_attribute_formset
 from cms.dashboard.models import CategoryTableQuerySet, CategoryTable, CategoryTableAttribute
 from cms.models import Product
-from cms.dashboard.toolbar import LinkButton
+from cms.dashboard.toolbar import LinkButton, DropdownItem
 from cms.dashboard.views.base import Breadcrumb, BaseDashboardMixin
 
 
