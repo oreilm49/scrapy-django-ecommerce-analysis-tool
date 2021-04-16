@@ -19,10 +19,11 @@ def product_specs(context: dict, product: Product):
     table_product_attributes = product.top_attributes
     if table and table.category_table_attributes:
         table_product_attributes = []
+        specs_limit = table.category_table_attributes.count()
         for category_table_attribute in table.category_table_attributes.order_by('order'):
             category_table_attribute: CategoryTableAttribute
             table_product_attributes.append(product.productattributes.filter(attribute_type=category_table_attribute.attribute).first())
-    for index, product_attribute in enumerate(table_product_attributes or product.top_attributes):
+    for index, product_attribute in enumerate(table_product_attributes):
         product_attribute: ProductAttribute
         if index > specs_limit:
             break
