@@ -4,6 +4,7 @@ from typing import Optional, List, Dict
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import ListView
+from django.utils.translation import gettext as _
 
 from cms.dashboard.toolbar import LinkButton
 from cms.models import Product, ProductQuerySet, WebsiteProductAttributeQuerySet, WebsiteProductAttribute
@@ -34,7 +35,7 @@ class Products(BaseDashboardMixin, ListView):
 
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
-        data.update(filter_form=self.get_form())
+        data.update(filter_form=self.get_form(), header=_('Products'))
         return data
 
 
