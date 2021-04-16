@@ -52,9 +52,11 @@ class NavItem:
 
 
 class DropdownItem:
-    def __init__(self, dropdown_icon, dropdown_id, items):
+    def __init__(self, dropdown_icon, dropdown_id, items, dropdown_class="", dropdown_label=""):
         self.dropdown_icon = dropdown_icon
         self.dropdown_id = dropdown_id
+        self.dropdown_class = dropdown_class
+        self.dropdown_label = dropdown_label
         self.items = items
 
     def render(self):
@@ -64,16 +66,18 @@ class DropdownItem:
         return format_html(
             """
             <div class="dropdown no-arrow">
-                <a class="dropdown-toggle" href="#" id="{dropdown_id}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="{dropdown_icon}"></i>
+                <a class="dropdown-toggle {dropdown_class}" href="#" id="{dropdown_id}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="{dropdown_icon}"></i> {dropdown_label}
                 </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{dropdown_id}">
+                <div class="dropdown-menu" aria-labelledby="{dropdown_id}">
                     {items}
                 </div>
             </div>
             """,
             dropdown_icon=self.dropdown_icon,
             dropdown_id=self.dropdown_id,
+            dropdown_label=self.dropdown_label,
+            dropdown_class=self.dropdown_class,
             items=items
         )
 
