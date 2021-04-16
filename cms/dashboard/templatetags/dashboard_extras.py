@@ -5,6 +5,7 @@ from django.utils.html import format_html
 
 from cms.dashboard.constants import COMPETITIVE_SCORE_GOOD, COMPETITIVE_SCORE_ATTENTION, COMPETITIVE_SCORE_BAD, \
     CategoryTableProduct, CategoryTableEmpty
+from cms.dashboard.models import CategoryTable, CategoryTableAttribute
 from cms.models import Product, ProductAttribute
 
 register = template.Library()
@@ -14,7 +15,14 @@ register = template.Library()
 def product_specs(context: dict, product: Product):
     specs_limit: int = 5
     html = ""
-    for index, product_attribute in enumerate(product.top_attributes):
+    table: Optional[CategoryTable] = context.get('table')
+    table_product_attributes = product.top_attributes
+    if table and table.category_table_attributes:
+        table_product_attributes = []
+        for category_table_attribute in table.category_table_attributes.order_by('order'):
+            category_table_attribute: CategoryTableAttribute
+            table_product_attributes.append(product.productattributes.filter(attribute_type=category_table_attribute.attribute).first())
+    for index, product_attribute in enumerate(table_product_attributes or product.top_attributes):
         product_attribute: ProductAttribute
         if index > specs_limit:
             break

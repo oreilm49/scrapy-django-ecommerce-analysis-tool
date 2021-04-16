@@ -6,11 +6,12 @@ from django import forms
 from django.contrib.postgres.forms import SimpleArrayField
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.forms import modelformset_factory
 from django.utils.translation import gettext as _
 from django.utils import timezone
 
 from cms.dashboard.models import CategoryTable, CategoryTableQuerySet, CategoryGapAnalysisReport, \
-    CategoryGapAnalysisQuerySet
+    CategoryGapAnalysisQuerySet, CategoryTableAttribute
 from cms.dashboard.utils import get_brands
 from cms.form_widgets import TagWidget
 from cms.models import AttributeType, Category, ProductQuerySet, Website, WebsiteProductAttributeQuerySet, Product
@@ -232,3 +233,14 @@ class CategoryGapAnalysisFilterForm(forms.Form):
                 'css/select2.min.css',
             ),
         }
+
+
+class CategoryTableAttributeForm(forms.ModelForm):
+
+    class Meta:
+        model = CategoryTableAttribute
+        fields = 'attribute', 'order',
+
+
+def get_category_table_attribute_formset():
+    return modelformset_factory(CategoryTableAttribute, form=CategoryTableAttributeForm, extra=1, can_delete=True)
