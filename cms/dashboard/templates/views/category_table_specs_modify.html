@@ -60,6 +60,8 @@
                 var name = $(this).attr('name').replace('-' + (total-1) + '-', '-' + total + '-');
                 var id = 'id_' + name;
                 $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+            });
+            newElement.find('input[type=checkbox]').each(function() {
                 $(this).addClass('remove-formset-row');
             });
             newElement.find('label').each(function() {
