@@ -1,6 +1,9 @@
-.category-table {
+.overflow-container {
     display: block;
     overflow-x: auto;
+}
+
+.category-table {
     white-space: nowrap;
     text-align: center;
 }
