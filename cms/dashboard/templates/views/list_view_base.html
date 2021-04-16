@@ -1,0 +1,31 @@
+{% extends 'dashboard_base.html' %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ filter_form.media.css }}
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ filter_form.media.js }}
+{% endblock %}
+
+{% block content %}
+    {% include 'includes/header.html' %}
+    <div class="card shadow mb-4" style="padding: 14px 14px 0;">
+        {% with field_col_class='col-xs-12 col-sm-2' %}
+            {% include 'includes/filter_form.html' %}
+        {% endwith %}
+    </div>
+    <div class="card shadow mb-4" style="max-height: 830px;">
+        <div class="card-body">
+            <div class="table-responsive">
+                {% block list_table %}
+                {% endblock %}
+            </div>
+            {% include 'includes/table_pagination.html' %}
+        </div>
+    </div>
+{% endblock %}
