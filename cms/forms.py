@@ -131,6 +131,14 @@ class ProductAttributeForm(forms.ModelForm):
                 raise ValidationError(_("Unable to serialize data. Please ensure you're using the correct data type for this attribute: '{error}'").format(error=e))
         return {'value': value}
 
+    @property
+    def attribute_type(self) -> AttributeType:
+        attribute_type = self.initial['attribute_type']
+        if isinstance(attribute_type, AttributeType):
+            return attribute_type
+        else:
+            return AttributeType.objects.get(pk=self.initial['attribute_type'])
+
 
 def get_product_attribute_formset(extra: int):
     return modelformset_factory(ProductAttribute, form=ProductAttributeForm, extra=extra)
