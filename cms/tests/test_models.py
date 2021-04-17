@@ -235,3 +235,37 @@ class TestModels(TestCase):
         with self.assertRaises(ValueError) as context:
             ProductAttribute.objects.serialize()
         self.assertEqual(str(context.exception), "could not convert string to float: 'test'")
+
+    def test_attribute_type_convert_unit(self):
+        kilogram: Unit = mommy.make(Unit, name="kilogram")
+        attribute_type: AttributeType = mommy.make(AttributeType, name="weight", unit=kilogram)
+
+        with self.subTest("same unit type"):
+            self.assertEqual(attribute_type.convert_unit(kilogram).unit, kilogram)
+
+        gram: Unit = mommy.make(Unit, name="gram")
+        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 7})
+        with self.subTest("convert to grams"):
+            self.assertEqual(attribute_type.convert_unit(gram).unit, gram)
+            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=7000))
+
+        with self.subTest("unit is None"):
+            attribute_type_1: AttributeType = mommy.make(AttributeType, unit=None)
+            attribute_type_2: AttributeType = mommy.make(AttributeType, unit=None)
+            self.assertIsNone(attribute_type_1.convert_unit(attribute_type_2.unit).unit)
+
+        with self.subTest("mismatch units"):
+            litre: Unit = mommy.make(Unit, name="litre")
+            mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 7})
+            with self.assertRaises(Exception) as context:
+                attribute_type.convert_unit(litre)
+            self.assertEqual(str(context.exception), "Cannot convert from 'gram' ([mass]) to 'liter' ([length] ** 3)")
+            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, attribute_type__unit=gram, data__value=7))
+
+        with self.subTest("text conversion attempt"):
+            mg: Unit = mommy.make(Unit, name="mg")
+            mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'test'})
+            with self.assertRaises(Exception) as context:
+                attribute_type.convert_unit(mg)
+            self.assertEqual(str(context.exception), "'test' is not defined in the unit registry")
+            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, attribute_type__unit=gram, data__value='test'))
