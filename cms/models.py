@@ -16,6 +16,7 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext as _
 from django_extensions.db.fields import ModificationDateTimeField, CreationDateTimeField
+from pint import Quantity
 
 from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN, \
     THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN, \
@@ -267,6 +268,26 @@ class AttributeType(BaseModel):
 
     class Meta:
         unique_together = ['name', 'unit']
+
+    @transaction.atomic
+    def convert_unit(self, unit: Unit) -> 'AttributeType':
+        """
+        Changes unit from one to another, handling any value
+        conversion required
+        """
+        if unit == self.unit:
+            return self
+        from cms.data_processing.units import UnitManager
+        units: UnitManager = UnitManager()
+        product_attribute: ProductAttribute
+        for product_attribute in self.productattributes.all():
+            quantity: Quantity = units.ureg(product_attribute.display)
+            quantity = quantity.to(unit.name)
+            product_attribute.data['value'] = quantity.magnitude
+            product_attribute.save()
+        self.unit = unit
+        self.save()
+        return self
 
 
 class BaseProductAttribute(BaseModel):
