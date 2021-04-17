@@ -17,7 +17,7 @@ urlpatterns = [
     path('accounts/password_reset/', auth_views.PasswordResetView.as_view(template_name='auth/password_reset_form.html')),
     path('accounts/password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='auth/password_reset_done.html')),
     path('accounts/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='auth/password_reset_confirm.html')),
-    path('accounts/reset/done/', auth_views.PasswordChangeDoneView.as_view(template_name='auth/password_change_done.html')),
+    path('accounts/reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='auth/password_change_done.html')),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 
