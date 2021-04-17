@@ -1,5 +1,6 @@
 bokeh==2.3.0
 celery==5.0.5
+django-debug-toolbar==3.2.1
 Django==3.1.5
 django-bootstrap-daterangepicker==1.0.6
 django-celery-beat==2.2.0
