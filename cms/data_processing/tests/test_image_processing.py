@@ -16,6 +16,7 @@ class TestImageProcessing(TestCase):
         super().setUpTestData()
         cls.image_path = "/app/cms/data_processing/tests/data/label.png"
         cls.pdf_url = "https://cc.isitetv.com/clients/wp/whirlpool/859991530490/documentation/eur/whirlpool-fwl71253wuk-energy-label-el859991530490.pdf"
+        cls.image_url = "https://www.miele.ie/pmedia/ZEN/100264825-EU-00_11358760.4002516248538.EU01.Energylabel.png"
 
     def test_validate_pdf_url(self):
         with self.subTest("content type validation"):
@@ -37,6 +38,12 @@ class TestImageProcessing(TestCase):
 
         with self.subTest("valid pdf"):
             image_path = small_pdf_2_image(self.pdf_url)
+            self.assertIn(IMAGES_ENERGY_LABELS_STORE, image_path)
+            self.assertIn('.png', image_path)
+            open(image_path)
+
+        with self.subTest("image url"):
+            image_path = small_pdf_2_image(self.image_url)
             self.assertIn(IMAGES_ENERGY_LABELS_STORE, image_path)
             self.assertIn('.png', image_path)
             open(image_path)
