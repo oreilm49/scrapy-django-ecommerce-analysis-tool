@@ -114,9 +114,10 @@ class ProductAttributeForm(forms.ModelForm):
             self.fields['product'].disabled = True
         self.fields['attribute_type'].disabled = True
         if self.initial.get('attribute_type'):
-            attribute_type: AttributeType = self.initial['attribute_type']
-            if attribute_type.unit:
-                self.fields['data'] = attribute_type.unit.field_class(label=_('Data'), required=True)
+            if self.attribute_type.unit:
+                self.fields['data'] = self.attribute_type.unit.field_class(label=_('Data'), required=True)
+        if self.initial.get('data'):
+            self.initial['data'] = self.initial['data']['value']
 
     class Meta:
         model = ProductAttribute
