@@ -12,56 +12,43 @@
     {{ filter_form.media.js }}
 {% endblock %}
 
-{% block content %}
-    <div class="card shadow mb-4" style="max-height: 830px;">
-        {% with 'Pivot Tables' as header %}
-            {% include 'includes/card_header.html' %}
-        {% endwith %}
-        <div class="card-body">
-            <div class="table-responsive">
-                {% with field_col_class='col-xs-12 col-sm-3' %}
-                    {% include 'includes/filter_form.html' %}
-                {% endwith %}
-                <table class="table table-bordered scrollable-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Horizontal</th>
-                            <th>Vertical</th>
-                            <th>Modify</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for table in object_list %}
-                            <tr>
-                                <td><a href="{% url 'dashboard:category-table' pk=table.pk %}">{{ table.name }}</a></td>
-                                <td>{{ table.category }}</td>
-                                <td>{{ table.x_axis_attribute }}</td>
-                                <td>{{ table.y_axis_attribute }}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="{% url 'dashboard:category-table-update' pk=table.pk %}" class="btn"><i class="fa fa-pen"></i></a>
-                                        {% blocktrans asvar message with name=table.name %}Are you sure you want to remove {{ name }}?{% endblocktrans %}
-                                        <button class="btn text-danger" onclick="showDialog('{% trans 'Delete Table' %}', '{{ message }}', null, BTN_CANCEL, btnRemove(function() {
-                                                    $('form#delete-form').submit();
-                                                }))">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                        <form id="delete-form" method="post" action="{% url 'dashboard:category-table-update' pk=table.pk %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="delete" value="save">
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr><td colspan="5" style="text-align: center">No category tables</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% include 'includes/table_pagination.html' %}
-        </div>
-    </div>
+{% block list_table %}
+    <table class="table table-bordered scrollable-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Horizontal</th>
+                <th>Vertical</th>
+                <th>Modify</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for table in object_list %}
+                <tr>
+                    <td><a href="{% url 'dashboard:category-table' pk=table.pk %}">{{ table.name }}</a></td>
+                    <td>{{ table.category }}</td>
+                    <td>{{ table.x_axis_attribute }}</td>
+                    <td>{{ table.y_axis_attribute }}</td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{% url 'dashboard:category-table-update' pk=table.pk %}" class="btn"><i class="fa fa-pen"></i></a>
+                            {% blocktrans asvar message with name=table.name %}Are you sure you want to remove {{ name }}?{% endblocktrans %}
+                            <button class="btn text-danger" onclick="showDialog('{% trans 'Delete Table' %}', '{{ message }}', null, BTN_CANCEL, btnRemove(function() {
+                                        $('form#delete-form').submit();
+                                    }))">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                            <form id="delete-form" method="post" action="{% url 'dashboard:category-table-update' pk=table.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="delete" value="save">
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" style="text-align: center">No category tables</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
