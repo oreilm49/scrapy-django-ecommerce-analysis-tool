@@ -21,3 +21,7 @@ sentry_sdk.init(
     # associates users to errors
     send_default_pii=True
 )
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda _request: DEBUG
+}
