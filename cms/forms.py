@@ -70,12 +70,14 @@ class AttributeTypeMergeForm(BaseMergeForm):
         :param duplicate: the attribute type to be merged into source.
         :return: the merged attribute type instance.
         """
+        if attribute_type.unit:
+            duplicate: AttributeType = duplicate.convert_unit(attribute_type.unit)
+        elif duplicate.unit:
+            attribute_type: AttributeType = attribute_type.convert_unit(duplicate.unit)
         attribute_type_products = attribute_type.productattributes.values_list('product', flat=True)
         duplicate.productattributes.exclude(product__in=attribute_type_products).update(attribute_type=attribute_type)
         duplicate.productattributes.all().delete()
         duplicate.websiteproductattributes.update(attribute_type=attribute_type)
-        if not attribute_type.unit and duplicate.unit:
-            attribute_type.unit = duplicate.unit
         attribute_type.alternate_names.append(duplicate.name)
         attribute_type.alternate_names += duplicate.alternate_names
         attribute_type.save()
