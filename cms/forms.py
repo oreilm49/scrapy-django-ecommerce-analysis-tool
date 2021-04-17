@@ -112,7 +112,8 @@ class ProductAttributeForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.fields.get('product'):
             self.fields['product'].disabled = True
-        self.fields['attribute_type'].disabled = True
+        if self.instance.attribute_type:
+            self.fields['attribute_type'].disabled = True
         if self.initial.get('attribute_type'):
             if self.attribute_type.unit:
                 self.fields['data'] = self.attribute_type.unit.field_class(label=_('Data'), required=True)
