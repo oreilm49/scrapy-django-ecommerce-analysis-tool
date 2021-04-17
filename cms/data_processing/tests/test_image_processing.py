@@ -1,11 +1,10 @@
 import os
-import shutil
 
 import requests
 from django.test import TestCase
 
 from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr, read_qr, \
-    extract_eprel_code_from_url, validate_pdf_url
+    extract_eprel_code_from_url, validate_pdf_url, ContentTypeImageException
 from cms.scraper.settings import IMAGES_ENERGY_LABELS_STORE
 
 
@@ -20,9 +19,9 @@ class TestImageProcessing(TestCase):
 
     def test_validate_pdf_url(self):
         with self.subTest("content type validation"):
-            with self.assertRaises(Exception) as context:
+            with self.assertRaises(ContentTypeImageException) as context:
                 validate_pdf_url("https://www.specr.ie/images/pivot_table.png")
-            self.assertEqual(str(context.exception), "Download url is not a pdf link: 'https://www.specr.ie/images/pivot_table.png'")
+            self.assertEqual(context.exception.content_type, "image/png")
 
         with self.subTest("invalid http response"):
             with self.assertRaises(Exception) as context:
