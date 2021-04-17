@@ -89,6 +89,7 @@ class WebsiteProductAttributeAdmin(admin.ModelAdmin):
 class AttributeTypeAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'alternate_names', 'unit',
     list_filter = 'name', 'alternate_names', 'unit',
+    inlines = ProductAttributeInlineAdmin,
 
 
 @admin.register(SpiderResult)
