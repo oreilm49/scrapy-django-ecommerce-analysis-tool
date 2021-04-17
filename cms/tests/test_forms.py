@@ -15,7 +15,7 @@ class TestForms(TestCase):
         cls.website: Website = mommy.make(Website, name="test_website", currency__name="€")
         cls.category: Category = mommy.make(Category, name="washing machines")
         cls.product: Product = mommy.make(Product, model="model_number")
-        cls.attribute: AttributeType = mommy.make(AttributeType, name="test_attr", unit=None)
+        cls.attribute: AttributeType = mommy.make(AttributeType, name="test_attr", unit__name="gram")
         cls.product_attribute: ProductAttribute = mommy.make(ProductAttribute, product=cls.product, attribute_type=cls.attribute)
 
     def test_product_merge_form(self):
@@ -41,7 +41,7 @@ class TestForms(TestCase):
         self.assertEqual(ProductImage.objects.get(pk=thumb_image.pk).product, self.product)
 
     def test_attribute_type_merge_form(self):
-        duplicate: AttributeType = mommy.make(AttributeType, name="duplicate attr", unit__name="test unit", alternate_names=["test alternate name"])
+        duplicate: AttributeType = mommy.make(AttributeType, name="duplicate attr", unit__name="kg", alternate_names=["test alternate name"])
         product_attr__deleted: ProductAttribute = mommy.make(ProductAttribute, product=self.product, attribute_type=duplicate)
         product_attr__mapped: ProductAttribute = mommy.make(ProductAttribute, attribute_type=duplicate)
         web_attr__mapped: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, product=self.product, attribute_type=duplicate)
