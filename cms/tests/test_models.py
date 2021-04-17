@@ -223,3 +223,15 @@ class TestModels(TestCase):
 
         with self.subTest("eprel category added to product"):
             self.assertEqual("https://eprel.ec.europa.eu/api/products/washingmachines2019/298173", product.get_eprel_api_url())
+
+    def test_product_attributes_serialize(self):
+        attribute_type: AttributeType = mommy.make(AttributeType, name="weight", unit=mommy.make(Unit, name="kg", widget=get_dotted_path(FloatInput)))
+        attr_1 = mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': '100'})
+        attr_2 = mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': '200.20'})
+        attrs = ProductAttribute.objects.serialize()
+        self.assertEqual(attrs.get(pk=attr_1.pk).data['value'], 100.0)
+        self.assertEqual(attrs.get(pk=attr_2.pk).data['value'], 200.20)
+        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'test'})
+        with self.assertRaises(ValueError) as context:
+            ProductAttribute.objects.serialize()
+        self.assertEqual(str(context.exception), "could not convert string to float: 'test'")
