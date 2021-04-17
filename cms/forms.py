@@ -110,7 +110,8 @@ class ProductAttributeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['product'].disabled = True
+        if self.fields.get('product'):
+            self.fields['product'].disabled = True
         self.fields['attribute_type'].disabled = True
         if self.initial.get('attribute_type'):
             attribute_type: AttributeType = self.initial['attribute_type']
