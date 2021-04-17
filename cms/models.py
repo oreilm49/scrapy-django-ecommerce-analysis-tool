@@ -298,6 +298,16 @@ class ProductAttributeQuerySet(BaseQuerySet):
     def products(self) -> 'ProductAttributeQuerySet':
         return Product.objects.filter(pk__in=[product_attribute.product.pk for product_attribute in self])
 
+    @transaction.atomic
+    def serialize(self) -> 'ProductAttributeQuerySet':
+        """Runs serialization on all data in the queryset"""
+        product_attribute: ProductAttribute
+        for product_attribute in self:
+            if product_attribute.attribute_type.unit:
+                product_attribute.data['value'] = product_attribute.attribute_type.unit.serializer.serializer(product_attribute.data['value'])
+                product_attribute.save()
+        return self
+
 
 class ProductAttribute(BaseProductAttribute):
 
