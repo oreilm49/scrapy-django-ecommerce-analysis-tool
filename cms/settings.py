@@ -52,9 +52,11 @@ INSTALLED_APPS = [
     'cms.dashboard',
     'sendgrid',
     'rest_framework',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -202,3 +204,11 @@ LOGGING = {
     }
 }
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+    'localhost',
+]
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda _request: DEBUG
+}
