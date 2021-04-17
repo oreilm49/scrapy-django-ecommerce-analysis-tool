@@ -9,7 +9,7 @@ import requests
 from django import forms
 from django.contrib.humanize.templatetags import humanize
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
+from django.db import models, transaction
 from django.db.models import PROTECT, CASCADE, SET_NULL, QuerySet, Q
 from django.db.models.fields.json import KeyTextTransform
 from django.utils.functional import cached_property
