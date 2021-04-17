@@ -71,7 +71,7 @@ class UnitManager:
                 values: List[str] = value.split("-")
                 low: Union[UnitValue, Value] = self.get_or_create_unit(values[0].strip(), unit=unit)
                 high: Union[UnitValue, Value] = self.get_or_create_unit(values[1].strip(), unit=unit)
-                range_unit: Unit = high.unit if isinstance(high, UnitValue) else low.unit
+                range_unit: Unit = unit if unit else high.unit if isinstance(high, UnitValue) else low.unit
                 return RangeUnitValue(unit=range_unit, value_low=low.value, value_high=high.value)
             raise UnhandledDefinitionSyntaxError
 
