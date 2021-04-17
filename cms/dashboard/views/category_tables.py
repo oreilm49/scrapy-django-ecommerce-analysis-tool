@@ -29,19 +29,20 @@ class CategoryTables(CategoryTableMixin, ListView):
 
     def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
         return [
-            Breadcrumb(name="Pivot Tables", url=reverse('dashboard:category-tables'), active=True),
+            Breadcrumb(name="Category Tables", url=reverse('dashboard:category-tables'), active=True),
         ]
 
     def get_context_data(self, **kwargs):
         data: dict = super().get_context_data(**kwargs)
         data.update(
-            card_action_button=LinkButton(
+            action_item=LinkButton(
                 label='New',
                 url=reverse('dashboard:category-table-create'),
                 icon='fa fa-plus',
                 btn_class='btn btn-primary btn-sm',
             ),
-            filter_form=self.get_form()
+            filter_form=self.get_form(),
+            header=_('Category Tables')
         )
         return data
 
