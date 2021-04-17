@@ -281,10 +281,11 @@ class AttributeType(BaseModel):
         units: UnitManager = UnitManager()
         product_attribute: ProductAttribute
         for product_attribute in self.productattributes.all():
-            quantity: Quantity = units.ureg(product_attribute.display)
-            quantity = quantity.to(unit.name)
-            product_attribute.data['value'] = quantity.magnitude
-            product_attribute.save()
+            if product_attribute.data['value']:
+                quantity: Quantity = units.ureg(product_attribute.display)
+                quantity = quantity.to(unit.name)
+                product_attribute.data['value'] = quantity.magnitude
+                product_attribute.save()
         self.unit = unit
         self.save()
         return self
