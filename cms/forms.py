@@ -80,6 +80,7 @@ class AttributeTypeMergeForm(BaseMergeForm):
         attribute_type.alternate_names += duplicate.alternate_names
         attribute_type.save()
         duplicate.delete()
+        attribute_type.productattributes.serialize()
         return attribute_type
 
 
