@@ -325,7 +325,7 @@ class ProductAttributeQuerySet(BaseQuerySet):
         """Runs serialization on all data in the queryset"""
         product_attribute: ProductAttribute
         for product_attribute in self:
-            if product_attribute.attribute_type.unit:
+            if product_attribute.attribute_type.unit and product_attribute.data['value']:
                 product_attribute.data['value'] = product_attribute.attribute_type.unit.serializer.serializer(product_attribute.data['value'])
                 product_attribute.save()
         return self
