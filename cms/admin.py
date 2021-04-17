@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 
+from cms.forms import ProductAttributeForm
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
     ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult, EprelCategory
 from cms.views.admin import ProductMapView, AttributeTypeMapView, ProductAttributeBulkCreateView
@@ -60,6 +61,7 @@ class ProductAttributeInlineAdmin(admin.TabularInline):
     fields = 'attribute_type', 'data',
     show_change_link = True
     classes = ['collapse']
+    form = ProductAttributeForm
 
 
 class ProductImageInlineAdmin(admin.TabularInline):
