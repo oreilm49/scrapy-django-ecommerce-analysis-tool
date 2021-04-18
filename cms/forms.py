@@ -162,22 +162,17 @@ class AttributeTypeForm(forms.ModelForm):
         model = AttributeType
         fields = 'name', 'alternate_names', 'unit'
 
-    def clean_unit(self):
-        unit: Unit = self.cleaned_data['unit']
-        if unit and self.instance.unit:
-            try:
-                units: UnitManager = UnitManager()
-                quantity: Quantity = units.ureg(f"2{self.instance.unit}")
-                quantity.to(unit.name)
-            except Exception as e:
-                raise ValidationError(str(e))
-        return unit
+
+class AttributeTypeUnitConversionForm(forms.Form):
+
+    unit = forms.ModelChoiceField(queryset=Unit.objects.published(), label=_('Unit'))
+
+    def __init__(self, *args, attribute_type: AttributeType, instance=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.attribute_type = attribute_type
+        if self.attribute_type and self.attribute_type.unit:
+            self.fields['unit'].queryset = Unit.objects.exclude(pk=self.attribute_type.unit.pk)
 
     @transaction.atomic
-    def save(self, commit=True):
-        """If unit has changed, serialize and convert all product attribute values"""
-        if 'unit' in self.changed_data:
-            self.instance.convert_product_attributes(self.cleaned_data['unit'], from_unit=self.initial_unit)
-        return super().save(commit)
-
-
+    def save(self):
+        self.attribute_type.convert_unit(self.cleaned_data['unit'])
