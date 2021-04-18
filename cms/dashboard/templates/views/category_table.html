@@ -9,9 +9,19 @@
 {% endblock %}
 
 {% block content %}
-    {% with header=table.name action_item=card_action_button %}
-        {% include 'includes/header.html' %}
-    {% endwith %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div class="dropdown">
+          <button class="btn dropdown-toggle dropdown-button" type="button" id="SelectDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{ table.name }}
+          </button>
+          <div class="dropdown-menu" aria-labelledby="SelectDropdown">
+              {% for table_item in tables %}
+                  <a class="dropdown-item {% if table_item == table %}active{% endif %}" href="{% url 'dashboard:category-table' table_item.pk %}">{{ table_item.name }}</a>
+              {% endfor %}
+          </div>
+        </div>
+        {{ card_action_button.render }}
+    </div>
     <div class="overflow-container shadow">
         <table class="shadow bg-white category-table">
             <thead>
