@@ -13,7 +13,9 @@ CustomValueSerializer = namedtuple('CustomValueSerializer', ['serializer', 'dese
 def to_float(number: Union[str, int, float]):
     if isinstance(number, float):
         return number
-    return float(number)
+    if isinstance(number, int):
+        return float(number)
+    return float(UnitRegistry()(number))
 
 
 serializers = {
