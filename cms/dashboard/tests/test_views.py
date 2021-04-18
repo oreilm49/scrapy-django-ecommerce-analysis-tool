@@ -39,7 +39,7 @@ class TestViews(TestCase):
         with self.subTest("page content"):
             response: TemplateResponse = self.client.get(reverse('dashboard:category-table-create'))
             self.assertIsInstance(response.context_data['form'], CategoryTableForm)
-            self.assertContains(response, 'Create New Pivot Table')
+            self.assertContains(response, 'Create New Category Table')
 
         with self.subTest("post"):
             response: TemplateResponse = self.client.post(reverse('dashboard:category-table-create'), data={
