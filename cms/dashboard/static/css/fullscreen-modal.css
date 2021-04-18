@@ -10,5 +10,5 @@
 
 #fullscreen-modal .modal-content {
     overflow: auto;
-    max-height: 650px;
+    height: 95vh;
 }
