@@ -155,7 +155,8 @@ class AttributeTypeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.initial_unit = self.instance.unit
+        if self.instance.pk:
+            self.fields['unit'].disabled = True
 
     class Meta:
         model = AttributeType
