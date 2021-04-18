@@ -138,6 +138,7 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
         return super().get_context_data(
             **kwargs,
             table=self.table,
+            tables=self.get_queryset(),
             table_data=self.table.build_table(Product.objects.published()),
             x_axis_values=self.table.x_axis_values,
             card_action_button=DropdownItem(
