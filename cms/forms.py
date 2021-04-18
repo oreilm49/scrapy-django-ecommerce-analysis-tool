@@ -3,9 +3,11 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import modelformset_factory
 from django.utils.translation import gettext as _
+from pint import Quantity
 
 from cms import constants
-from cms.models import Product, Category, ProductQuerySet, BaseModel, AttributeType, ProductAttribute
+from cms.data_processing.units import UnitManager
+from cms.models import Product, Category, ProductQuerySet, BaseModel, AttributeType, ProductAttribute, Unit
 
 
 class BaseMergeForm(forms.Form):
@@ -147,3 +149,34 @@ class ProductAttributeForm(forms.ModelForm):
 
 def get_product_attribute_formset(extra: int):
     return modelformset_factory(ProductAttribute, form=ProductAttributeForm, extra=extra)
+
+
+class AttributeTypeForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_unit = self.instance.unit
+
+    class Meta:
+        model = AttributeType
+        fields = 'name', 'alternate_names', 'unit'
+
+    def clean_unit(self):
+        unit: Unit = self.cleaned_data['unit']
+        if unit and self.instance.unit:
+            try:
+                units: UnitManager = UnitManager()
+                quantity: Quantity = units.ureg(f"2{self.instance.unit}")
+                quantity.to(unit.name)
+                return unit
+            except Exception as e:
+                raise ValidationError(str(e))
+
+    @transaction.atomic
+    def save(self, commit=True):
+        """If unit has changed, serialize and convert all product attribute values"""
+        if 'unit' in self.changed_data:
+            self.instance.convert_product_attributes(self.cleaned_data['unit'], from_unit=self.initial_unit)
+        return super().save(commit)
+
+
