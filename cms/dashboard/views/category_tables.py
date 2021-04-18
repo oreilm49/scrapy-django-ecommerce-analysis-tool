@@ -141,7 +141,7 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
             tables=self.get_queryset(),
             table_data=self.table.build_table(Product.objects.published()),
             x_axis_values=self.table.x_axis_values,
-            card_action_button=DropdownItem(
+            action_button=DropdownItem(
                 dropdown_icon='fas fa-cog fa-sm fa-fw text-gray-400',
                 dropdown_id='tableEditDropdown',
                 dropdown_class='btn-primary btn-sm',
