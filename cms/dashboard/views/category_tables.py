@@ -12,7 +12,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from cms.dashboard.forms import CategoryTableFilterForm, CategoryTableForm, get_category_table_attribute_formset
 from cms.dashboard.models import CategoryTableQuerySet, CategoryTable, CategoryTableAttribute
 from cms.models import Product
-from cms.dashboard.toolbar import LinkButton, DropdownItem
+from cms.dashboard.toolbar import LinkButton, DropdownItem, DataItem, DropdownMenu
 from cms.dashboard.views.base import Breadcrumb, BaseDashboardMixin
 
 
@@ -141,23 +141,30 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
             tables=self.get_queryset(),
             table_data=self.table.build_table(Product.objects.published()),
             x_axis_values=self.table.x_axis_values,
-            action_button=DropdownItem(
+            action_button=DropdownMenu(
                 dropdown_icon='fas fa-cog fa-sm fa-fw text-gray-400',
                 dropdown_id='tableEditDropdown',
                 dropdown_class='btn-primary btn-sm',
                 dropdown_label='Configure',
                 items=[
-                    LinkButton(
+                    DropdownItem(
+                        url="#",
+                        icon='fas fa-search fa-sm fa-fw text-gray-400',
+                        label=_('Fullscreen'),
+                        btn_class='view-fullscreen',
+                        data=[DataItem(key='fullscreen-target', value='category-table')],
+                    ),
+                    DropdownItem(
                         url=reverse('dashboard:category-table-update', kwargs={'pk': self.table.pk}),
                         icon='fas fa-pen fa-sm fa-fw text-gray-400',
                         label=_('Table'),
                     ),
-                    LinkButton(
+                    DropdownItem(
                         url=reverse('dashboard:category-table-specs', kwargs={'pk': self.table.pk}),
                         icon='fas fa-pen fa-sm fa-fw text-gray-400',
                         label=_('Specs'),
                     ),
-                    LinkButton(
+                    DropdownItem(
                         url=reverse('dashboard:category-table-create'),
                         icon='fas fa-plus fa-sm fa-fw text-gray-400',
                         label=_('Create'),
