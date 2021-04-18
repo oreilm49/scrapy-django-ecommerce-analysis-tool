@@ -60,8 +60,11 @@ class TestForms(TestCase):
 
     def test_attribute_type_form__unit_conversion(self):
         kilogram: Unit = mommy.make(Unit, name="kilogram")
-        attribute_type: AttributeType = mommy.make(AttributeType, name="weight", unit=kilogram)
-        form: AttributeTypeForm = AttributeTypeForm(data={'name': 'weight', 'unit': kilogram, 'alternate_names': []}, instance=attribute_type)
+        with self.subTest("create attribute type"):
+            form: AttributeTypeForm = AttributeTypeForm(data={'name': 'weight', 'unit': kilogram, 'alternate_names': []})
+            self.assertTrue(form.is_valid(), msg=form.errors)
+            form.save()
+            attribute_type: AttributeType = AttributeType.objects.get(name='weight', unit=kilogram)
 
         with self.subTest("same unit type"):
             self.assertTrue(form.is_valid(), msg=form.errors)
