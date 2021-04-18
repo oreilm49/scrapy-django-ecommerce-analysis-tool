@@ -131,7 +131,7 @@ class ProductAttributeForm(forms.ModelForm):
     def clean_data(self):
         value = self.cleaned_data['data']
         attribute_type: AttributeType = self.cleaned_data['attribute_type']
-        if attribute_type.unit:
+        if attribute_type and attribute_type.unit:
             try:
                 value = attribute_type.unit.serializer.serializer(value)
             except Exception as e:
