@@ -168,9 +168,9 @@ class AttributeTypeForm(forms.ModelForm):
                 units: UnitManager = UnitManager()
                 quantity: Quantity = units.ureg(f"2{self.instance.unit}")
                 quantity.to(unit.name)
-                return unit
             except Exception as e:
                 raise ValidationError(str(e))
+        return unit
 
     @transaction.atomic
     def save(self, commit=True):
