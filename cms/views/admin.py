@@ -80,7 +80,7 @@ class ProductAttributeBulkCreateView(SuccessMessageMixin, FormView):
         return self.form_valid(formset)
 
 
-class AttributeTypeConversionView(SuccessMessageMixin, UpdateView):
+class AttributeTypeConversionView(SuccessMessageMixin, FormView):
     template_name = 'site/simple_form.html'
     form_class = AttributeTypeUnitConversionForm
     success_message = _('Successfully updated unit for attribute type')
