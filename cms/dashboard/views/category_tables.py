@@ -71,7 +71,7 @@ class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
 
     def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
         return [
-            Breadcrumb(name="Pivot Tables", url=reverse('dashboard:category-tables'), active=False),
+            Breadcrumb(name="Category Tables", url=reverse('dashboard:category-tables'), active=False),
             Breadcrumb(name="Create", url=reverse('dashboard:category-table-create'), active=True),
         ]
 
@@ -81,7 +81,7 @@ class CategoryTableCreate(CategoryTableMixin, SuccessMessageMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        data.update(header="Create New Pivot Table")
+        data.update(header="Create New Category Table")
         return data
 
 
@@ -118,7 +118,7 @@ class CategoryTableUpdate(CategoryTableMixin, SuccessMessageMixin, UpdateView):
 
     def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
         return [
-            Breadcrumb(name="Pivot Tables", url=reverse('dashboard:category-tables'), active=False),
+            Breadcrumb(name="Category Tables", url=reverse('dashboard:category-tables'), active=False),
             Breadcrumb(name="Update", url=reverse('dashboard:category-table-update', kwargs={'pk': self.table.pk}), active=True),
         ]
 
@@ -168,7 +168,7 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
 
     def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
         return [
-            Breadcrumb(name="Pivot Tables", url=reverse('dashboard:category-tables'), active=False),
+            Breadcrumb(name="Category Tables", url=reverse('dashboard:category-tables'), active=False),
             Breadcrumb(name=self.table.name, url=reverse('dashboard:category-table', kwargs={'pk': self.table.pk}), active=True),
         ]
 
