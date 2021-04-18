@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 
-from cms.forms import ProductAttributeForm
+from cms.forms import ProductAttributeForm, AttributeTypeForm
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
     ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult, EprelCategory
 from cms.views.admin import ProductMapView, AttributeTypeMapView, ProductAttributeBulkCreateView
@@ -92,6 +92,7 @@ class AttributeTypeAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'alternate_names', 'unit',
     list_filter = 'name', 'alternate_names', 'unit',
     inlines = ProductAttributeInlineAdmin,
+    form = AttributeTypeForm
 
 
 @admin.register(SpiderResult)
