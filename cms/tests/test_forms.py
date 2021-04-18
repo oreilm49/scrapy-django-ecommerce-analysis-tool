@@ -4,7 +4,7 @@ from model_mommy import mommy
 from cms.constants import MAIN, THUMBNAIL
 from cms.models import Category, Product, ProductAttribute, Website, WebsiteProductAttribute, AttributeType, \
     ProductImage, Unit
-from cms.forms import ProductMergeForm, AttributeTypeMergeForm, AttributeTypeForm
+from cms.forms import ProductMergeForm, AttributeTypeMergeForm, AttributeTypeForm, AttributeTypeUnitConversionForm
 
 
 class TestForms(TestCase):
@@ -58,39 +58,40 @@ class TestForms(TestCase):
         self.assertIsNotNone(AttributeType.objects.get(pk=self.attribute.pk).unit)
         self.assertEqual(WebsiteProductAttribute.objects.get(pk=web_attr__mapped.pk).attribute_type, self.attribute)
 
-    def test_attribute_type_form__unit_conversion(self):
-        kilogram: Unit = mommy.make(Unit, name="kilogram")
+    def test_attribute_type_form(self):
+        form: AttributeTypeForm = AttributeTypeForm({'name': 'test', 'unit': self.gram, 'alternate_names': []})
+        self.assertFalse(form.fields['unit'].disabled)
+
+        form: AttributeTypeForm = AttributeTypeForm({'name': 'test', 'unit': self.gram, 'alternate_names': []}, instance=self.attribute)
+        self.assertTrue(form.fields['unit'].disabled)
+
         with self.subTest("create attribute type"):
-            form: AttributeTypeForm = AttributeTypeForm(data={'name': 'weight', 'unit': kilogram, 'alternate_names': []})
+            form: AttributeTypeForm = AttributeTypeForm(data={'name': 'weight', 'unit': self.gram, 'alternate_names': []})
             self.assertTrue(form.is_valid(), msg=form.errors)
             form.save()
-            attribute_type: AttributeType = AttributeType.objects.get(name='weight', unit=kilogram)
+            AttributeType.objects.get(name='weight', unit=self.gram)
+
+    def test_attribute_type_unit_conversion_form(self):
+        kilogram: Unit = mommy.make(Unit, name="kilogram")
+        attribute_type: AttributeType = mommy.make(AttributeType, name='weight', unit=kilogram)
 
         with self.subTest("same unit type"):
-            self.assertTrue(form.is_valid(), msg=form.errors)
-            form.save()
-            self.assertEqual(AttributeType.objects.get(pk=attribute_type.pk).unit, kilogram)
+            form: AttributeTypeUnitConversionForm = AttributeTypeUnitConversionForm({'unit': kilogram}, attribute_type=attribute_type)
+            self.assertFalse(form.is_valid())
+            self.assertIn("Select a valid choice. That choice is not one of the available choices.", form.errors['unit'])
 
         mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 7})
         with self.subTest("convert to grams"):
-            form: AttributeTypeForm = AttributeTypeForm({'name': 'weight', 'unit': self.gram, 'alternate_names': []}, instance=attribute_type)
+            form: AttributeTypeUnitConversionForm = AttributeTypeUnitConversionForm({'unit': self.gram}, attribute_type=attribute_type)
             self.assertTrue(form.is_valid(), msg=form.errors)
             form.save()
             self.assertEqual(AttributeType.objects.get(pk=attribute_type.pk).unit, self.gram)
             self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=7000))
 
-        with self.subTest("unit is None"):
-            attribute_type_1: AttributeType = mommy.make(AttributeType, name="test1", unit=None)
-            attribute_type_2: AttributeType = mommy.make(AttributeType, name="test2", unit=None)
-            form: AttributeTypeForm = AttributeTypeForm({'name': 'test1', 'unit': attribute_type_2.unit}, instance=attribute_type_1)
-            self.assertTrue(form.is_valid(), msg=form.errors)
-            form.save()
-            self.assertIsNone(AttributeType.objects.get(pk=attribute_type_1.pk).unit)
-
         with self.subTest("mismatch units"):
             litre: Unit = mommy.make(Unit, name="litre")
             mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 7})
-            form: AttributeTypeForm = AttributeTypeForm({'name': 'weight', 'unit': litre}, instance=attribute_type)
+            form: AttributeTypeUnitConversionForm = AttributeTypeUnitConversionForm({'unit': litre}, attribute_type=attribute_type)
             self.assertFalse(form.is_valid())
             self.assertIn("Cannot convert from 'gram' ([mass]) to 'liter' ([length] ** 3)", form.errors['unit'])
             self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, attribute_type__unit=self.gram, data__value=7))
@@ -98,7 +99,7 @@ class TestForms(TestCase):
         with self.subTest("text conversion attempt"):
             mg: Unit = mommy.make(Unit, name="mg")
             mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'test'})
-            form: AttributeTypeForm = AttributeTypeForm({'name': 'weight', 'unit': mg}, instance=attribute_type)
+            form: AttributeTypeUnitConversionForm = AttributeTypeUnitConversionForm({'unit': mg}, attribute_type=attribute_type)
             self.assertTrue(form.is_valid(), msg=form.errors)
             with self.assertRaises(Exception) as context:
                 form.save()
