@@ -157,6 +157,11 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
                         icon='fas fa-pen fa-sm fa-fw text-gray-400',
                         label=_('Specs'),
                     ),
+                    LinkButton(
+                        url=reverse('dashboard:category-table-create'),
+                        icon='fas fa-plus fa-sm fa-fw text-gray-400',
+                        label=_('Create'),
+                    ),
                 ]
             )
         )
