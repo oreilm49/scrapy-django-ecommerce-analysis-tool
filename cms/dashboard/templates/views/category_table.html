@@ -6,6 +6,7 @@
 {% block extrahead %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/pivot-table.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fullscreen-modal.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -57,5 +58,11 @@
                 {% endfor %}
             </tbody>
         </table>
+    {% include 'includes/fullscreen_modal.html' %}
     </div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'js/fullscreen-modal.js' %}"></script>
 {% endblock %}
