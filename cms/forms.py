@@ -167,7 +167,7 @@ class AttributeTypeUnitConversionForm(forms.Form):
 
     unit = forms.ModelChoiceField(queryset=Unit.objects.published(), label=_('Unit'))
 
-    def __init__(self, *args, attribute_type: AttributeType, instance=None, **kwargs):
+    def __init__(self, *args, attribute_type: AttributeType, **kwargs):
         super().__init__(*args, **kwargs)
         self.attribute_type = attribute_type
         if self.attribute_type and self.attribute_type.unit:
