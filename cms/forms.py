@@ -173,6 +173,17 @@ class AttributeTypeUnitConversionForm(forms.Form):
         if self.attribute_type and self.attribute_type.unit:
             self.fields['unit'].queryset = Unit.objects.exclude(pk=self.attribute_type.unit.pk)
 
+    def clean_unit(self):
+        unit: Unit = self.cleaned_data['unit']
+        if unit and self.attribute_type.unit:
+            try:
+                units: UnitManager = UnitManager()
+                quantity: Quantity = units.ureg(f"2{self.attribute_type.unit}")
+                quantity.to(unit.name)
+            except Exception as e:
+                raise ValidationError(str(e))
+        return unit
+
     @transaction.atomic
     def save(self):
         self.attribute_type.convert_unit(self.cleaned_data['unit'])
