@@ -4,13 +4,14 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
 from django.db.models import QuerySet
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from django.views.generic import FormView
+from django.views.generic import FormView, UpdateView
 
-from cms.forms import ProductMergeForm, AttributeTypeMergeForm, get_product_attribute_formset
-from cms.models import CategoryAttributeConfig, Product, ProductAttribute
+from cms.forms import ProductMergeForm, AttributeTypeMergeForm, get_product_attribute_formset, \
+    AttributeTypeUnitConversionForm
+from cms.models import CategoryAttributeConfig, Product, ProductAttribute, AttributeType
 
 
 class MapViewMixin(SuccessMessageMixin, FormView):
@@ -77,3 +78,31 @@ class ProductAttributeBulkCreateView(SuccessMessageMixin, FormView):
             return render(request, self.template_name, {'formset': formset})
         formset.save()
         return self.form_valid(formset)
+
+
+class AttributeTypeConversionView(SuccessMessageMixin, UpdateView):
+    template_name = 'site/simple_form.html'
+    form_class = AttributeTypeUnitConversionForm
+    success_message = _('Successfully updated unit for attribute type')
+    queryset = AttributeType.objects.published()
+
+    @property
+    def attribute_type(self) -> AttributeType:
+        return get_object_or_404(self.queryset, pk=self.request.resolver_match.kwargs.get('pk'))
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['attribute_type'] = self.attribute_type
+        return kwargs
+
+    def get_success_url(self):
+        return reverse('admin:cms_attributetype_change', kwargs={'object_id': self.attribute_type.pk})
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if not form.is_valid():
+            messages.error(request, _('There was an error converting attribute type unit'))
+            return render(request, self.template_name, {'form': form})
+        form.save()
+        return self.form_valid(form)
