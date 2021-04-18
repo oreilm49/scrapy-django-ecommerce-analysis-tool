@@ -5,6 +5,7 @@ from django import forms
 from django.test import TestCase
 from model_mommy import mommy
 from pandas import DataFrame
+from pint import UndefinedUnitError
 
 from cms.constants import MAIN, THUMBNAIL, WEEKLY, MONTHLY, YEARLY, ENERGY_LABEL_IMAGE
 from cms.form_widgets import FloatInput
@@ -232,9 +233,9 @@ class TestModels(TestCase):
         self.assertEqual(attrs.get(pk=attr_1.pk).data['value'], 100.0)
         self.assertEqual(attrs.get(pk=attr_2.pk).data['value'], 200.20)
         mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'test'})
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(UndefinedUnitError) as context:
             ProductAttribute.objects.serialize()
-        self.assertEqual(str(context.exception), "could not convert string to float: 'test'")
+        self.assertEqual(str(context.exception), "'test' is not defined in the unit registry")
 
     def test_attribute_type_convert_unit(self):
         kilogram: Unit = mommy.make(Unit, name="kilogram")
