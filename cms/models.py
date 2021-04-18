@@ -277,18 +277,24 @@ class AttributeType(BaseModel):
         """
         if unit == self.unit:
             return self
+        self.convert_product_attributes(unit)
+        self.unit = unit
+        self.save()
+        return self
+
+    def convert_product_attributes(self, unit: Unit, from_unit: Optional[Unit] = None) -> None:
         from cms.data_processing.units import UnitManager
         units: UnitManager = UnitManager()
         product_attribute: ProductAttribute
         for product_attribute in self.productattributes.all():
             if product_attribute.data['value']:
-                quantity: Quantity = units.ureg(product_attribute.display)
+                if from_unit:
+                    quantity: Quantity = units.ureg(f"{product_attribute.formatted_value} {from_unit}")
+                else:
+                    quantity: Quantity = units.ureg(product_attribute.display)
                 quantity = quantity.to(unit.name)
                 product_attribute.data['value'] = quantity.magnitude
                 product_attribute.save()
-        self.unit = unit
-        self.save()
-        return self
 
 
 class BaseProductAttribute(BaseModel):
