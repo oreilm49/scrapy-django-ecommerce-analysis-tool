@@ -157,6 +157,7 @@ class ProductQuerySet(BaseQuerySet):
 class Product(BaseModel):
     model = models.CharField(verbose_name=_("Model"), max_length=MAX_LENGTH, unique=True)
     category = models.ForeignKey(to=Category, verbose_name=_("Category"), on_delete=SET_NULL, blank=True, null=True)
+    brand = models.ForeignKey(to="cms.Brand", verbose_name=_("Brand"), on_delete=SET_NULL, blank=True, null=True)
     alternate_models = ArrayField(verbose_name=_("Alternate models"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True, default=list)
     eprel_scraped = models.BooleanField(verbose_name=_("EPREL Scraped"), default=False, help_text=_("Has the EPREL database been scraped for this product?"))
     eprel_code = models.CharField(verbose_name=_("EPREL Code"), max_length=MAX_LENGTH, unique=True, blank=True, null=True)
@@ -203,11 +204,6 @@ class Product(BaseModel):
         """avg price of product from most recent price"""
         price = self.current_average_price_int
         return humanize.intcomma(price) if price else None
-
-    @cached_property
-    def brand(self) -> Optional[str]:
-        attribute: ProductAttribute = self.productattributes.filter(attribute_type__name="brand").first()
-        return attribute.data['value'] if attribute else None
 
     @cached_property
     def top_attributes(self) -> Iterator[ProductQuerySet]:
