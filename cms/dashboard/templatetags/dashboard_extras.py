@@ -17,7 +17,7 @@ def product_specs(context: dict, product: Product):
     html = ""
     table: Optional[CategoryTable] = context.get('table')
     table_product_attributes = product.top_attributes
-    if table and table.category_table_attributes:
+    if table and table.category_table_attributes.exists():
         table_product_attributes = []
         specs_limit = table.category_table_attributes.count()
         for category_table_attribute in table.category_table_attributes.order_by('order'):
