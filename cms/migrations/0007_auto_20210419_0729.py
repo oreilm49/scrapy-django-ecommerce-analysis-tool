@@ -6,6 +6,11 @@ import django_extensions.db.fields
 import uuid
 
 
+def migrate_brands(apps, schema_editor):
+    from cms.utils import migrate_brands_delete_attrs
+    migrate_brands_delete_attrs(apps.get_model('cms', 'ProductAttribute'))
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -40,4 +45,5 @@ class Migration(migrations.Migration):
             name='brand',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='cms.brand', verbose_name='Brand'),
         ),
+        migrations.RunPython(migrate_brands),
     ]
