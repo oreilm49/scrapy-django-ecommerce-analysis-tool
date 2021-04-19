@@ -132,6 +132,13 @@ class CategoryGapAnalysisReportDetail(CategoryGapAnalysisReportMixin, DetailView
     def get_context_data(self, **kwargs):
         return super().get_context_data(
             report=self.report,
+            reports=self.get_queryset(),
+            action_button=LinkButton(
+                url=reverse('dashboard:category-gap-report-update', kwargs={'pk': self.report.pk}),
+                icon='fas fa-pen fa-sm fa-fw text-gray-400',
+                label=_('Edit'),
+                btn_class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+            ),
             **kwargs
         )
 

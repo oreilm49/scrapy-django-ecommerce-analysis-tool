@@ -10,8 +10,17 @@
 
 {% block content %}
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">{{ report.name }}</h1>
-        <a href="{% url 'dashboard:category-gap-report-update' pk=report.pk %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-pen fa-sm fa-fw text-gray-400"></i> Edit</a>
+        <div class="dropdown">
+          <button class="btn dropdown-toggle dropdown-button text-gray-800" type="button" id="SelectDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{ report.name }}
+          </button>
+          <div class="dropdown-menu" aria-labelledby="SelectDropdown">
+              {% for report_item in reports %}
+                  <a class="dropdown-item {% if report_item == report %}active{% endif %}" href="{% url 'dashboard:category-table' report_item.pk %}">{{ report_item.name }}</a>
+              {% endfor %}
+          </div>
+        </div>
+        {{ action_button.render }}
     </div>
     {% for cluster in report.gap_analysis_clusters %}
         <div class="card shadow mb-4 p-4">
