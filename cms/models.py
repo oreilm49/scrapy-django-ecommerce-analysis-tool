@@ -444,7 +444,7 @@ class EprelCategory(BaseModel):
 
 class Brand(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH)
-    image = models.ImageField(verbose_name=_("image"), upload_to='brand_images/')
+    image = models.ImageField(verbose_name=_("image"), upload_to='brand_images/', blank=True, null=True)
     website = models.ForeignKey(to="cms.Website", on_delete=SET_NULL, related_name="brands", blank=True, null=True)
 
     def __str__(self):
