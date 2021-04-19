@@ -11,7 +11,7 @@ from cms.constants import MAIN, THUMBNAIL, WEEKLY, MONTHLY, YEARLY, ENERGY_LABEL
 from cms.form_widgets import FloatInput
 from cms.serializers import serializers
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute, json_data_default, Unit, AttributeType, \
-    Website, Category, ProductImage, WebsiteProductAttributeQuerySet, EprelCategory
+    Website, Category, ProductImage, WebsiteProductAttributeQuerySet, EprelCategory, Brand
 from cms.utils import get_dotted_path
 
 
@@ -270,3 +270,21 @@ class TestModels(TestCase):
                 attribute_type.convert_unit(mg)
             self.assertEqual(str(context.exception), "'test' is not defined in the unit registry")
             self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, attribute_type__unit=gram, data__value='test'))
+
+    def test_product_update_brand(self):
+        product: Product = Product.objects.create(model="test")
+        with self.subTest("new brand"):
+            self.assertFalse(Brand.objects.filter(name="new brand").exists())
+            product: Product = product.update_brand("new brand")
+            brand: Brand = Brand.objects.get(name="new brand")
+            self.assertEqual(product.brand, brand)
+
+        with self.subTest("product already has brand"):
+            with self.assertRaises(Exception) as context:
+                product.update_brand("new brand")
+            self.assertEqual(str(context.exception), f"Product brand already exists: {brand}")
+
+        with self.subTest("add existing brand to product"):
+            product2: Product = Product.objects.create(model="test2")
+            product2: Product = product2.update_brand("new brand")
+            self.assertEqual(product2.brand, brand)
