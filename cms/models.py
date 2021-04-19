@@ -291,9 +291,9 @@ class AttributeType(BaseModel):
                 if from_unit:
                     quantity: Quantity = units.ureg(f"{product_attribute.formatted_value} {from_unit}")
                 else:
-                    quantity: Quantity = units.ureg(product_attribute.display)
-                quantity = quantity.to(unit.name)
-                product_attribute.data['value'] = quantity.magnitude
+                    quantity: Union[Quantity, int] = units.ureg(product_attribute.display)
+                value = quantity.to(unit.name).magnitude if isinstance(quantity, Quantity) else quantity
+                product_attribute.data['value'] = value
                 product_attribute.save()
 
 
