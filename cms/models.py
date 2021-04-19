@@ -93,6 +93,7 @@ class Website(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The website name"), unique=True)
     domain = models.CharField(verbose_name=_("Domain"), max_length=MAX_LENGTH, help_text=_("The website domain name"), unique=True)
     currency = models.ForeignKey(to=Unit, verbose_name=_("Currency"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The currency this website trades in."), related_name="websites")
+    website_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=WEBSITE_TYPES, default=WEBSITE_TYPE_RETAILER)
 
     def __str__(self):
         return self.name
