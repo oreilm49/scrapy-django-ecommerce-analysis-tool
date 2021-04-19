@@ -270,3 +270,11 @@ class TestModels(TestCase):
                 attribute_type.convert_unit(mg)
             self.assertEqual(str(context.exception), "'test' is not defined in the unit registry")
             self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, attribute_type__unit=gram, data__value='test'))
+
+        with self.subTest("adding new unit"):
+            kg: Unit = mommy.make(Unit, name="kg")
+            attribute_type: AttributeType = mommy.make(AttributeType, unit=None)
+            mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': '700'})
+            attribute_type.convert_unit(kg)
+            self.assertEqual(AttributeType.objects.get(pk=attribute_type.pk).unit, kg)
+            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=700))
