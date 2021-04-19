@@ -349,7 +349,7 @@ class ProductAttribute(BaseProductAttribute):
         return f"{self.formatted_value} {self.attribute_type.unit}" if self.attribute_type.unit else f"{self.data['value']}"
 
     @property
-    def formatted_value(self):
+    def formatted_value(self) -> str:
         try:
             return humanize.intcomma(int(self.data['value']))
         except Exception:
