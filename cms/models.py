@@ -239,6 +239,17 @@ class Product(BaseModel):
                 self.save()
                 return url
 
+    def update_brand(self, brand_name: str) -> 'Product':
+        if self.brand:
+            raise Exception(f"Product brand already exists: {self.brand}")
+        brand: QuerySet = Brand.objects.filter(name=brand_name)
+        if brand.exists():
+            self.brand = brand.first()
+        else:
+            self.brand = Brand.objects.create(name=brand_name)
+        self.save()
+        return self
+
 
 class AttributeTypeQuerySet(BaseQuerySet):
 
