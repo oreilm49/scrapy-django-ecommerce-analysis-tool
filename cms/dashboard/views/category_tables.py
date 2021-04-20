@@ -214,3 +214,10 @@ class CategoryTableAttributeUpdate(CategoryTableMixin, SuccessMessageMixin, Upda
             form.save()
         formset.save_m2m()
         return self.form_valid(formset)
+
+    def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
+        return [
+            Breadcrumb(name="Category Tables", url=reverse('dashboard:category-tables'), active=False),
+            Breadcrumb(name=self.table.name, url=reverse('dashboard:category-table', kwargs={'pk': self.table.pk}), active=False),
+            Breadcrumb(name="Update specs", url=reverse('dashboard:category-table-specs', kwargs={'pk': self.table.pk}), active=True),
+        ]
