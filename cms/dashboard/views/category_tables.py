@@ -139,7 +139,7 @@ class CategoryTableDetail(BaseDashboardMixin, DetailView):
             **kwargs,
             table=self.table,
             tables=self.get_queryset(),
-            table_data=self.table.build_table(Product.objects.published()),
+            table_data=self.table.build_table,
             x_axis_values=self.table.x_axis_values,
             action_button=DropdownMenu(
                 dropdown_icon='fas fa-cog fa-sm fa-fw text-gray-400',
@@ -214,3 +214,10 @@ class CategoryTableAttributeUpdate(CategoryTableMixin, SuccessMessageMixin, Upda
             form.save()
         formset.save_m2m()
         return self.form_valid(formset)
+
+    def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
+        return [
+            Breadcrumb(name="Category Tables", url=reverse('dashboard:category-tables'), active=False),
+            Breadcrumb(name=self.table.name, url=reverse('dashboard:category-table', kwargs={'pk': self.table.pk}), active=False),
+            Breadcrumb(name="Update specs", url=reverse('dashboard:category-table-specs', kwargs={'pk': self.table.pk}), active=True),
+        ]

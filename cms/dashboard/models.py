@@ -4,6 +4,7 @@ from typing import List, Iterator, Any, Optional, Dict
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
+from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
 from cms.dashboard.constants import CategoryTableProduct, CategoryTableEmpty
@@ -55,7 +56,9 @@ class CategoryTable(BaseModel):
     def __str__(self):
         return self.name
 
-    def get_products(self, queryset: 'ProductQuerySet') -> 'ProductQuerySet':
+    @property
+    def get_products(self) -> 'ProductQuerySet':
+        queryset = Product.objects.published().filter(category=self.category, websiteproductattributes__data__value__isnull=False)
         if self.query:
             queryset = queryset.filter(model__contains=self.query)
         if self.websites.exists():
@@ -80,9 +83,10 @@ class CategoryTable(BaseModel):
             product_pks.append(products_from_attributes.values_list('product', flat=True))
         if product_pks:
             queryset = queryset.filter(pk__in=product_pks)
-        return queryset.filter(category=self.category, websiteproductattributes__data__value__isnull=False).distinct()
+        return queryset.distinct()
 
-    def build_table(self, queryset: ProductQuerySet):
+    @cached_property
+    def build_table(self):
         """
         Builds a dict of product lists, grouped by y_axis_grouper and ordered by price.
         """
@@ -90,7 +94,7 @@ class CategoryTable(BaseModel):
             x_axis_grouper=products_grouper(product, self.x_axis_attribute, self.x_axis_values),
             y_axis_grouper=products_grouper(product, self.y_axis_attribute, self.y_axis_values),
             product=product
-        ) for product in self.get_products(queryset)]
+        ) for product in self.get_products]
         products = sorted([product for product in products], key=lambda product: product.product.current_average_price_int)
         if not self.y_axis_attribute:
             return {None: products}

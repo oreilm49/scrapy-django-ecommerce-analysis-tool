@@ -11,7 +11,7 @@ from django.views.generic import CreateView, ListView, UpdateView, DetailView
 
 from cms.dashboard.forms import CategoryGapAnalysisForm, CategoryGapAnalysisFilterForm
 from cms.dashboard.models import CategoryGapAnalysisQuerySet, CategoryGapAnalysisReport
-from cms.dashboard.toolbar import LinkButton
+from cms.dashboard.toolbar import LinkButton, DropdownMenu, DropdownItem
 from cms.dashboard.views.base import BaseDashboardMixin, Breadcrumb
 
 
@@ -118,6 +118,7 @@ class CategoryGapAnalysisReportUpdate(CategoryGapAnalysisReportMixin, SuccessMes
     def get_breadcrumbs(self) -> Optional[List[Breadcrumb]]:
         return [
             Breadcrumb(name="Category Gap Analysis", url=reverse('dashboard:category-gap-reports'), active=False),
+            Breadcrumb(name=self.report.name, url=reverse('dashboard:category-gap-report', kwargs={'pk': self.report.pk}), active=False),
             Breadcrumb(name="Update", url=reverse('dashboard:category-gap-report-update', kwargs={'pk': self.report.pk}), active=True),
         ]
 
@@ -132,6 +133,25 @@ class CategoryGapAnalysisReportDetail(CategoryGapAnalysisReportMixin, DetailView
     def get_context_data(self, **kwargs):
         return super().get_context_data(
             report=self.report,
+            reports=self.get_queryset(),
+            action_button=DropdownMenu(
+                dropdown_icon='fas fa-cog fa-sm fa-fw text-gray-400',
+                dropdown_id='tableEditDropdown',
+                dropdown_class='btn-primary btn-sm',
+                dropdown_label='Configure',
+                items=[
+                    DropdownItem(
+                        url=reverse('dashboard:category-gap-report-update', kwargs={'pk': self.report.pk}),
+                        icon='fas fa-pen fa-sm fa-fw text-gray-400',
+                        label=_('Edit'),
+                    ),
+                    DropdownItem(
+                        url=reverse('dashboard:category-gap-report-create'),
+                        icon='fas fa-plus fa-sm fa-fw text-gray-400',
+                        label=_('Create'),
+                    ),
+                ]
+            ),
             **kwargs
         )
 

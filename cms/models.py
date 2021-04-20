@@ -109,7 +109,7 @@ class Website(BaseModel):
 
 
 class Url(BaseModel):
-    url = models.CharField(verbose_name=_("Url"), max_length=MAX_LENGTH, help_text=_("The page url"), unique=True)
+    url = models.CharField(verbose_name=_("Url"), max_length=255, help_text=_("The page url"), unique=True)
     url_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=URL_TYPES)
     website = models.ForeignKey(to="cms.Website", on_delete=CASCADE, related_name="urls")
     last_scanned = models.DateTimeField(verbose_name=_("Last scanned"), null=True, blank=True)
@@ -299,9 +299,9 @@ class AttributeType(BaseModel):
                 if from_unit:
                     quantity: Quantity = units.ureg(f"{product_attribute.formatted_value} {from_unit}")
                 else:
-                    quantity: Quantity = units.ureg(product_attribute.display)
-                quantity = quantity.to(unit.name)
-                product_attribute.data['value'] = quantity.magnitude
+                    quantity: Union[Quantity, int] = units.ureg(product_attribute.display)
+                value = quantity.to(unit.name).magnitude if isinstance(quantity, Quantity) else quantity
+                product_attribute.data['value'] = value
                 product_attribute.save()
 
 
@@ -353,11 +353,13 @@ class ProductAttribute(BaseProductAttribute):
     objects = ProductAttributeQuerySet.as_manager()
 
     @property
-    def display(self):
-        return f"{self.formatted_value} {self.attribute_type.unit}" if self.attribute_type.unit else self.data['value']
+    def display(self) -> str:
+        if self.attribute_type.unit and not self.attribute_type.unit.is_bool:
+            return f"{self.formatted_value} {self.attribute_type.unit}"
+        return f"{self.data['value']}"
 
     @property
-    def formatted_value(self):
+    def formatted_value(self) -> str:
         try:
             return humanize.intcomma(int(self.data['value']))
         except Exception:

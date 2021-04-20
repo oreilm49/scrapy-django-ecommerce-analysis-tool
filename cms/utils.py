@@ -32,6 +32,8 @@ def products_grouper(product: 'Product', attribute: Optional['AttributeType'], a
     """
     if not attribute:
         return None
+    if attribute.name == 'price':
+        return extract_grouper(product.current_average_price_int, attribute_values)
     product_attribute: QuerySet = attribute.productattributes.filter(product=product)
     if product_attribute.exists():
         return extract_grouper(product_attribute.first().data['value'], attribute_values)
