@@ -3,8 +3,7 @@ from model_mommy import mommy
 
 from cms.dashboard.forms import CategoryTableForm, CategoryTableFilterForm, ProductsFilterForm
 from cms.dashboard.models import CategoryTable
-from cms.dashboard.utils import get_brands
-from cms.models import Product, AttributeType, Category, ProductAttribute, WebsiteProductAttribute
+from cms.models import Product, AttributeType, Category, ProductAttribute, WebsiteProductAttribute, Brand
 
 
 class TestForms(TestCase):
@@ -129,10 +128,10 @@ class TestForms(TestCase):
             self.assertIn(cat_2, tables)
 
     def test_products_filter_form(self):
+        whirlpool: Brand = Brand.objects.create(name="whirlpool")
         with self.subTest("brands"):
-            brand_attr: ProductAttribute = mommy.make(ProductAttribute, attribute_type__name="brand", data={'value': 'whirlpool'})
             form: ProductsFilterForm = ProductsFilterForm()
-            self.assertEqual(form.fields['brands'].choices, list((brand, brand) for brand in get_brands()))
+            self.assertEqual([brand.pk for brand in form.fields['brands'].queryset], [brand.pk for brand in Brand.objects.all()])
 
         with self.subTest("q"):
             with self.subTest("model"):
@@ -180,8 +179,9 @@ class TestForms(TestCase):
             self.assertIn(prod_2, tables)
 
         with self.subTest("brands"):
-            form: ProductsFilterForm = ProductsFilterForm({'brands': ["whirlpool"]})
+            form: ProductsFilterForm = ProductsFilterForm({'brands': [whirlpool]})
             form.is_valid()
+            product: Product = Product.objects.create(model="test3", brand=whirlpool)
             tables = form.search(Product.objects.all())
-            self.assertIn(brand_attr.product, tables)
+            self.assertIn(product, tables)
             self.assertNotIn(prod_1, tables)
