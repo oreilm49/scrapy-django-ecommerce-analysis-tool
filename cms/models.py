@@ -150,8 +150,8 @@ class ProductQuerySet(BaseQuerySet):
             return product_check.first()
         return Product.objects.create(model=model, category=category)
 
-    def brands(self) -> 'ProductAttributeQuerySet':
-        return ProductAttribute.objects.filter(product__in=self, attribute_type__name="brand").values_list('data__value', flat=True).distinct('data__value')
+    def brands(self) -> 'QuerySet':
+        return Brand.objects.published().filter(products__in=self).distinct()
 
 
 class Product(BaseModel):
