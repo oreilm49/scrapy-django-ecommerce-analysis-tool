@@ -3,7 +3,7 @@ from django.urls import path
 
 from cms.forms import ProductAttributeForm, AttributeTypeForm
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
-    ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult, EprelCategory
+    ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult, EprelCategory, Brand
 from cms.views.admin import ProductMapView, AttributeTypeMapView, ProductAttributeBulkCreateView, \
     AttributeTypeConversionView
 
@@ -73,6 +73,14 @@ class ProductImageInlineAdmin(admin.TabularInline):
     classes = ['collapse']
 
 
+class ProductInlineAdmin(admin.TabularInline):
+    model = Product
+    extra = 0
+    fields = 'model', 'category',
+    show_change_link = True
+    classes = ['collapse']
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = 'id', 'model', 'category', 'alternate_models',
@@ -99,6 +107,12 @@ class AttributeTypeAdmin(admin.ModelAdmin):
 @admin.register(SpiderResult)
 class SpiderResultAdmin(admin.ModelAdmin):
     list_display = 'created', 'spider_name', 'website', 'category', 'items_scraped',
+
+
+@admin.register(Brand)
+class BrandAdmin(admin.ModelAdmin):
+    list_display = 'name', 'image', 'website',
+    inlines = ProductInlineAdmin,
 
 
 def get_admin_urls(urls):

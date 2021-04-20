@@ -69,6 +69,14 @@ class TestPipeline(TestCase):
             item['attributes']: List[Dict] = [{'value': 'a+++', 'label': 'energy rating'}]
             ProductAttributePipeline().process_item(item, {})
             self.assertTrue(ProductAttribute.objects.filter(product=self.product, attribute_type__name='energy rating', data__value="a+++").exists())
+        with self.subTest("brand"):
+            self.assertIsNone(self.product.brand)
+            item['attributes']: List[Dict] = [{'value': 'whirlpool', 'label': 'brand'}]
+            ProductAttributePipeline().process_item(item, {})
+            self.assertTrue(Product.objects.filter(pk=self.product.pk, brand__name='whirlpool'))
+            item['attributes']: List[Dict] = [{'value': 'hotpoint', 'label': 'brand'}]
+            ProductAttributePipeline().process_item(item, {})
+            self.assertFalse(Product.objects.filter(pk=self.product.pk, brand__name='hotpoint'))
 
     def test_website_product_attribute(self):
         item: ProductPageItem = ProductPageItem(product=self.product, category=self.category, website=self.website)
