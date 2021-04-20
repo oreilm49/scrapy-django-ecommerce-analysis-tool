@@ -23,7 +23,7 @@ def migrate_brands(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0008_auto_20210420_1832'),
+        ('cms', '0008_auto_20210420_1905'),
     ]
 
     operations = [
