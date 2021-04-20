@@ -44,7 +44,7 @@ class TestModels(TestCase):
             name="test",
         )
         with self.subTest("attribute filtering"):
-            products = table.get_products(Product.objects.published())
+            products = table.get_products
             self.assertIn(product_1, products)
             self.assertIn(product_2, products)
             self.assertNotIn(product_3, products)
@@ -57,7 +57,7 @@ class TestModels(TestCase):
 
         with self.subTest("websites filter"):
             table.websites.add(price_attr.website)
-            products = table.get_products(Product.objects.published())
+            products = table.get_products
             self.assertIn(product_1, products)
             self.assertNotIn(product_2, products)
 
@@ -65,7 +65,7 @@ class TestModels(TestCase):
             table.brands = ["hotpoint"]
             table.websites.remove(price_attr.website)
             table.save()
-            products = table.get_products(Product.objects.published())
+            products = table.get_products
             self.assertNotIn(product_1, products)
             self.assertIn(product_2, products)
 
@@ -74,7 +74,7 @@ class TestModels(TestCase):
             product_4.save()
             table.products.add(product_4)
             table.save()
-            products = table.get_products(Product.objects.published())
+            products = table.get_products
             self.assertNotIn(product_2, products)
             self.assertIn(product_4, products)
 
@@ -84,7 +84,7 @@ class TestModels(TestCase):
             table.price_low = 100
             table.price_high = 200
             table.save()
-            products = table.get_products(Product.objects.published())
+            products = table.get_products
             self.assertIn(product_1, products)
             self.assertNotIn(product_2, products)
             self.assertNotIn(product_3, products)
