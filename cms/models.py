@@ -108,7 +108,7 @@ class Website(BaseModel):
 
 
 class Url(BaseModel):
-    url = models.CharField(verbose_name=_("Url"), max_length=MAX_LENGTH, help_text=_("The page url"), unique=True)
+    url = models.CharField(verbose_name=_("Url"), max_length=255, help_text=_("The page url"), unique=True)
     url_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=URL_TYPES)
     website = models.ForeignKey(to="cms.Website", on_delete=CASCADE, related_name="urls")
     last_scanned = models.DateTimeField(verbose_name=_("Last scanned"), null=True, blank=True)
