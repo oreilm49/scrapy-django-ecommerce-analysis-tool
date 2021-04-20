@@ -117,8 +117,8 @@ OPERATORS = (OPERATOR_MEAN, OPERATOR_MAX, OPERATOR_MIN, OPERATOR_SUM)
 
 EPREL_API_ROOT_URL = 'https://eprel.ec.europa.eu/api/products/'
 
-WEBSITE_TYPE_RETAILER = 'ecommerce'
-WEBSITE_TYPE_SUPPLIER = 'ecommerce'
+WEBSITE_TYPE_RETAILER = 'retailer'
+WEBSITE_TYPE_SUPPLIER = 'supplier'
 WEBSITE_TYPES = (
     (WEBSITE_TYPE_RETAILER, _('Retailer')),
     (WEBSITE_TYPE_SUPPLIER, _('Supplier')),
