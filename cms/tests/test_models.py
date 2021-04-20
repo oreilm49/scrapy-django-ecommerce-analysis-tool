@@ -99,13 +99,6 @@ class TestModels(TestCase):
         old_attrib.save()
         self.assertEqual(product.current_average_price, str(int(statistics.mean([299.99, 249.99]))))
 
-    def test_product_brand(self):
-        product: Product = mommy.make(Product)
-        product_attribute: ProductAttribute = mommy.make(ProductAttribute, product=product, attribute_type__name="brand")
-        product_attribute.data['value'] = "whirlpool"
-        product_attribute.save()
-        self.assertEqual(product.brand, "whirlpool")
-
     def test_product_price_history(self):
         product: Product = mommy.make(Product)
         # today's prices
@@ -296,3 +289,16 @@ class TestModels(TestCase):
             product2: Product = Product.objects.create(model="test2")
             product2: Product = product2.update_brand("new brand")
             self.assertEqual(product2.brand, brand)
+
+    def test_products_brands(self):
+        brand: Brand = mommy.make(Brand)
+        product: Product = Product.objects.create(model="test")
+        product = product.update_brand("new brand")
+        product2: Product = Product.objects.create(model="test2")
+        product2 = product2.update_brand("unpub brand")
+        unpub_brand = product2.brand
+        unpub_brand.publish = False
+        unpub_brand.save()
+        self.assertIn(product.brand, Product.objects.brands())
+        self.assertNotIn(brand, Product.objects.brands())
+        self.assertNotIn(unpub_brand, Product.objects.brands())
