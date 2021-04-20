@@ -63,14 +63,3 @@ def camel_case_to_sentence(string: str) -> str:
 
 def filename_from_path(path: str) -> str:
     return path.split("/")[-1]
-
-
-def migrate_brands_delete_attrs(attr_model) -> None:
-    """
-    Used in data migration to change brands from AttributeType,
-    to Product.brand model field.
-    """
-    brand_attributes = attr_model.objects.filter(attribute_type__name="brand")
-    for brand_attribute in brand_attributes:
-        brand_attribute.product.update_brand(brand_attribute.data['value'])
-    brand_attributes.delete()

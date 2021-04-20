@@ -37,17 +37,3 @@ class TestUtils(TestCase):
     def test_filename_from_path(self):
         path = "opt/project/cms/media/product_images/energy_labels/9d08fa81-ba1f-4c3c-9803-cbca5a2ed010.png"
         self.assertEqual("9d08fa81-ba1f-4c3c-9803-cbca5a2ed010.png", filename_from_path(path))
-
-    def test_migrate_brands_delete_attrs(self):
-        self.assertFalse(Brand.objects.exists())
-        brand_attr: AttributeType = mommy.make(AttributeType, name="brand")
-        p_attr_1: ProductAttribute = mommy.make(ProductAttribute, attribute_type=brand_attr, data={'value': 'whirlpool'})
-        p_attr_2: ProductAttribute = mommy.make(ProductAttribute, attribute_type=brand_attr, data={'value': 'whirlpool'})
-        p_attr_3: ProductAttribute = mommy.make(ProductAttribute, attribute_type=brand_attr, data={'value': 'hotpoint'})
-        migrate_brands_delete_attrs(ProductAttribute)
-        whirlpool: Brand = Brand.objects.get(name="whirlpool")
-        hotpoint: Brand = Brand.objects.get(name="hotpoint")
-        self.assertEqual(Product.objects.get(pk=p_attr_1.product.pk).brand, whirlpool)
-        self.assertEqual(Product.objects.get(pk=p_attr_2.product.pk).brand, whirlpool)
-        self.assertEqual(Product.objects.get(pk=p_attr_3.product.pk).brand, hotpoint)
-        self.assertFalse(ProductAttribute.objects.filter(attribute_type=brand_attr).exists())
