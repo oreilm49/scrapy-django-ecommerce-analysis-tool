@@ -4,8 +4,20 @@ from django.db import migrations
 
 
 def migrate_brands(apps, schema_editor):
-    from cms.utils import migrate_brands_delete_attrs
-    migrate_brands_delete_attrs(apps.get_model('cms', 'ProductAttribute'))
+    product_attribute_model = apps.get_model('cms', 'ProductAttribute')
+    brand_model = apps.get_model('cms', 'Brand')
+    brand_attributes = product_attribute_model.objects.filter(attribute_type__name="brand")
+    for brand_attribute in brand_attributes:
+        product = brand_attribute.product
+        if product.brand:
+            raise Exception(f"Product brand already exists: {product.brand}")
+        brand = brand_model.objects.filter(name=brand_attribute.data['value'])
+        if brand.exists():
+            product.brand = brand.first()
+        else:
+            product.brand = brand_model.objects.create(name=brand_attribute.data['value'])
+        product.save()
+    brand_attributes.delete()
 
 
 class Migration(migrations.Migration):
