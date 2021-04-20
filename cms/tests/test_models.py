@@ -192,13 +192,6 @@ class TestModels(TestCase):
         retrieved_attribute: ProductAttribute = ProductAttribute.objects.custom_get_or_create(product, attribute_type, "299")
         self.assertEqual(retrieved_attribute, created_attribute)
 
-    def test_product_queryset_brands(self):
-        attribute_type: AttributeType = mommy.make(AttributeType, name="brand")
-        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'whirlpool'})
-        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'whirlpool'})
-        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'hotpoint'})
-        self.assertEqual(sorted(list(Product.objects.brands())), ['hotpoint', 'whirlpool'])
-
     def test_product_get_eprel_api_url(self):
         category: Category = mommy.make(Category, name="washers")
         product: Product = Product.objects.create(model="EWD 71452 W UK N", category=category, eprel_code=None, eprel_scraped=False, eprel_category=None)
