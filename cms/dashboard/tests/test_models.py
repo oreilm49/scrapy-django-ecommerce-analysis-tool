@@ -8,7 +8,7 @@ from model_mommy import mommy
 from cms.accounts.models import Company
 from cms.dashboard.models import CategoryTable, CategoryGapAnalysisReport
 from cms.dashboard.reports import ProductCluster
-from cms.models import Product, ProductAttribute, WebsiteProductAttribute, AttributeType, Category, Website
+from cms.models import Product, WebsiteProductAttribute, AttributeType, Category, Website, Brand
 from cms.scripts.load_cms import run as load_cms
 
 
@@ -16,11 +16,14 @@ class TestModels(TestCase):
 
     def test_category_table_get_products(self):
         category: Category = mommy.make(Category)
-        product_1: Product = mommy.make(Product, category=category, model="product_1")
-        product_2: Product = mommy.make(Product, category=category, model="product_2")
-        product_3: Product = mommy.make(Product, category=category, model="product_3")
-        product_4: Product = mommy.make(Product, category__name="dryers", model="product_4")
-        product_5: Product = mommy.make(Product, category=category, model="filtered_by_search")
+        whirlpool: Brand = Brand.objects.create(name="whirlpool")
+        hotpoint: Brand = Brand.objects.create(name="hotpoint")
+        indesit: Brand = Brand.objects.create(name="indesit")
+        product_1: Product = mommy.make(Product, category=category, model="product_1", brand=whirlpool)
+        product_2: Product = mommy.make(Product, category=category, model="product_2", brand=hotpoint)
+        product_3: Product = mommy.make(Product, category=category, model="product_3", brand=indesit)
+        product_4: Product = mommy.make(Product, category__name="dryers", model="product_4", brand=hotpoint)
+        product_5: Product = mommy.make(Product, category=category, model="filtered_by_search", brand=hotpoint)
         brand_attr: AttributeType = mommy.make(AttributeType, name="brand")
         price_attr: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, attribute_type__name="price")
         mommy.make(WebsiteProductAttribute, product=product_1, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 150})
@@ -28,11 +31,6 @@ class TestModels(TestCase):
         mommy.make(WebsiteProductAttribute, product=product_3, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 250})
         mommy.make(WebsiteProductAttribute, product=product_4, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 150})
         mommy.make(WebsiteProductAttribute, product=product_5, attribute_type=price_attr.attribute_type, website=price_attr.website, data={'value': 150})
-        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_1, data={"value": "whirlpool"})
-        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_2, data={"value": "hotpoint"})
-        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_3, data={"value": "indesit"})
-        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_4, data={"value": "hotpoint"})
-        mommy.make(ProductAttribute, attribute_type=brand_attr, product=product_5, data={"value": "hotpoint"})
         table: CategoryTable = mommy.make(
             CategoryTable,
             x_axis_values=["0", "199", "299", "399", "499"],
@@ -62,7 +60,7 @@ class TestModels(TestCase):
             self.assertNotIn(product_2, products)
 
         with self.subTest("brands filter"):
-            table.brands = ["hotpoint"]
+            table.brands.add(hotpoint)
             table.websites.remove(price_attr.website)
             table.save()
             products = table.get_products
@@ -80,7 +78,7 @@ class TestModels(TestCase):
 
         with self.subTest("price filter"):
             table.products.remove(product_4)
-            table.brands = []
+            table.brands.remove(hotpoint)
             table.price_low = 100
             table.price_high = 200
             table.save()
@@ -163,13 +161,14 @@ class TestModels(TestCase):
             self.assertIsInstance(analyzed_clusters[0], ProductCluster)
 
     def test_gap_analysis_products(self):
-        report: CategoryGapAnalysisReport = mommy.make(CategoryGapAnalysisReport, category__name="washers", brand="whirlpool")
-        brand_attr: AttributeType = mommy.make(AttributeType, name="brand")
-        p1 = mommy.make(ProductAttribute, attribute_type=brand_attr, product__category=report.category, data={'value': "whirlpool"})
-        p2 = mommy.make(ProductAttribute, attribute_type=brand_attr, product__category=report.category, data={'value': "bosch"})
+        whirlpool: Brand = Brand.objects.create(name="whirlpool")
+        bosch: Brand = Brand.objects.create(name="bosch")
+        report: CategoryGapAnalysisReport = mommy.make(CategoryGapAnalysisReport, category__name="washers", brand=whirlpool)
+        product = mommy.make(Product, brand=whirlpool, category=report.category)
+        product2 = mommy.make(Product, brand=bosch, category=report.category)
         with self.subTest("products"):
-            self.assertIn(p1.product, report.products)
-            self.assertIn(p1.product, report.products)
+            self.assertIn(product, report.products)
+            self.assertIn(product2, report.products)
         with self.subTest("target range"):
-            self.assertIn(p1.product, report.target_range)
-            self.assertNotIn(p2.product, report.target_range)
+            self.assertIn(product, report.target_range)
+            self.assertNotIn(product2, report.target_range)
