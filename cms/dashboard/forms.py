@@ -237,9 +237,21 @@ class CategoryGapAnalysisFilterForm(forms.Form):
 
 class CategoryTableAttributeForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['attribute'].queryset = AttributeType.objects.exclude(name='price').order_by('name')
+
     class Meta:
         model = CategoryTableAttribute
         fields = 'attribute', 'order',
+
+    class Media:
+        js = 'js/select2.min.js', 'js/category_attribute_form.js',
+        css = {
+            'all': (
+                'css/select2.min.css',
+            ),
+        }
 
 
 def get_category_table_attribute_formset():
