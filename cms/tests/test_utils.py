@@ -3,8 +3,8 @@ import itertools
 from django.test import TestCase
 from model_mommy import mommy
 
-from cms.models import Product, ProductAttribute, WebsiteProductAttribute, AttributeType, Brand
-from cms.utils import products_grouper, extract_grouper, filename_from_path, migrate_brands_delete_attrs
+from cms.models import Product, ProductAttribute, WebsiteProductAttribute
+from cms.utils import products_grouper, extract_grouper, filename_from_path
 
 
 class TestUtils(TestCase):
