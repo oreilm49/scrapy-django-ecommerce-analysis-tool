@@ -248,7 +248,7 @@ class TestModels(TestCase):
         mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 7})
         with self.subTest("convert to grams"):
             self.assertEqual(attribute_type.convert_unit(gram).unit, gram)
-            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=7000.0))
+            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=7000))
 
         with self.subTest("unit is None"):
             attribute_type_1: AttributeType = mommy.make(AttributeType, unit=None)
