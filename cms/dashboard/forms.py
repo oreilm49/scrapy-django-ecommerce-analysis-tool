@@ -245,14 +245,6 @@ class CategoryTableAttributeForm(forms.ModelForm):
         model = CategoryTableAttribute
         fields = 'attribute', 'order',
 
-    class Media:
-        js = 'js/select2.min.js', 'js/category_attribute_form.js',
-        css = {
-            'all': (
-                'css/select2.min.css',
-            ),
-        }
-
 
 def get_category_table_attribute_formset():
     return modelformset_factory(CategoryTableAttribute, form=CategoryTableAttributeForm, extra=1, can_delete=True)
