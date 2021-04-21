@@ -224,17 +224,17 @@ class TestModels(TestCase):
         self.assertEqual(str(context.exception), "'test' is not defined in the unit registry")
 
     def test_attribute_type_convert_unit(self):
-        kilogram: Unit = mommy.make(Unit, name="kilogram")
+        kilogram: Unit = mommy.make(Unit, name="kilogram", widget=get_dotted_path(FloatInput))
         attribute_type: AttributeType = mommy.make(AttributeType, name="weight", unit=kilogram)
 
         with self.subTest("same unit type"):
             self.assertEqual(attribute_type.convert_unit(kilogram).unit, kilogram)
 
-        gram: Unit = mommy.make(Unit, name="gram")
+        gram: Unit = mommy.make(Unit, name="gram", widget=get_dotted_path(FloatInput))
         mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 7})
         with self.subTest("convert to grams"):
             self.assertEqual(attribute_type.convert_unit(gram).unit, gram)
-            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=7000))
+            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=7000.0))
 
         with self.subTest("unit is None"):
             attribute_type_1: AttributeType = mommy.make(AttributeType, unit=None)
@@ -242,7 +242,7 @@ class TestModels(TestCase):
             self.assertIsNone(attribute_type_1.convert_unit(attribute_type_2.unit).unit)
 
         with self.subTest("mismatch units"):
-            litre: Unit = mommy.make(Unit, name="litre")
+            litre: Unit = mommy.make(Unit, name="litre", widget=get_dotted_path(FloatInput))
             mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 7})
             with self.assertRaises(Exception) as context:
                 attribute_type.convert_unit(litre)
@@ -250,7 +250,7 @@ class TestModels(TestCase):
             self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, attribute_type__unit=gram, data__value=7))
 
         with self.subTest("text conversion attempt"):
-            mg: Unit = mommy.make(Unit, name="mg")
+            mg: Unit = mommy.make(Unit, name="mg", widget=get_dotted_path(FloatInput))
             mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'test'})
             with self.assertRaises(Exception) as context:
                 attribute_type.convert_unit(mg)
@@ -258,12 +258,12 @@ class TestModels(TestCase):
             self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, attribute_type__unit=gram, data__value='test'))
 
         with self.subTest("adding new unit"):
-            kg: Unit = mommy.make(Unit, name="kg")
+            kg: Unit = mommy.make(Unit, name="kg", widget=get_dotted_path(FloatInput))
             attribute_type: AttributeType = mommy.make(AttributeType, unit=None)
             mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': '700'})
             attribute_type.convert_unit(kg)
             self.assertEqual(AttributeType.objects.get(pk=attribute_type.pk).unit, kg)
-            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=700))
+            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=700.0))
 
     def test_product_update_brand(self):
         product: Product = Product.objects.create(model="test")
