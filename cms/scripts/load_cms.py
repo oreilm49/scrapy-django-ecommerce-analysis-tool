@@ -6,7 +6,7 @@ from cms.constants import CATEGORY, TABLE_LABEL_COLUMN, TABLE_VALUE_COLUMN, TABL
     HOURLY, IMAGE, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER
 from cms.form_widgets import FloatInput
 from cms.models import Website, Category, Url, Selector, Unit, Product, ProductAttribute, AttributeType, \
-    WebsiteProductAttribute, CategoryAttributeConfig, EprelCategory
+    WebsiteProductAttribute, CategoryAttributeConfig, EprelCategory, Brand
 from cms.utils import get_dotted_path
 
 
@@ -49,13 +49,13 @@ def set_up_attributes():
 
 
 def make_product(model: str, price: float, load_size: int, spin: int, energy: int, category: Category, brand: str) -> Optional[Product]:
+    brand, _ = Brand.objects.get_or_create(name=brand)
     if Product.objects.filter(model=model).exists():
         return
-    product = Product.objects.create(model=model, category=category)
+    product = Product.objects.create(model=model, category=category, brand=brand)
     ProductAttribute.objects.create(product=product, attribute_type=AttributeType.objects.get(name="load size"), data={'value': load_size})
     ProductAttribute.objects.create(product=product, attribute_type=AttributeType.objects.get(name="spin speed"), data={'value': spin})
     ProductAttribute.objects.create(product=product, attribute_type=AttributeType.objects.get(name="energy usage"), data={'value': energy})
-    ProductAttribute.objects.create(product=product, attribute_type=AttributeType.objects.get(name="brand"), data={'value': brand})
     website = Website.objects.get(name="harvey_norman")
     WebsiteProductAttribute.objects.create(product=product, website=website, attribute_type=AttributeType.objects.get(name="price"), data={'value': price})
     return product
