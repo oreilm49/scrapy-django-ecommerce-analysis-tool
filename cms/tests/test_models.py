@@ -11,7 +11,7 @@ from cms.constants import MAIN, THUMBNAIL, WEEKLY, MONTHLY, YEARLY, ENERGY_LABEL
 from cms.form_widgets import FloatInput
 from cms.serializers import serializers
 from cms.models import Product, ProductAttribute, WebsiteProductAttribute, json_data_default, Unit, AttributeType, \
-    Website, Category, ProductImage, WebsiteProductAttributeQuerySet, EprelCategory
+    Website, Category, ProductImage, WebsiteProductAttributeQuerySet, EprelCategory, Brand
 from cms.utils import get_dotted_path
 
 
@@ -98,13 +98,6 @@ class TestModels(TestCase):
         old_attrib.created = datetime.datetime.now() - datetime.timedelta(hours=24)
         old_attrib.save()
         self.assertEqual(product.current_average_price, str(int(statistics.mean([299.99, 249.99]))))
-
-    def test_product_brand(self):
-        product: Product = mommy.make(Product)
-        product_attribute: ProductAttribute = mommy.make(ProductAttribute, product=product, attribute_type__name="brand")
-        product_attribute.data['value'] = "whirlpool"
-        product_attribute.save()
-        self.assertEqual(product.brand, "whirlpool")
 
     def test_product_price_history(self):
         product: Product = mommy.make(Product)
@@ -199,13 +192,6 @@ class TestModels(TestCase):
         retrieved_attribute: ProductAttribute = ProductAttribute.objects.custom_get_or_create(product, attribute_type, "299")
         self.assertEqual(retrieved_attribute, created_attribute)
 
-    def test_product_queryset_brands(self):
-        attribute_type: AttributeType = mommy.make(AttributeType, name="brand")
-        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'whirlpool'})
-        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'whirlpool'})
-        mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'hotpoint'})
-        self.assertEqual(sorted(list(Product.objects.brands())), ['hotpoint', 'whirlpool'])
-
     def test_product_get_eprel_api_url(self):
         category: Category = mommy.make(Category, name="washers")
         product: Product = Product.objects.create(model="EWD 71452 W UK N", category=category, eprel_code=None, eprel_scraped=False, eprel_category=None)
@@ -238,13 +224,13 @@ class TestModels(TestCase):
         self.assertEqual(str(context.exception), "'test' is not defined in the unit registry")
 
     def test_attribute_type_convert_unit(self):
-        kilogram: Unit = mommy.make(Unit, name="kilogram")
+        kilogram: Unit = mommy.make(Unit, name="kilogram", widget=get_dotted_path(FloatInput))
         attribute_type: AttributeType = mommy.make(AttributeType, name="weight", unit=kilogram)
 
         with self.subTest("same unit type"):
             self.assertEqual(attribute_type.convert_unit(kilogram).unit, kilogram)
 
-        gram: Unit = mommy.make(Unit, name="gram")
+        gram: Unit = mommy.make(Unit, name="gram", widget=get_dotted_path(FloatInput))
         mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 7})
         with self.subTest("convert to grams"):
             self.assertEqual(attribute_type.convert_unit(gram).unit, gram)
@@ -256,7 +242,7 @@ class TestModels(TestCase):
             self.assertIsNone(attribute_type_1.convert_unit(attribute_type_2.unit).unit)
 
         with self.subTest("mismatch units"):
-            litre: Unit = mommy.make(Unit, name="litre")
+            litre: Unit = mommy.make(Unit, name="litre", widget=get_dotted_path(FloatInput))
             mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 7})
             with self.assertRaises(Exception) as context:
                 attribute_type.convert_unit(litre)
@@ -264,7 +250,7 @@ class TestModels(TestCase):
             self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, attribute_type__unit=gram, data__value=7))
 
         with self.subTest("text conversion attempt"):
-            mg: Unit = mommy.make(Unit, name="mg")
+            mg: Unit = mommy.make(Unit, name="mg", widget=get_dotted_path(FloatInput))
             mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': 'test'})
             with self.assertRaises(Exception) as context:
                 attribute_type.convert_unit(mg)
@@ -272,9 +258,40 @@ class TestModels(TestCase):
             self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, attribute_type__unit=gram, data__value='test'))
 
         with self.subTest("adding new unit"):
-            kg: Unit = mommy.make(Unit, name="kg")
+            kg: Unit = mommy.make(Unit, name="kg", widget=get_dotted_path(FloatInput))
             attribute_type: AttributeType = mommy.make(AttributeType, unit=None)
             mommy.make(ProductAttribute, attribute_type=attribute_type, data={'value': '700'})
             attribute_type.convert_unit(kg)
             self.assertEqual(AttributeType.objects.get(pk=attribute_type.pk).unit, kg)
-            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=700))
+            self.assertTrue(ProductAttribute.objects.filter(attribute_type=attribute_type, data__value=700.0))
+
+    def test_product_update_brand(self):
+        product: Product = Product.objects.create(model="test")
+        with self.subTest("new brand"):
+            self.assertFalse(Brand.objects.filter(name="new brand").exists())
+            product: Product = product.update_brand("new brand")
+            brand: Brand = Brand.objects.get(name="new brand")
+            self.assertEqual(product.brand, brand)
+
+        with self.subTest("product already has brand"):
+            with self.assertRaises(Exception) as context:
+                product.update_brand("new brand")
+            self.assertEqual(str(context.exception), f"Product brand already exists: {brand}")
+
+        with self.subTest("add existing brand to product"):
+            product2: Product = Product.objects.create(model="test2")
+            product2: Product = product2.update_brand("new brand")
+            self.assertEqual(product2.brand, brand)
+
+    def test_products_brands(self):
+        brand: Brand = mommy.make(Brand)
+        product: Product = Product.objects.create(model="test")
+        product = product.update_brand("new brand")
+        product2: Product = Product.objects.create(model="test2")
+        product2 = product2.update_brand("unpub brand")
+        unpub_brand = product2.brand
+        unpub_brand.publish = False
+        unpub_brand.save()
+        self.assertIn(product.brand, Product.objects.brands())
+        self.assertNotIn(brand, Product.objects.brands())
+        self.assertNotIn(unpub_brand, Product.objects.brands())

@@ -7,12 +7,6 @@ from bokeh.embed import components
 from bokeh.plotting import figure, ColumnDataSource
 from pandas import DataFrame
 
-from cms.models import ProductAttribute
-
-
-def get_brands() -> List[Optional[str]]:
-    return ProductAttribute.objects.filter(attribute_type__name="brand").values_list('data__value', flat=True).distinct()
-
 
 def line_chart(df: DataFrame, title: str, x: str, x_label: str, y: str, y_label: str) -> Optional[Dict]:
     if df.empty:

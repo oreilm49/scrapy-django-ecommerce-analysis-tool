@@ -2,9 +2,11 @@ from django.test import TestCase
 from model_mommy import mommy
 
 from cms.constants import MAIN, THUMBNAIL
+from cms.form_widgets import FloatInput
 from cms.models import Category, Product, ProductAttribute, Website, WebsiteProductAttribute, AttributeType, \
     ProductImage, Unit
 from cms.forms import ProductMergeForm, AttributeTypeMergeForm, AttributeTypeForm, AttributeTypeUnitConversionForm
+from cms.utils import get_dotted_path
 
 
 class TestForms(TestCase):
@@ -15,7 +17,7 @@ class TestForms(TestCase):
         cls.website: Website = mommy.make(Website, name="test_website", currency__name="€")
         cls.category: Category = mommy.make(Category, name="washing machines")
         cls.product: Product = mommy.make(Product, model="model_number")
-        cls.gram: Unit = mommy.make(Unit, name="gram")
+        cls.gram: Unit = mommy.make(Unit, name="gram", widget=get_dotted_path(FloatInput))
         cls.attribute: AttributeType = mommy.make(AttributeType, name="test_attr", unit=cls.gram)
         cls.product_attribute: ProductAttribute = mommy.make(ProductAttribute, product=cls.product, attribute_type=cls.attribute)
 
