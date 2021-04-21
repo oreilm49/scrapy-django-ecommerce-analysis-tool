@@ -5,7 +5,6 @@ from celery import shared_task
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
-from cms.constants import WEBSITE_TYPE_RETAILER
 from cms.data_processing.utils import create_product_attribute
 from cms.models import Website, Product
 from cms.scraper.spiders.ecommerce import EcommerceSpider
@@ -15,7 +14,7 @@ from cms.utils import camel_case_to_sentence
 @shared_task
 def crawl_websites():
     process = CrawlerProcess(get_project_settings())
-    for website in Website.objects.published().filter(website_type=WEBSITE_TYPE_RETAILER):
+    for website in Website.objects.filter(publish=True):
         process.crawl(EcommerceSpider, website=website)
     process.start()
 

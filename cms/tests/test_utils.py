@@ -3,7 +3,7 @@ import itertools
 from django.test import TestCase
 from model_mommy import mommy
 
-from cms.models import Product, WebsiteProductAttribute, AttributeType
+from cms.models import Product, ProductAttribute, WebsiteProductAttribute
 from cms.utils import products_grouper, extract_grouper, filename_from_path
 
 
@@ -16,11 +16,11 @@ class TestUtils(TestCase):
         self.assertEqual(extract_grouper(159, [299, 99, 199, 299]), 299)
 
     def test_products_grouper(self):
-        product: Product = mommy.make(Product, brand__name="whirlpool")
+        product: Product = mommy.make(Product)
         with self.subTest("product attributes"):
-            attribute: AttributeType = mommy.make(AttributeType, name="brand")
-            self.assertEqual(products_grouper(product, attribute, ["whirlpool", "hotpoint"]), "whirlpool")
-            self.assertEqual(products_grouper(product, attribute, ["hotpoint"]), None)
+            product_attribute: ProductAttribute = mommy.make(ProductAttribute, attribute_type__name="brand", data={"value": "whirlpool"}, product=product)
+            self.assertEqual(products_grouper(product, product_attribute.attribute_type, ["whirlpool", "hotpoint"]), "whirlpool")
+            self.assertEqual(products_grouper(product, product_attribute.attribute_type, ["hotpoint"]), None)
 
         with self.subTest("website product attributes"):
             website_attribute: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, attribute_type__name="price", data={"value": 199}, product=product)

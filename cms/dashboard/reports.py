@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 
 from cms.dashboard.constants import COMPETITIVE_SCORE_GOOD, COMPETITIVE_SCORE_BAD, COMPETITIVE_SCORE_ATTENTION
 from cms.models import Product, ProductQuerySet, Category, CategoryAttributeConfig, ProductAttribute, \
-    ProductAttributeQuerySet, Brand
+    ProductAttributeQuerySet
 
 DominantSpecs = Dict[CategoryAttributeConfig, Dict[str, Union[int, float, str]]]
 ProductSpecValues = List[Dict[CategoryAttributeConfig, Union[str, float, int, bool]]]
@@ -59,16 +59,16 @@ class ProductCluster:
     @cached_property
     def dominant_brand(self) -> Optional[Dict[str, Union[str, int]]]:
         """Gets the most common brands for this pricepoint"""
-        sorted_products = sorted([product for product in self.products if product.brand], key=lambda product: product.brand.pk)
-        ranked_brands = tuple((brand, sum(1 for _ in products)) for brand, products in groupby(sorted_products, key=lambda product: product.brand.pk))
+        sorted_products = sorted([product for product in self.products if product.brand], key=lambda product: product.brand)
+        ranked_brands = tuple((brand, sum(1 for _ in products)) for brand, products in
+                              groupby(sorted_products, key=lambda product: product.brand))
         if ranked_brands:
-            dominant_brand_id, num_products = max(ranked_brands, key=itemgetter(1))
-            dominant_brand: Brand = Brand.objects.get(pk=dominant_brand_id)
-            display_share = '{:.0%}'.format(num_products / self.products.count()) if self.products.exists() else None
+            dominant_brand = max(ranked_brands, key=itemgetter(1))
+            display_share = '{:.0%}'.format(dominant_brand[1] / self.products.count()) if self.products.exists() else None
             target_range_display_share = '{:.0%}'.format(self.target_range.count() / self.products.count()) if self.products.exists() else None
             return {
-                'value': dominant_brand,
-                'number_of_products': num_products,
+                'value': dominant_brand[0],
+                'number_of_products': dominant_brand[1],
                 'display_share': display_share,
                 'target_range_display_share': target_range_display_share,
             }
