@@ -12,9 +12,9 @@ from django.utils import timezone
 
 from cms.dashboard.models import CategoryTable, CategoryTableQuerySet, CategoryGapAnalysisReport, \
     CategoryGapAnalysisQuerySet, CategoryTableAttribute
+from cms.dashboard.utils import get_brands
 from cms.form_widgets import TagWidget
-from cms.models import AttributeType, Category, ProductQuerySet, Website, WebsiteProductAttributeQuerySet, Product, \
-    Brand
+from cms.models import AttributeType, Category, ProductQuerySet, Website, WebsiteProductAttributeQuerySet, Product
 from cms.serializers import to_float
 from cms.utils import serialized_values_for_attribute_type, is_value_numeric
 
@@ -25,7 +25,7 @@ class CategoryTableForm(forms.ModelForm):
     """
     x_axis_values = SimpleArrayField(base_field=forms.CharField())
     y_axis_values = SimpleArrayField(base_field=forms.CharField())
-    brands = forms.ModelMultipleChoiceField(label=_('Brands'), queryset=Brand.objects.published(), required=False, help_text=_("Only show products for these brands."))
+    brands = forms.MultipleChoiceField(label=_('Brands'), choices=(), required=False, help_text=_("Only show products for these brands."))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -41,6 +41,7 @@ class CategoryTableForm(forms.ModelForm):
         self.fields['y_axis_values'].required = False
         self.fields['y_axis_attribute'].required = False
 
+        self.fields['brands'].choices = ((brand, brand) for brand in get_brands())
         self.fields['websites'].queryset = Website.objects.published()
         self.fields['websites'].required = False
         self.fields['products'].queryset = Product.objects.published()
@@ -70,9 +71,7 @@ class CategoryTableForm(forms.ModelForm):
         if is_value_numeric(values[0]):
             return serialized_values_for_attribute_type(values, attribute_type)
         for value in values:
-            if not attribute_type.productattributes.filter(data__value=value).exists() \
-                    and not attribute_type.websiteproductattributes.filter(data__value=value).exists() \
-                    and not Brand.objects.filter(name=value).exists():
+            if not attribute_type.productattributes.filter(data__value=value).exists() and not attribute_type.websiteproductattributes.filter(data__value=value).exists():
                 raise ValidationError(_("'{attribute}' with value '{value}' does not exist.").format(attribute=attribute_type.name, value=value))
         return serialized_values_for_attribute_type(values, attribute_type)
 
@@ -121,7 +120,11 @@ class ProductsFilterForm(forms.Form):
     category = forms.ModelChoiceField(label=_('Category'), empty_label=_('Category'), queryset=Category.objects.published(), required=False)
     price_low = forms.FloatField(label=_('Price: low'), required=False)
     price_high = forms.FloatField(label=_('Price: high'), required=False)
-    brands = forms.ModelMultipleChoiceField(label=_('Brands'), queryset=Brand.objects.published(), required=False)
+    brands = forms.MultipleChoiceField(label=_('Brands'), choices=(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['brands'].choices = ((brand, brand) for brand in get_brands())
 
     def search(self, queryset: ProductQuerySet) -> ProductQuerySet:
         if self.cleaned_data.get('q'):
@@ -135,7 +138,8 @@ class ProductsFilterForm(forms.Form):
             queryset = queryset.filter(websiteproductattributes__attribute_type__name='price',
                                        websiteproductattributes__data__value__lte=self.cleaned_data['price_high'])
         if self.cleaned_data.get('brands'):
-            queryset = queryset.filter(brand__in=self.cleaned_data['brands'])
+            queryset = queryset.filter(productattributes__attribute_type__name='brand',
+                                       productattributes__data__value__in=self.cleaned_data['brands'])
         return queryset
 
     class Media:
@@ -180,11 +184,12 @@ class ProductPriceFilterForm(forms.Form):
 
 
 class CategoryGapAnalysisForm(forms.ModelForm):
-    brand = forms.ModelChoiceField(label=_('Brands'), queryset=Brand.objects.published(), required=False, help_text=_("The brand you'd like to use as the target for this analysis."))
+    brand = forms.ChoiceField(label=_('Brand'), choices=(), required=True, help_text=_("The brand you'd like to use as the target for this analysis."))
     price_clusters = SimpleArrayField(base_field=forms.CharField())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['brand'].choices = ((brand, brand) for brand in get_brands())
         self.fields['websites'].required = False
         self.fields['price_clusters'].widget = TagWidget()
         self.fields['price_clusters'].help_text = _('The price clusters used to group products.')

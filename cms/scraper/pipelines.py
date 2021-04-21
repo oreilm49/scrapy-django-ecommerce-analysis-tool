@@ -29,10 +29,7 @@ class ProductAttributePipeline:
             product: Product = item['product']
             for attribute in item['attributes']:
                 attribute: Dict
-                if attribute['label'] == 'brand' and not product.brand:
-                    product.update_brand(attribute['value'])
-                else:
-                    create_product_attribute(product, attribute['label'], attribute['value'])
+                create_product_attribute(product, attribute['label'], attribute['value'])
         return item
 
 

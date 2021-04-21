@@ -46,7 +46,7 @@ class CategoryTable(BaseModel):
     category = models.ForeignKey("cms.Category", verbose_name=_('Category'), help_text=_('The category products should belong to in order to appear in the table.'), on_delete=models.SET_NULL, null=True)
     query = models.CharField(verbose_name=_('Search'), blank=True, null=True, max_length=100, help_text=_('General search text used to further filter products.'))
     websites = models.ManyToManyField("cms.Website", verbose_name=_("Websites"), help_text=_('Only show products that are on these websites.'))
-    brands = models.ManyToManyField("cms.Brand", help_text=_('Only show products for these brands.'))
+    brands = models.JSONField(verbose_name=_('Brands'), help_text=_('Only show products for these brands.'), default=list, blank=True, null=True)
     products = models.ManyToManyField("cms.Product", verbose_name=_("Products"), help_text=_('Only show these products.'))
     price_low = models.FloatField(verbose_name=_("Price low"), help_text=_("Only show products above this price"), blank=True, null=True)
     price_high = models.FloatField(verbose_name=_("Price high"), help_text=_("Only show products below this price"), blank=True, null=True)
@@ -69,20 +69,20 @@ class CategoryTable(BaseModel):
         if self.price_high:
             queryset = queryset.filter(websiteproductattributes__attribute_type__name='price',
                                        websiteproductattributes__data__value__lte=self.price_high)
-        if self.brands.exists():
-            queryset = queryset.filter(brand__in=self.brands.all())
+        if self.brands:
+            queryset = queryset.filter(productattributes__attribute_type__name='brand',
+                                       productattributes__data__value__in=self.brands)
         if self.products.exists():
             queryset = queryset.filter(pk__in=self.products.all())
+        product_pks: List[int] = []
         if self.x_axis_values and not is_value_numeric(self.x_axis_values[0]):
-            if self.x_axis_attribute.name == 'brand':
-                queryset = queryset.filter(brand__name__in=self.x_axis_values)
-            else:
-                queryset.filter(pk__in=self.x_axis_attribute.productattributes.filter(data__value__in=self.x_axis_values))
+            products_from_attributes: 'ProductQuerySet' = self.x_axis_attribute.productattributes.filter(data__value__in=self.x_axis_values)
+            product_pks.append(products_from_attributes.values_list('product', flat=True))
         if self.y_axis_values and not is_value_numeric(self.y_axis_values[0]):
-            if self.y_axis_attribute.name == 'brand':
-                queryset = queryset.filter(brand__name__in=self.y_axis_values)
-            else:
-                queryset.filter(pk__in=self.y_axis_attribute.productattributes.filter(data__value__in=self.y_axis_values))
+            products_from_attributes: 'ProductQuerySet' = self.y_axis_attribute.productattributes.filter(data__value__in=self.y_axis_values)
+            product_pks.append(products_from_attributes.values_list('product', flat=True))
+        if product_pks:
+            queryset = queryset.filter(pk__in=product_pks)
         return queryset.distinct()
 
     @cached_property
@@ -160,7 +160,7 @@ class CategoryGapAnalysisReport(BaseModel):
     user = models.ForeignKey(User, verbose_name=_("User"), on_delete=models.SET_NULL, null=True)
     name = models.CharField(verbose_name=_('Name'), max_length=100, help_text=_('The name for this dashboard'))
     category = models.ForeignKey("cms.Category", verbose_name=_('Category'), help_text=_('The category products should belong to in order to appear in the table.'), on_delete=models.SET_NULL, null=True)
-    brand = models.ForeignKey("cms.Brand", help_text=_('The brand analysed in the gap analysis report.'), on_delete=models.SET_NULL, null=True)
+    brand = models.CharField(verbose_name=_('Brand'), max_length=100, help_text=_('The brand analysed in the gap analysis report.'))
     websites = models.ManyToManyField("cms.Website", verbose_name=_("Websites"), help_text=_('Limit gap analysis report to these websites.'))
     price_clusters = models.JSONField(verbose_name=_('Price clusters'), help_text=_('Price levels used to cluster products.'), default=list)
 
@@ -178,7 +178,8 @@ class CategoryGapAnalysisReport(BaseModel):
 
     @property
     def target_range(self) -> ProductQuerySet:
-        return self.products.filter(brand=self.brand)
+        brand_attributes: ProductAttributeQuerySet = ProductAttribute.objects.filter(attribute_type__name="brand", data__value=self.brand)
+        return self.products.filter(pk__in=[product_attribute.product.pk for product_attribute in brand_attributes])
 
     def get_products(self) -> List[Product]:
         """Retrieves and sorts products relevant to report."""

@@ -5,7 +5,7 @@ from typing import List, Union, Optional
 from django.db.models import QuerySet
 
 
-def extract_grouper(value: Union[str, float, int], grouper_values: List[Union[str, int]]) -> Optional[Union[str, int, float]]:
+def extract_grouper(value: Union[str, float, int], grouper_values: List[Union[str, int]]) -> Optional[Union[str]]:
     """
     Extracts a grouper value given a value and a list of possible grouper values.
     For number values, a value is matched with the first grouper_value it's less than or equal to.
@@ -22,7 +22,7 @@ def extract_grouper(value: Union[str, float, int], grouper_values: List[Union[st
             return grouper_value
 
 
-def products_grouper(product: 'Product', attribute: Optional['AttributeType'], attribute_values: Optional[List[Union[str, int]]]) -> Optional[Union[str, int, float]]:
+def products_grouper(product: 'Product', attribute: Optional['AttributeType'], attribute_values: Optional[List[Union[str, int]]]) -> Optional[Union[str]]:
     """
     Extracts a grouper key for product by comparing attribute value against list of attribute_values.
     :param product: Product object.
@@ -34,8 +34,6 @@ def products_grouper(product: 'Product', attribute: Optional['AttributeType'], a
         return None
     if attribute.name == 'price':
         return extract_grouper(product.current_average_price_int, attribute_values)
-    if attribute.name == 'brand':
-        return extract_grouper(product.brand.name, attribute_values) if product.brand else None
     product_attribute: QuerySet = attribute.productattributes.filter(product=product)
     if product_attribute.exists():
         return extract_grouper(product_attribute.first().data['value'], attribute_values)
