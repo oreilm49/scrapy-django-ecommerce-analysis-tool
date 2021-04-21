@@ -88,6 +88,12 @@ class ProductAdmin(admin.ModelAdmin):
     list_per_page = 25
     inlines = ProductAttributeInlineAdmin, ProductImageInlineAdmin,
 
+    def get_urls(self):
+        return [
+            path('map_products/', self.admin_site.admin_view(ProductMapView.as_view()), name="map_products"),
+            path('map_product_attributes/', self.admin_site.admin_view(ProductAttributeBulkCreateView.as_view()), name="map_product_attributes"),
+        ] + super().get_urls()
+
 
 @admin.register(WebsiteProductAttribute)
 class WebsiteProductAttributeAdmin(admin.ModelAdmin):
@@ -103,6 +109,12 @@ class AttributeTypeAdmin(admin.ModelAdmin):
     inlines = ProductAttributeInlineAdmin,
     form = AttributeTypeForm
 
+    def get_urls(self):
+        return [
+            path('map_attribute_types/', self.admin_site.admin_view(AttributeTypeMapView.as_view()), name="map_attribute_types"),
+            path('cms/attributetype/<int:pk>/convert-unit', self.admin_site.admin_view(AttributeTypeConversionView.as_view()), name="attribute_type_unit_conversion")
+        ] + super().get_urls()
+
 
 @admin.register(SpiderResult)
 class SpiderResultAdmin(admin.ModelAdmin):
@@ -113,18 +125,3 @@ class SpiderResultAdmin(admin.ModelAdmin):
 class BrandAdmin(admin.ModelAdmin):
     list_display = 'name', 'image', 'website',
     inlines = ProductInlineAdmin,
-
-
-def get_admin_urls(urls):
-    def get_urls():
-        return urls + [
-            path('map_products/', admin.site.admin_view(ProductMapView.as_view()), name="map_products"),
-            path('map_attribute_types/', admin.site.admin_view(AttributeTypeMapView.as_view()), name="map_attribute_types"),
-            path('map_product_attributes/', admin.site.admin_view(ProductAttributeBulkCreateView.as_view()), name="map_product_attributes"),
-            path('cms/attributetype/<int:pk>/convert-unit', admin.site.admin_view(AttributeTypeConversionView.as_view()), name="attribute_type_unit_conversion")
-        ]
-    return get_urls
-
-
-admin_urls = get_admin_urls(admin.site.get_urls())
-admin.site.get_urls = admin_urls

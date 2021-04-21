@@ -109,7 +109,7 @@ class CategoryGapAnalysisReportUpdate(CategoryGapAnalysisReportMixin, SuccessMes
             report.publish = False
             report.save()
             messages.success(request, _('Successfully deleted "{report}"').format(report=report))
-            return HttpResponseRedirect(reverse('dashboard:category-reports'))
+            return HttpResponseRedirect(reverse('dashboard:category-gap-reports'))
         return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
