@@ -4,12 +4,14 @@
 {% block object-tools-items %}
     {{ block.super }}
     <li>
-        <a href="{% add_preserved_filters '/admin/map_products/' is_popup to_field %}" class="addlink">
+        {% url 'admin:map_products' as map_products %}
+        <a href="{% add_preserved_filters map_products is_popup to_field %}" class="addlink">
           {% blocktranslate %}Map Products{% endblocktranslate %}
         </a>
     </li>
     <li>
-        <a href="{% add_preserved_filters '/admin/map_product_attributes/' is_popup to_field %}" class="addlink">
+        {% url 'admin:map_product_attributes' as map_product_attributes %}
+        <a href="{% add_preserved_filters map_product_attributes is_popup to_field %}" class="addlink">
           {% blocktranslate %}Update Missing Attributes{% endblocktranslate %}
         </a>
     </li>
