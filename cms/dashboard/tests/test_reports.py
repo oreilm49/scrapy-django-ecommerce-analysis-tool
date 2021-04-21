@@ -7,7 +7,7 @@ from cms.constants import SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER
 from cms.dashboard.constants import COMPETITIVE_SCORE_GOOD, COMPETITIVE_SCORE_BAD, COMPETITIVE_SCORE_ATTENTION
 from cms.dashboard.reports import ProductCluster
 from cms.models import Product, ProductAttribute, Category, CategoryAttributeConfig, AttributeType, \
-    WebsiteProductAttribute, ProductQuerySet
+    WebsiteProductAttribute, ProductQuerySet, Brand
 
 
 class TestReports(TestCase):
@@ -20,23 +20,23 @@ class TestReports(TestCase):
         cls.cat_cfg_1: CategoryAttributeConfig = mommy.make(CategoryAttributeConfig, attribute_type__name="load size", order=1, category=cls.category, scoring=SCORING_NUMERICAL_HIGHER)
         cls.cat_cfg_2: CategoryAttributeConfig = mommy.make(CategoryAttributeConfig, attribute_type__name="spin", order=2, category=cls.category, scoring=SCORING_NUMERICAL_HIGHER)
         cls.cat_cfg_3: CategoryAttributeConfig = mommy.make(CategoryAttributeConfig, attribute_type__name="energy usage", order=3, category=cls.category, scoring=SCORING_NUMERICAL_LOWER)
-        cls.brand_attr: AttributeType = mommy.make(AttributeType, name="brand")
         cls.price_attr: AttributeType = mommy.make(AttributeType, name="price")
 
         def make_product(price: float, load_size: int, spin: int, energy: int, order: int, brand: Optional[str] = None) -> Product:
-            product: Product = mommy.make(Product, category=cls.category, order=order)
+            product: Product = mommy.make(Product, category=cls.category, order=order, brand=brand)
             mommy.make(ProductAttribute, product=product, attribute_type=cls.cat_cfg_1.attribute_type, data={'value': load_size})
             mommy.make(ProductAttribute, product=product, attribute_type=cls.cat_cfg_2.attribute_type, data={'value': spin})
             mommy.make(ProductAttribute, product=product, attribute_type=cls.cat_cfg_3.attribute_type, data={'value': energy})
-            if brand:
-                mommy.make(ProductAttribute, product=product, attribute_type=cls.brand_attr, data={'value': brand})
             mommy.make(WebsiteProductAttribute, product=product, attribute_type=cls.price_attr, data={'value': price})
             return product
 
-        cls.p1: Product = make_product(299.99, 7, 1400, 50, 1, brand="whirlpool")
-        cls.p2: Product = make_product(399.99, 8, 1400, 75, 2, brand="whirlpool")
-        cls.p3: Product = make_product(349.99, 8, 1600, 100, 3, brand="hotpoint")
-        cls.p4: Product = make_product(399.99, 6, 1200, 100, 4, brand="indesit")
+        cls.whirlpool = Brand.objects.create(name="whirlpool")
+        cls.hotpoint = Brand.objects.create(name="hotpoint")
+        cls.indesit = Brand.objects.create(name="indesit")
+        cls.p1: Product = make_product(299.99, 7, 1400, 50, 1, brand=cls.whirlpool)
+        cls.p2: Product = make_product(399.99, 8, 1400, 75, 2, brand=cls.whirlpool)
+        cls.p3: Product = make_product(349.99, 8, 1600, 100, 3, brand=cls.hotpoint)
+        cls.p4: Product = make_product(399.99, 6, 1200, 100, 4, brand=cls.indesit)
         cls.cluster: ProductCluster = ProductCluster(
             cls.category,
             (1, [product for product in Product.objects.all()]),
@@ -98,7 +98,7 @@ class TestReports(TestCase):
             'display_share': '50%',
             'number_of_products': 2,
             'target_range_display_share': '25%',
-            'value': 'whirlpool'
+            'value': self.whirlpool
         })
 
         with self.subTest("empty queryset"):
