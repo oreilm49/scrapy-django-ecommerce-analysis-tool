@@ -301,7 +301,7 @@ class AttributeType(BaseModel):
                 else:
                     quantity: Union[Quantity, int] = units.ureg(product_attribute.display)
                 value = quantity.to(unit.name).magnitude if isinstance(quantity, Quantity) else quantity
-                product_attribute.data['value'] = value
+                product_attribute.data['value'] = unit.serializer.serializer(value)
                 product_attribute.save()
 
 
