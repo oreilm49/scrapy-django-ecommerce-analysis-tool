@@ -21,7 +21,7 @@ from pint import Quantity
 from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUENCIES, ONCE, IMAGE_TYPES, MAIN, \
     THUMBNAIL, WIDGET_CHOICES, WIDGETS, DAILY, PRICE_TIME_PERIODS_LIST, WEEKLY, OPERATORS, OPERATOR_MEAN, \
     SCORING_CHOICES, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER, SCORING_BOOL_TRUE, SCORING_BOOL_FALSE, \
-    EPREL_API_ROOT_URL, ENERGY_LABEL_IMAGE
+    EPREL_API_ROOT_URL, ENERGY_LABEL_IMAGE, WEBSITE_TYPES, WEBSITE_TYPE_RETAILER
 from cms.serializers import serializers, CustomValueSerializer
 
 
@@ -93,6 +93,7 @@ class Website(BaseModel):
     name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, help_text=_("The website name"), unique=True)
     domain = models.CharField(verbose_name=_("Domain"), max_length=MAX_LENGTH, help_text=_("The website domain name"), unique=True)
     currency = models.ForeignKey(to=Unit, verbose_name=_("Currency"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The currency this website trades in."), related_name="websites")
+    website_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=WEBSITE_TYPES, default=WEBSITE_TYPE_RETAILER)
 
     def __str__(self):
         return self.name
@@ -149,13 +150,14 @@ class ProductQuerySet(BaseQuerySet):
             return product_check.first()
         return Product.objects.create(model=model, category=category)
 
-    def brands(self) -> 'ProductAttributeQuerySet':
-        return ProductAttribute.objects.filter(product__in=self, attribute_type__name="brand").values_list('data__value', flat=True).distinct('data__value')
+    def brands(self) -> 'QuerySet':
+        return Brand.objects.published().filter(products__in=self).distinct()
 
 
 class Product(BaseModel):
     model = models.CharField(verbose_name=_("Model"), max_length=MAX_LENGTH, unique=True)
     category = models.ForeignKey(to=Category, verbose_name=_("Category"), on_delete=SET_NULL, blank=True, null=True)
+    brand = models.ForeignKey(to="cms.Brand", verbose_name=_("Brand"), related_name="products", on_delete=SET_NULL, blank=True, null=True)
     alternate_models = ArrayField(verbose_name=_("Alternate models"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), blank=True, null=True, default=list)
     eprel_scraped = models.BooleanField(verbose_name=_("EPREL Scraped"), default=False, help_text=_("Has the EPREL database been scraped for this product?"))
     eprel_code = models.CharField(verbose_name=_("EPREL Code"), max_length=MAX_LENGTH, unique=True, blank=True, null=True)
@@ -204,11 +206,6 @@ class Product(BaseModel):
         return humanize.intcomma(price) if price else None
 
     @cached_property
-    def brand(self) -> Optional[str]:
-        attribute: ProductAttribute = self.productattributes.filter(attribute_type__name="brand").first()
-        return attribute.data['value'] if attribute else None
-
-    @cached_property
     def top_attributes(self) -> Iterator[ProductQuerySet]:
         for attribute_config in self.category.category_attribute_configs.order_by('order').iterator():
             attribute_config: 'CategoryAttributeConfig'
@@ -241,6 +238,17 @@ class Product(BaseModel):
                 self.eprel_category = eprel_category
                 self.save()
                 return url
+
+    def update_brand(self, brand_name: str) -> 'Product':
+        if self.brand:
+            raise Exception(f"Product brand already exists: {self.brand}")
+        brand: QuerySet = Brand.objects.filter(name=brand_name)
+        if brand.exists():
+            self.brand = brand.first()
+        else:
+            self.brand = Brand.objects.create(name=brand_name)
+        self.save()
+        return self
 
 
 class AttributeTypeQuerySet(BaseQuerySet):
@@ -293,7 +301,7 @@ class AttributeType(BaseModel):
                 else:
                     quantity: Union[Quantity, int] = units.ureg(product_attribute.display)
                 value = quantity.to(unit.name).magnitude if isinstance(quantity, Quantity) else quantity
-                product_attribute.data['value'] = value
+                product_attribute.data['value'] = unit.serializer.serializer(value)
                 product_attribute.save()
 
 
@@ -434,3 +442,12 @@ class EprelCategory(BaseModel):
 
     class Meta:
         unique_together = 'category', 'name',
+
+
+class Brand(BaseModel):
+    name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH)
+    image = models.ImageField(verbose_name=_("image"), upload_to='brand_images/', blank=True, null=True)
+    website = models.ForeignKey(to="cms.Website", on_delete=SET_NULL, related_name="brands", blank=True, null=True)
+
+    def __str__(self):
+        return self.name
