@@ -58,7 +58,7 @@ properties:
   - name: celery-worker
     properties:
       image: specr.azurecr.io/specr:deployment
-      command: ["celery", "-A", "specr", "worker", "-l", "DEBUG", "--concurrency", "1", "--events"]
+      command: ["celery", "-A", "cms", "worker", "-l", "DEBUG", "--concurrency", "1", "--events"]
       environmentVariables:
         - name: POSTGRES_HOST
           value: specr.postgres.database.azure.com
@@ -88,7 +88,7 @@ properties:
   - name: celery-beat
     properties:
       image: specr.azurecr.io/specr:deployment
-      command: ["celery", "-A", "specr", "beat", "-l", "DEBUG"]
+      command: ["celery", "-A", "cms", "beat", "-l", "DEBUG"]
       environmentVariables:
         - name: POSTGRES_HOST
           value: specr.postgres.database.azure.com
