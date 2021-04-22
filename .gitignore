@@ -9,3 +9,6 @@ cms/sitestatic
 *specr.log*
 cms/media
 .coverage
+project.egg-info
+setup.py
+build
