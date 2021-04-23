@@ -127,6 +127,17 @@ class Category(BaseModel):
     def __str__(self):
         return self.name
 
+    @property
+    def searchable_names(self) -> Iterator[str]:
+        """
+        Yields names to assist text matching
+        """
+        for name in [self.name] + [self.alternate_names]:
+            yield name
+            yield name.upper()
+            yield name.title()
+            yield name.lower()
+
 
 class Selector(BaseModel):
     selector_type = models.CharField(verbose_name=_("Type"), max_length=MAX_LENGTH, choices=SELECTOR_TYPES)
