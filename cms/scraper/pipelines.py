@@ -7,7 +7,7 @@ from cms.data_processing.image_processing import small_pdf_2_image, energy_label
     extract_eprel_code_from_url
 from cms.data_processing.utils import create_product_attribute
 from cms.models import Product, Selector, AttributeType, ProductImage
-from cms.scraper.items import ProductPageItem
+from cms.scraper.items import ProductPageItem, EnergyLabelItem
 from cms.scraper.settings import IMAGES_FOLDER, IMAGES_ENERGY_LABELS_FOLDER
 from cms.utils import filename_from_path
 
@@ -76,31 +76,36 @@ class ProductImagePipeline:
 
 class PDFEnergyLabelConverterPipeline:
 
+    def create_energy_label(self, url, product: Optional[Product] = None):
+        energy_label_image_path: str = small_pdf_2_image(url)
+        energy_label_qr_image_path: str = energy_label_cropped_2_qr(energy_label_image_path)
+        ProductImage.objects.create(
+            product=product,
+            image_type=ENERGY_LABEL_IMAGE,
+            image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{filename_from_path(energy_label_image_path)}",
+        )
+        ProductImage.objects.create(
+            product=product,
+            image_type=ENERGY_LABEL_QR,
+            image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{filename_from_path(energy_label_qr_image_path)}",
+        )
+        if product and not product.eprel_code:
+            decoded_text = read_qr(energy_label_qr_image_path)
+            if decoded_text:
+                eprel_code: Optional[str] = extract_eprel_code_from_url(decoded_text)
+                if eprel_code:
+                    product.eprel_code = eprel_code
+                    product.save()
+
     @transaction.atomic
     def process_item(self, item, spider):
+        if not item.get('energy_label_urls'):
+            return item
+        url = item['energy_label_urls'][0]
         if isinstance(item, ProductPageItem):
-            if not item['energy_label_urls']:
-                return item
             product: Product = item['product']
             if product.energy_label_required:
-                url = item['energy_label_urls'][0]
-                energy_label_image_path: str = small_pdf_2_image(url)
-                energy_label_qr_image_path: str = energy_label_cropped_2_qr(energy_label_image_path)
-                ProductImage.objects.create(
-                    product=item['product'],
-                    image_type=ENERGY_LABEL_IMAGE,
-                    image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{filename_from_path(energy_label_image_path)}",
-                )
-                ProductImage.objects.create(
-                    product=item['product'],
-                    image_type=ENERGY_LABEL_QR,
-                    image=f"{IMAGES_ENERGY_LABELS_FOLDER}/{filename_from_path(energy_label_qr_image_path)}",
-                )
-                if not product.eprel_code:
-                    decoded_text = read_qr(energy_label_qr_image_path)
-                    if decoded_text:
-                        eprel_code: Optional[str] = extract_eprel_code_from_url(decoded_text)
-                        if eprel_code:
-                            product.eprel_code = eprel_code
-                            product.save()
+                self.create_energy_label(url, product=item['product'])
+        elif isinstance(item, EnergyLabelItem):
+            self.create_energy_label(url)
         return item
