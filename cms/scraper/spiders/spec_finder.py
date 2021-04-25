@@ -14,7 +14,7 @@ class SpecFinderSpider(BaseSpider):
 
     def __init__(self, *args, category_name: str, **kwargs):
         super().__init__(*args, **kwargs)
-        self.start_urls = [self.allowed_domains]
+        self.start_urls = [f"http://{url}" for url in self.allowed_domains]
         self.category = category
 
     def start_requests(self):
