@@ -1,10 +1,9 @@
 import datetime
 import uuid
 from statistics import mean
-from typing import Optional, Dict, Union, Type, Iterator, Any
+from typing import Optional, Dict, Union, Type, Iterator, Any, Tuple
 import pandas as pd
 from pandas import DataFrame, Series
-import requests
 
 from django import forms
 from django.contrib.humanize.templatetags import humanize
@@ -23,6 +22,7 @@ from cms.constants import MAX_LENGTH, URL_TYPES, SELECTOR_TYPES, TRACKING_FREQUE
     SCORING_CHOICES, SCORING_NUMERICAL_HIGHER, SCORING_NUMERICAL_LOWER, SCORING_BOOL_TRUE, SCORING_BOOL_FALSE, \
     EPREL_API_ROOT_URL, ENERGY_LABEL_IMAGE, WEBSITE_TYPES, WEBSITE_TYPE_RETAILER
 from cms.serializers import serializers, CustomValueSerializer
+from cms.utils import get_eprel_api_url_and_category
 
 
 def json_data_default() -> Dict[str, None]:
@@ -242,13 +242,11 @@ class Product(BaseModel):
             return
         if self.eprel_category:
             return f"{EPREL_API_ROOT_URL}{self.eprel_category.name}/{self.eprel_code}"
-        for eprel_category in self.category.eprel_names.all():
-            url = f"{EPREL_API_ROOT_URL}{eprel_category.name}/{self.eprel_code}"
-            response = requests.get(url)
-            if response.status_code == 200:
-                self.eprel_category = eprel_category
-                self.save()
-                return url
+        eprel_category_url: Optional[Tuple[EprelCategory, str]] = get_eprel_api_url_and_category(self.eprel_code, self.category)
+        if eprel_category_url:
+            self.eprel_category = eprel_category_url[0]
+            self.save()
+            return eprel_category_url[1]
 
     def update_brand(self, brand_name: str) -> 'Product':
         if self.brand:
