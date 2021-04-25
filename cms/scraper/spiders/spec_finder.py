@@ -58,7 +58,5 @@ class SpecFinderSpider(EcommerceSpider):
                 item = EnergyLabelItem()
                 item['energy_label_urls'] = [pdf]
                 item['category'] = category
-                item['website'] = self.website
-                item['product_link'] = href
                 yield item
                 break
