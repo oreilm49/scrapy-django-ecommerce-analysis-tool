@@ -12,7 +12,7 @@ from cms.scraper.spiders.base import BaseSpider
 class SpecFinderSpider(BaseSpider):
     name = 'spec_finder'
 
-    def __init__(self, *args, category: Category, **kwargs):
+    def __init__(self, *args, category_name: str, **kwargs):
         super().__init__(*args, **kwargs)
         self.start_urls = [self.allowed_domains]
         self.category = category
