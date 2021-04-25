@@ -15,7 +15,7 @@ class SpecFinderSpider(BaseSpider):
     def __init__(self, *args, category_name: str, **kwargs):
         super().__init__(*args, **kwargs)
         self.start_urls = [f"http://{url}" for url in self.allowed_domains]
-        self.category = category
+        self.category: Category = Category.objects.get(name=category_name)
 
     def start_requests(self):
         yield scrapy.Request(self.start_urls[0], callback=self.parse_category_link, cb_kwargs={'category': self.category})
