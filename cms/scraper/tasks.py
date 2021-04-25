@@ -20,14 +20,18 @@ def crawl_websites():
     process.start()
 
 
+def create_product_attributes(product: Product, data: dict) -> None:
+    for attribute_label, attribute_value in data.items():
+        attribute_label: str = camel_case_to_sentence(attribute_label)
+        if isinstance(attribute_value, (int, float, str)):
+            create_product_attribute(product, attribute_label, attribute_value)
+
+
 @shared_task
 def crawl_eprel_data():
     for product in Product.objects.published().filter(eprel_scraped=False, eprel_code__isnull=False):
         url: Optional[str] = product.get_eprel_api_url()
         response = requests.get(url)
-        for attribute_label, attribute_value in response.json().items():
-            attribute_label: str = camel_case_to_sentence(attribute_label)
-            if isinstance(attribute_value, (int, float, str)):
-                create_product_attribute(product, attribute_label, attribute_value)
+        create_product_attributes(product, response.json())
         product.eprel_scraped = True
         product.save()
