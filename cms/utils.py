@@ -67,3 +67,12 @@ def camel_case_to_sentence(string: str) -> str:
 
 def filename_from_path(path: str) -> str:
     return path.split("/")[-1]
+
+
+def get_eprel_api_url_and_category(eprel_code: str, category: 'Category') -> Optional[Tuple['EprelCategory', str]]:
+    from cms.constants import EPREL_API_ROOT_URL
+    for eprel_category in category.eprel_names.all():
+        url = f"{EPREL_API_ROOT_URL}{eprel_category.name}/{eprel_code}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            return eprel_category, url
