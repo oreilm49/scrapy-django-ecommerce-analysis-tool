@@ -49,7 +49,7 @@ class SpecFinderSpider(BaseSpider):
         # is most likely to be the list of product links.
         longest_list = max(grouped_hrefs, key=lambda group: len(group))
         for href in longest_list:
-            yield response.follow(response.urljoin(href), self.parse_product, cb_kwargs={'category': category, 'href': href})
+            yield response.follow(response.urljoin(href), self.parse_product_energy_label, cb_kwargs={'category': category, 'href': href})
 
     def parse_product_energy_label(self, response, category: Category = None, href: str = None, **kwargs):
         pdf_urls: List[str] = response.xpath('//a[contains(@href, ".pdf")]/@href').getall()
