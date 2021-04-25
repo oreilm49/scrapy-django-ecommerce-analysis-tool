@@ -1,15 +1,17 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
+import requests
 from django.db import transaction
 
 from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_IMAGE, ENERGY_LABEL_QR
 from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr, read_qr, \
     extract_eprel_code_from_url
 from cms.data_processing.utils import create_product_attribute
-from cms.models import Product, Selector, AttributeType, ProductImage
-from cms.scraper.items import ProductPageItem
+from cms.models import Product, Selector, AttributeType, ProductImage, Category, EprelCategory
+from cms.scraper.items import ProductPageItem, EnergyLabelItem
 from cms.scraper.settings import IMAGES_FOLDER, IMAGES_ENERGY_LABELS_FOLDER
-from cms.utils import filename_from_path
+from cms.scraper.tasks import create_product_attributes
+from cms.utils import filename_from_path, get_eprel_api_url_and_category
 
 
 class ProductPipeline:
@@ -103,4 +105,37 @@ class PDFEnergyLabelConverterPipeline:
                         if eprel_code:
                             product.eprel_code = eprel_code
                             product.save()
+        return item
+
+
+class SpecFinderPDFEnergyLabelPipeline:
+
+    @transaction.atomic
+    def process_item(self, item, spider):
+        if isinstance(item, EnergyLabelItem):
+            if not item['energy_label_urls']:
+                return item
+            url = item['energy_label_urls'][0]
+            category: Category = item['category']
+            energy_label_image_path: str = small_pdf_2_image(url)
+            energy_label_qr_image_path: str = energy_label_cropped_2_qr(energy_label_image_path)
+            decoded_text = read_qr(energy_label_qr_image_path)
+            if not decoded_text:
+                return item
+            eprel_code: Optional[str] = extract_eprel_code_from_url(decoded_text)
+            if not eprel_code:
+                return item
+            eprel_category_url: Optional[Tuple[EprelCategory, str]] = get_eprel_api_url_and_category(eprel_code, category)
+            if not eprel_category_url:
+                return item
+            eprel_category, eprel_url = eprel_category_url
+            response = requests.get(eprel_url)
+            product_data: dict = response.json()
+            product = Product.objects.custom_get_or_create(product_data['modelIdentifier'], category)
+            product: Product
+            create_product_attributes(product, product_data)
+            product.eprel_code = eprel_code
+            product.eprel_scraped = True
+            product.eprel_category = eprel_category
+            product.save()
         return item
