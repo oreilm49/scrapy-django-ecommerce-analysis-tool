@@ -132,7 +132,7 @@ class Category(BaseModel):
         """
         Yields names to assist text matching
         """
-        for name in [self.name] + [self.alternate_names]:
+        for name in [self.name] + self.alternate_names:
             yield name
             yield name.upper()
             yield name.title()
