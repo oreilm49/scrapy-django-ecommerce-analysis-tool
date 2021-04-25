@@ -121,7 +121,7 @@ class TestPipeline(TestCase):
         os.remove(img.image.path)
         os.remove(img_qr.image.path)
 
-    def test_spec_finder_pdf_energy_label_pipenline(self):
+    def test_spec_finder_pdf_energy_label_pipeline(self):
         Product.objects.all().delete()
         item: EnergyLabelItem = EnergyLabelItem(energy_label_urls=[], category=self.category)
         with self.subTest("empty list of urls"):
