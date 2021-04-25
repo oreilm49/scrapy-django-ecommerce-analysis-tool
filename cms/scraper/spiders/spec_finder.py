@@ -58,5 +58,6 @@ class SpecFinderSpider(BaseSpider):
                 item = EnergyLabelItem()
                 item['energy_label_urls'] = [pdf]
                 item['category'] = category
+                self.results[category] += 1
                 yield item
                 break
