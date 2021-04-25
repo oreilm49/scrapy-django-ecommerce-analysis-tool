@@ -1,28 +1,18 @@
 import re
-from typing import Iterator, Optional, Dict
+from typing import Iterator, Optional
 
 import scrapy
 
 from cms.constants import CATEGORY, PAGINATION, LINK, TABLE, TABLE_VALUE_COLUMN, TABLE_LABEL_COLUMN, MODEL, PRICE, \
     IMAGE, TABLE_VALUE_COLUMN_BOOL, ENERGY_LABEL_PDF
-from cms.models import Website, Url, Category, Selector, SpiderResult
+from cms.models import Url, Category, Selector
 
-from cms.scraper.exceptions import WebsiteNotProvidedInArguments
 from cms.scraper.items import ProductPageItem
+from cms.scraper.spiders.base import BaseSpider
 
 
-class EcommerceSpider(scrapy.Spider):
+class EcommerceSpider(BaseSpider):
     name = 'ecommerce'
-    allowed_domains = []
-    start_urls = []
-    results: Dict[Category, int] = {}
-
-    def __init__(self, website: str = None, **kwargs):
-        super().__init__(**kwargs)
-        if not website:
-            raise WebsiteNotProvidedInArguments
-        self.website: Website = Website.objects.get(name=website)
-        self.allowed_domains = [self.website.domain]
 
     def start_requests(self):
         for url in self.website.urls.filter(url_type=CATEGORY):
@@ -85,18 +75,3 @@ class EcommerceSpider(scrapy.Spider):
                 self.results[category] += 1
                 yield page_item
                 break
-
-    @classmethod
-    def from_crawler(cls, crawler, *args, **kwargs):
-        spider = super(EcommerceSpider, cls).from_crawler(crawler, *args, **kwargs)
-        crawler.signals.connect(spider.handle_spider_closed, scrapy.spiders.signals.spider_closed)
-        return spider
-
-    def handle_spider_closed(self, reason):
-        for category, items_scraped in self.results.items():
-            SpiderResult.objects.create(
-                spider_name=self.name,
-                website=self.website,
-                category=category,
-                items_scraped=items_scraped
-            )
