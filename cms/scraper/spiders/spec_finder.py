@@ -1,8 +1,5 @@
 import re
-from difflib import SequenceMatcher
-from typing import List, Optional
-
-import scrapy
+from typing import List
 
 from cms.models import Category
 from cms.scraper.items import EnergyLabelItem
@@ -17,50 +14,19 @@ class SpecFinderSpider(BaseSpiderMixin, SitemapSpider):
 
     def __init__(self, *args, category_name: str, **kwargs):
         super().__init__(*args, **kwargs)
-        self.start_urls = [f"http://{url}" for url in self.allowed_domains]
         self.category: Category = Category.objects.get(name=category_name)
+        self.results[self.category] = 0
+        self.sitemap_urls = [f"http://{self.website.domain}/sitemap.xml"]
+        self.sitemap_rules = [("".join(rf'(.*?){name_slice}(.*?)' for name_slice in name.split(" ")), 'parse')
+                              for name in self.category.searchable_names]
 
-    def start_requests(self):
-        yield scrapy.Request(self.start_urls[0], callback=self.parse_category_link, cb_kwargs={'category': self.category})
-
-    def parse_category_link(self, response, category: Category = None, **kwargs) -> scrapy.Request:
-        for name in category.searchable_names:
-            href: Optional[str] = response.xpath(f"//nav//a[contains(text(), '{name}')]/@href").get()
-            if href:
-                yield response.follow(response.urljoin(href), self.parse_product_list, cb_kwargs={'category': category})
-
-    def parse_product_list(self, response, category: Category = None, **kwargs):
-        """
-        Extracts a list of similar hrefs from the main content area of the page.
-        Hopefully, they are links to product pages.
-        """
-        hrefs: List[str] = response.xpath("//a//@href[not(ancestor::header)][not(ancestor::nav)][not(ancestor::aside)][not(ancestor::*[@id='footer'])][not(ancestor::*[@id='pagination'])][not(ancestor::*[@class='pagination'])]").getall()
-        grouped_hrefs: List[List[str]] = []
-        for href in hrefs:
-            if not len(grouped_hrefs):
-                grouped_hrefs.append([href])
-            else:
-                for i in range(0, len(grouped_hrefs)):
-                    score = SequenceMatcher(None, href, grouped_hrefs[i][0]).ratio()
-                    if score < 0.5:
-                        if i == len(grouped_hrefs) - 1:
-                            grouped_hrefs.append([href])
-                    else:
-                        if score != 1:
-                            grouped_hrefs[i].append(href)
-        # we only want the list with the most number of hrefs, as this
-        # is most likely to be the list of product links.
-        longest_list = max(grouped_hrefs, key=lambda group: len(group))
-        for href in longest_list:
-            yield response.follow(response.urljoin(href), self.parse_product_energy_label, cb_kwargs={'category': category, 'href': href})
-
-    def parse_product_energy_label(self, response, category: Category = None, href: str = None, **kwargs):
+    def parse(self, response, **kwargs):
         pdf_urls: List[str] = response.xpath('//a[contains(@href, ".pdf")]/@href').getall()
         for pdf in pdf_urls:
             if re.search(r"energy.*label", pdf):
                 item = EnergyLabelItem()
                 item['energy_label_urls'] = [pdf]
-                item['category'] = category
-                self.results[category] += 1
+                item['category'] = self.category
+                self.results[self.category] += 1
                 yield item
                 break
