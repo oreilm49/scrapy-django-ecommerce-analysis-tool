@@ -5,7 +5,7 @@ from cms.models import Website, Category, SpiderResult
 from cms.scraper.exceptions import WebsiteNotProvidedInArguments
 
 
-class BaseSpider(scrapy.Spider):
+class BaseSpiderMixin:
     name = 'base'
     allowed_domains = []
     start_urls = []
@@ -16,11 +16,11 @@ class BaseSpider(scrapy.Spider):
         if not website:
             raise WebsiteNotProvidedInArguments
         self.website: Website = Website.objects.get(name=website)
-        self.allowed_domains = [self.website.domain]
+        self.allowed_domains = [self.website.domain.split("/")[0]]
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
-        spider = super(BaseSpider, cls).from_crawler(crawler, *args, **kwargs)
+        spider = super(BaseSpiderMixin, cls).from_crawler(crawler, *args, **kwargs)
         crawler.signals.connect(spider.handle_spider_closed, scrapy.spiders.signals.spider_closed)
         return spider
 
