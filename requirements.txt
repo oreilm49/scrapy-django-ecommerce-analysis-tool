@@ -18,6 +18,7 @@ pillow==8.1.0
 pint==0.16.1
 psycopg2-binary==2.8
 python-dateutil==2.8.1
+pyzbar==0.1.8
 requests==2.25.1
 Scrapy==2.4.1
 scrapy-djangoitem==1.1.1
