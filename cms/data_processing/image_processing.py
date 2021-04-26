@@ -4,9 +4,10 @@ import os
 import requests
 from pdf2image import convert_from_path
 from PIL import Image
+from pyzbar import pyzbar
 import re
 import tempfile
-from typing import Optional
+from typing import Optional, List
 import uuid
 
 from cms.scraper.settings import IMAGES_ENERGY_LABELS_STORE
@@ -82,9 +83,8 @@ def read_qr(image_path: str) -> Optional[str]:
     Reads data from a qr code image.
     """
     image = cv.imread(image_path)
-    detector = cv.QRCodeDetector()
-    decoded_text, _, _ = detector.detectAndDecode(image)
-    return decoded_text
+    decoded_data_list: List[pyzbar.Decoded] = pyzbar.decode(image)
+    return decoded_data_list[0].data.decode('ascii').lower() if decoded_data_list else None
 
 
 def extract_eprel_code_from_url(url: str) -> Optional[str]:
