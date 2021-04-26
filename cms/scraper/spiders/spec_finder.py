@@ -6,10 +6,13 @@ import scrapy
 
 from cms.models import Category
 from cms.scraper.items import EnergyLabelItem
-from cms.scraper.spiders.base import BaseSpider
+from cms.scraper.spiders.base import BaseSpiderMixin
 
 
-class SpecFinderSpider(BaseSpider):
+from scrapy.spiders import SitemapSpider
+
+
+class SpecFinderSpider(BaseSpiderMixin, SitemapSpider):
     name = 'spec_finder'
 
     def __init__(self, *args, category_name: str, **kwargs):
