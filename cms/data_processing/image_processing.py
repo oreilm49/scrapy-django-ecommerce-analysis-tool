@@ -48,7 +48,7 @@ def small_pdf_2_image(download_url: str) -> str:
     except ContentTypeImageException:
         return download_image(download_url)
     with tempfile.TemporaryDirectory() as path:
-        images = convert_from_path(download_url, output_folder=path)
+        images = convert_from_path(download_url, output_folder=path, dpi=400)
         for image in images:
             path: str = f"{IMAGES_ENERGY_LABELS_STORE}/{uuid.uuid4()}.png"
             image.save(path)
