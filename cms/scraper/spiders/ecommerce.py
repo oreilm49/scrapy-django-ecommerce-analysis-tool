@@ -8,10 +8,10 @@ from cms.constants import CATEGORY, PAGINATION, LINK, TABLE, TABLE_VALUE_COLUMN,
 from cms.models import Url, Category, Selector
 
 from cms.scraper.items import ProductPageItem
-from cms.scraper.spiders.base import BaseSpider
+from cms.scraper.spiders.base import BaseSpiderMixin
 
 
-class EcommerceSpider(BaseSpider):
+class EcommerceSpider(BaseSpiderMixin, scrapy.Spider):
     name = 'ecommerce'
 
     def start_requests(self):
