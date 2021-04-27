@@ -198,7 +198,7 @@ class Product(BaseModel):
         image: ProductImage = self.images.filter(image_type=THUMBNAIL).first()
         return image.image.url if image else None
 
-    @property
+    @cached_property
     def current_average_price_int(self):
         """avg price of product from most recent price"""
         most_recent_price = self.websiteproductattributes.published().order_by('-created').first()
