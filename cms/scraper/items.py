@@ -16,3 +16,4 @@ class ProductPageItem(scrapy.Item):
 class EnergyLabelItem(scrapy.Item):
     category = scrapy.Field()
     energy_label_urls = scrapy.Field()
+    brand = scrapy.Field()
