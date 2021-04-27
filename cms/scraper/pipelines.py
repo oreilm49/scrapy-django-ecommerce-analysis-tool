@@ -2,6 +2,7 @@ from typing import Dict, Optional, Tuple
 
 import requests
 from django.db import transaction
+from requests import Response
 
 from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_IMAGE, ENERGY_LABEL_QR
 from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr, read_qr, \
@@ -129,7 +130,11 @@ class SpecFinderPDFEnergyLabelPipeline:
             if not eprel_category_url:
                 return item
             eprel_category, eprel_url = eprel_category_url
-            response = requests.get(eprel_url)
+            eprel_category: EprelCategory
+            eprel_url: str
+            response: Response = requests.get(eprel_url)
+            if not response.content:
+                return item
             product_data: dict = response.json()
             product = Product.objects.custom_get_or_create(product_data['modelIdentifier'], category)
             product: Product
