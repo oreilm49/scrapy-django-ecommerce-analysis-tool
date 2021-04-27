@@ -56,7 +56,7 @@ class CategoryTable(BaseModel):
     def __str__(self):
         return self.name
 
-    @property
+    @cached_property
     def get_products(self) -> 'ProductQuerySet':
         queryset = Product.objects.published().filter(category=self.category, websiteproductattributes__data__value__isnull=False)
         if self.query:
