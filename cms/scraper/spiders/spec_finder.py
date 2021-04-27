@@ -21,7 +21,7 @@ class SpecFinderSpider(BaseSpiderMixin, SitemapSpider):
         self.sitemap_rules = [(rf'(.*){slugify(name).replace("_", "-")}(.*)', 'parse')
                               for name in self.category.searchable_names] + self.sitemap_rules
         super().__init__(*args, **kwargs)
-        self.sitemap_urls = [f"http://{self.website.domain}/sitemap.xml"]
+        self.sitemap_urls = [f"http://{self.website.domain}/robots.txt"]
 
     def parse(self, response, **kwargs):
         pdf_urls: List[str] = response.xpath('//a[contains(@href, ".pdf")]/@href').getall()
