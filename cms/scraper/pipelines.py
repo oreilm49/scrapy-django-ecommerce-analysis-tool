@@ -137,5 +137,6 @@ class SpecFinderPDFEnergyLabelPipeline:
             product.eprel_code = eprel_code
             product.eprel_scraped = True
             product.eprel_category = eprel_category
+            product.brand = item['brand']
             product.save()
         return item
