@@ -24,7 +24,7 @@ class TestPipeline(TestCase):
         cls.website: Website = mommy.make(Website, name="test_website", currency__name="€", currency__widget=get_dotted_path(FloatInput))
         cls.category: Category = mommy.make(Category, name="washing machines")
         cls.product: Product = mommy.make(Product, model="model_number", category=cls.category)
-        cls.energy_label_pdf_url = "https://whirlpool-cdn.thron.com/static/7UO8OG_NEL859991596350_9DDFJI.pdf?xseo=&response-content-disposition=inline%3Bfilename%3D%22New-Energy-label.pdf"
+        cls.energy_label_pdf_url = "https://whirlpool-cdn.thron.com/static/7UO8OG_NEL859991596350_9DDFJI.pdf"
 
     def test_product(self):
         with self.subTest("create"):
