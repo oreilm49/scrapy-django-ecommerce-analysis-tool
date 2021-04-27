@@ -28,6 +28,7 @@ class SpecFinderSpider(BaseSpiderMixin, SitemapSpider):
                 item = EnergyLabelItem()
                 item['energy_label_urls'] = [pdf]
                 item['category'] = self.category
+                item['brand'] = self.website.brands.first()
                 self.results[self.category] += 1
                 yield item
                 break
