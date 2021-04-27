@@ -8,7 +8,7 @@ from model_mommy import mommy
 from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_IMAGE, ENERGY_LABEL_QR
 from cms.form_widgets import FloatInput
 from cms.models import Category, Product, ProductAttribute, Unit, Website, Selector, WebsiteProductAttribute, \
-    AttributeType, ProductImage, EprelCategory
+    AttributeType, ProductImage, EprelCategory, Brand
 from cms.utils import get_dotted_path
 
 from cms.scraper.items import ProductPageItem, EnergyLabelItem
@@ -123,7 +123,8 @@ class TestPipeline(TestCase):
 
     def test_spec_finder_pdf_energy_label_pipeline(self):
         Product.objects.all().delete()
-        item: EnergyLabelItem = EnergyLabelItem(energy_label_urls=[], category=self.category)
+        brand: Brand = mommy.make(Brand)
+        item: EnergyLabelItem = EnergyLabelItem(energy_label_urls=[], category=self.category, brand=brand)
         with self.subTest("empty list of urls"):
             self.assertEqual(SpecFinderPDFEnergyLabelPipeline().process_item(item, {}), item)
             self.assertFalse(Product.objects.exists())
@@ -146,3 +147,4 @@ class TestPipeline(TestCase):
             self.assertEqual(product.eprel_code, "258076")
             self.assertTrue(product.eprel_scraped)
             self.assertEqual(product.eprel_category, eprel_category)
+            self.assertEqual(product.brand, brand)
