@@ -134,9 +134,6 @@ class Category(BaseModel):
         """
         for name in [self.name] + self.alternate_names:
             yield name
-            yield name.upper()
-            yield name.title()
-            yield name.lower()
 
 
 class Selector(BaseModel):
