@@ -1,6 +1,8 @@
 import re
 from typing import List
 
+from django.utils.text import slugify
+
 from cms.models import Category
 from cms.scraper.items import EnergyLabelItem
 from cms.scraper.spiders.base import BaseSpiderMixin
@@ -14,12 +16,12 @@ class SpecFinderSpider(BaseSpiderMixin, SitemapSpider):
     sitemap_rules = [('a^', 'parse')]
 
     def __init__(self, *args, category_name: str, **kwargs):
-        super().__init__(*args, **kwargs)
         self.category: Category = Category.objects.get(name=category_name)
         self.results[self.category] = 0
+        self.sitemap_rules = [(rf'(.*){slugify(name).replace("_", "-")}(.*)', 'parse')
+                              for name in self.category.searchable_names] + self.sitemap_rules
+        super().__init__(*args, **kwargs)
         self.sitemap_urls = [f"http://{self.website.domain}/sitemap.xml"]
-        self.sitemap_rules = [("".join(rf'(.*?){name_slice}(.*?)' for name_slice in name.split(" ")), 'parse')
-                              for name in self.category.searchable_names]
 
     def parse(self, response, **kwargs):
         pdf_urls: List[str] = response.xpath('//a[contains(@href, ".pdf")]/@href').getall()
