@@ -11,6 +11,7 @@ from scrapy.spiders import SitemapSpider
 
 class SpecFinderSpider(BaseSpiderMixin, SitemapSpider):
     name = 'spec_finder'
+    sitemap_rules = [('a^', 'parse')]
 
     def __init__(self, *args, category_name: str, **kwargs):
         super().__init__(*args, **kwargs)
