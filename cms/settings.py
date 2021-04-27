@@ -212,3 +212,11 @@ INTERNAL_IPS = [
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda _request: DEBUG
 }
+
+CACHE_DURATION = 60 * 5
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
