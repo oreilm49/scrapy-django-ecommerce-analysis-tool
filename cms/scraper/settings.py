@@ -65,6 +65,7 @@ ITEM_PIPELINES = {
    'scraper.pipelines.WebsiteProductAttributePipeline': 400,
    'scraper.pipelines.ProductImagePipeline': 500,
    'scraper.pipelines.PDFEnergyLabelConverterPipeline': 600,
+   'scraper.pipelines.SpecFinderPDFEnergyLabelPipeline': 700,
 }
 
 IMAGES_FOLDER = 'product_images'

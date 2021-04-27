@@ -8,12 +8,12 @@ from model_mommy import mommy
 from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_IMAGE, ENERGY_LABEL_QR
 from cms.form_widgets import FloatInput
 from cms.models import Category, Product, ProductAttribute, Unit, Website, Selector, WebsiteProductAttribute, \
-    AttributeType, ProductImage
+    AttributeType, ProductImage, EprelCategory
 from cms.utils import get_dotted_path
 
-from cms.scraper.items import ProductPageItem
+from cms.scraper.items import ProductPageItem, EnergyLabelItem
 from cms.scraper.pipelines import ProductPipeline, ProductAttributePipeline, WebsiteProductAttributePipeline, \
-    ProductImagePipeline, PDFEnergyLabelConverterPipeline
+    ProductImagePipeline, PDFEnergyLabelConverterPipeline, SpecFinderPDFEnergyLabelPipeline
 
 
 class TestPipeline(TestCase):
@@ -24,6 +24,7 @@ class TestPipeline(TestCase):
         cls.website: Website = mommy.make(Website, name="test_website", currency__name="€", currency__widget=get_dotted_path(FloatInput))
         cls.category: Category = mommy.make(Category, name="washing machines")
         cls.product: Product = mommy.make(Product, model="model_number", category=cls.category)
+        cls.energy_label_pdf_url = "https://whirlpool-cdn.thron.com/static/7UO8OG_NEL859991596350_9DDFJI.pdf"
 
     def test_product(self):
         with self.subTest("create"):
@@ -109,14 +110,39 @@ class TestPipeline(TestCase):
             self.assertFalse(ProductImage.objects.filter(product=self.product, image_type=ENERGY_LABEL_QR).exists())
             self.assertIsNone(self.product.eprel_code)
 
-        pdf_url = "https://whirlpool-cdn.thron.com/static/7UO8OG_NEL859991596350_9DDFJI.pdf?xseo=&response-content-disposition=inline%3Bfilename%3D%22New-Energy-label.pdf"
         with self.subTest("url valid"):
-            self.assertEqual(requests.get(pdf_url).status_code, 200)
+            self.assertEqual(requests.get(self.energy_label_pdf_url).status_code, 200)
 
-        item: ProductPageItem = ProductPageItem(product=self.product, energy_label_urls=[pdf_url])
+        item: ProductPageItem = ProductPageItem(product=self.product, energy_label_urls=[self.energy_label_pdf_url])
         PDFEnergyLabelConverterPipeline().process_item(item, {})
         img: ProductImage = ProductImage.objects.get(product=self.product, image_type=ENERGY_LABEL_IMAGE)
         img_qr: ProductImage = ProductImage.objects.get(product=self.product, image_type=ENERGY_LABEL_QR)
         self.assertEqual("258076", self.product.eprel_code)
         os.remove(img.image.path)
         os.remove(img_qr.image.path)
+
+    def test_spec_finder_pdf_energy_label_pipeline(self):
+        Product.objects.all().delete()
+        item: EnergyLabelItem = EnergyLabelItem(energy_label_urls=[], category=self.category)
+        with self.subTest("empty list of urls"):
+            self.assertEqual(SpecFinderPDFEnergyLabelPipeline().process_item(item, {}), item)
+            self.assertFalse(Product.objects.exists())
+
+        with self.subTest("bad url"):
+            item['energy_label_urls'] = ["http://www.smartcaptech.com/wp-content/uploads/sample.pdf"]
+            self.assertEqual(SpecFinderPDFEnergyLabelPipeline().process_item(item, {}), item)
+            self.assertFalse(Product.objects.exists())
+
+        with self.subTest("no eprel category"):
+            item['energy_label_urls'] = [self.energy_label_pdf_url]
+            self.assertEqual(SpecFinderPDFEnergyLabelPipeline().process_item(item, {}), item)
+            self.assertFalse(Product.objects.exists())
+
+        with self.subTest("product and attribs created"):
+            eprel_category: EprelCategory = mommy.make(EprelCategory, name="washingmachines2019", category=self.category)
+            self.assertEqual(SpecFinderPDFEnergyLabelPipeline().process_item(item, {}), item)
+            product: Product = Product.objects.get(model="FFB 8448 WV UK")
+            self.assertTrue(ProductAttribute.objects.filter(product=product).exists())
+            self.assertEqual(product.eprel_code, "258076")
+            self.assertTrue(product.eprel_scraped)
+            self.assertEqual(product.eprel_category, eprel_category)

@@ -1,5 +1,6 @@
 import datetime
 import statistics
+from typing import Iterable
 
 from django import forms
 from django.test import TestCase
@@ -295,3 +296,11 @@ class TestModels(TestCase):
         self.assertIn(product.brand, Product.objects.brands())
         self.assertNotIn(brand, Product.objects.brands())
         self.assertNotIn(unpub_brand, Product.objects.brands())
+
+    def test_category_searchable_names(self):
+        category: Category = mommy.make(Category, name="washers", alternate_names=["front loaders", "frontloaders"])
+        searchable_names = category.searchable_names
+        self.assertIsInstance(searchable_names, Iterable)
+        searchable_names = list(searchable_names)
+        self.assertIn("washers", searchable_names)
+        self.assertIn("front loaders", searchable_names)

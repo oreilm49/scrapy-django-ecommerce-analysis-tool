@@ -3,8 +3,8 @@ import itertools
 from django.test import TestCase
 from model_mommy import mommy
 
-from cms.models import Product, WebsiteProductAttribute, AttributeType
-from cms.utils import products_grouper, extract_grouper, filename_from_path
+from cms.models import Product, WebsiteProductAttribute, AttributeType, Category, EprelCategory
+from cms.utils import products_grouper, extract_grouper, filename_from_path, get_eprel_api_url_and_category
 
 
 class TestUtils(TestCase):
@@ -37,3 +37,15 @@ class TestUtils(TestCase):
     def test_filename_from_path(self):
         path = "opt/project/cms/media/product_images/energy_labels/9d08fa81-ba1f-4c3c-9803-cbca5a2ed010.png"
         self.assertEqual("9d08fa81-ba1f-4c3c-9803-cbca5a2ed010.png", filename_from_path(path))
+
+    def test_get_eprel_api_url_and_category(self):
+        category: Category = mommy.make(Category, name="washing machines")
+        with self.subTest("no eprel categories"):
+            self.assertIsNone(get_eprel_api_url_and_category("test", category))
+
+        with self.subTest("eprel category exists"):
+            eprel_cat: EprelCategory = mommy.make(EprelCategory, name="washingmachines2019", category=category)
+            eprel_cat_and_url = get_eprel_api_url_and_category("258076", category)
+            self.assertIsInstance(eprel_cat_and_url, tuple)
+            self.assertEqual(eprel_cat_and_url[0], eprel_cat)
+            self.assertEqual(eprel_cat_and_url[1], "https://eprel.ec.europa.eu/api/products/washingmachines2019/258076")

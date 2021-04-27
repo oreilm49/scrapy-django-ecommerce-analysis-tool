@@ -11,3 +11,9 @@ class ProductPageItem(scrapy.Item):
     image_urls = scrapy.Field()
     images = scrapy.Field()
     energy_label_urls = scrapy.Field()
+
+
+class EnergyLabelItem(scrapy.Item):
+    category = scrapy.Field()
+    energy_label_urls = scrapy.Field()
+    brand = scrapy.Field()
