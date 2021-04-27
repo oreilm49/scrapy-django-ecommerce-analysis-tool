@@ -54,10 +54,19 @@ class TestImageProcessing(TestCase):
         os.remove(cropped_image_path)
 
     def test_read_qr(self):
-        cropped_image_path = energy_label_cropped_2_qr(self.image_path)
-        decoded_text = read_qr(cropped_image_path)
-        self.assertEqual("https://eprel.ec.europa.eu/qr/298173", decoded_text)
-        os.remove(cropped_image_path)
+        with self.subTest("image path"):
+            cropped_image_path = energy_label_cropped_2_qr(self.image_path)
+            decoded_text = read_qr(cropped_image_path)
+            self.assertEqual("https://eprel.ec.europa.eu/qr/298173", decoded_text)
+            os.remove(cropped_image_path)
+
+        with self.subTest("remote url"):
+            pdf = "https://media3.neff-international.com/Documents/energylabel/en-IE/S187ZCX43G.pdf"
+            img = small_pdf_2_image(pdf)
+            cropped_image_path = energy_label_cropped_2_qr(img)
+            decoded_text = read_qr(cropped_image_path)
+            self.assertEqual('https://eprel.ec.europa.eu/qr/365228', decoded_text)
+            os.remove(cropped_image_path)
 
     def test_extract_eprel_code_from_url(self):
         url = "https://eprel.ec.europa.eu/qr/298173"
