@@ -58,7 +58,10 @@ class CategoryTable(BaseModel):
 
     @property
     def get_products(self) -> 'ProductQuerySet':
-        queryset = Product.objects.published().filter(category=self.category, websiteproductattributes__data__value__isnull=False)
+        queryset = Product.objects.published()\
+            .select_related("brand")\
+            .prefetch_related('websiteproductattributes', 'websiteproductattributes__attribute_type')\
+            .filter(category_id=self.category_id, websiteproductattributes__data__value__isnull=False)
         if self.query:
             queryset = queryset.filter(model__contains=self.query)
         if self.websites.exists():
