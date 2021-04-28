@@ -29,7 +29,7 @@ class CategoryTableForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        attributes_queryset = AttributeType.objects.exclude(name='price').order_by('name')
+        attributes_queryset = AttributeType.objects.order_by('name')
         self.fields['x_axis_values'].widget = TagWidget()
         self.fields['x_axis_attribute'].label = _('Horizontal label')
         self.fields['x_axis_values'].label = _('Horizontal values')
