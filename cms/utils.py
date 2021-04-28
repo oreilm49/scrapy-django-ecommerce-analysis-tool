@@ -20,9 +20,9 @@ def extract_grouper(value: Union[str, float, int], grouper_values: List[Union[st
     groupers_are_nums: bool = type(grouper_values[0]) in [int, float]
     for grouper_value in grouper_values:
         if groupers_are_nums:
-            if value <= grouper_value:
+            if value and value <= grouper_value:
                 return grouper_value
-        elif value == grouper_value:
+        elif value and value == grouper_value:
             return grouper_value
 
 
