@@ -201,10 +201,7 @@ class Product(BaseModel):
     @cached_property
     def current_average_price_int(self):
         """avg price of product from most recent price"""
-        most_recent_price = self.websiteproductattributes.published().order_by('-created').first()
-        if not most_recent_price:
-            return None
-        prices = self.websiteproductattributes.published().filter(attribute_type__name="price").for_day(most_recent_price.created.date()).values_list('data__value', flat=True)
+        prices = self.websiteproductattributes.published().filter(attribute_type__name="price").for_day(datetime.datetime.now().date()).values_list('data__value', flat=True)
         return int(mean([float(price) for price in prices])) if prices else None
 
     @cached_property
