@@ -49,7 +49,7 @@ class CategoryTableForm(forms.ModelForm):
     class Meta:
         model = CategoryTable
         fields = ['name', 'x_axis_attribute', 'x_axis_values', 'y_axis_attribute', 'y_axis_values', 'category', 'query',
-                  'websites', 'brands', 'products', 'price_low', 'price_high']
+                  'websites', 'brands', 'products']
 
     def clean_x_axis_values(self) -> List[str]:
         return self.clean_axis_attributes(self.cleaned_data['x_axis_values'], self.cleaned_data['x_axis_attribute'])
