@@ -29,17 +29,20 @@ class CategoryTableForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        attributes_queryset = AttributeType.objects.exclude(name='price').order_by('name')
         self.fields['x_axis_values'].widget = TagWidget()
         self.fields['x_axis_attribute'].label = _('Horizontal label')
         self.fields['x_axis_values'].label = _('Horizontal values')
         self.fields['x_axis_values'].required = False
         self.fields['x_axis_attribute'].required = False
+        self.fields['x_axis_attribute'].queryset = attributes_queryset
 
         self.fields['y_axis_values'].widget = TagWidget()
         self.fields['y_axis_attribute'].label = _('Vertical label')
         self.fields['y_axis_values'].label = _('Vertical values')
         self.fields['y_axis_values'].required = False
         self.fields['y_axis_attribute'].required = False
+        self.fields['y_axis_attribute'].queryset = attributes_queryset
 
         self.fields['websites'].queryset = Website.objects.published()
         self.fields['websites'].required = False
