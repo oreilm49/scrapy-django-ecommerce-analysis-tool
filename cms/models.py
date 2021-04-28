@@ -357,7 +357,7 @@ class ProductAttribute(BaseProductAttribute):
 
     @property
     def display(self) -> str:
-        if self.attribute_type.unit and not self.attribute_type.unit.is_bool:
+        if self.attribute_type and self.attribute_type.unit and not self.attribute_type.unit.is_bool:
             return f"{self.formatted_value} {self.attribute_type.unit}"
         return f"{self.data['value']}"
 
