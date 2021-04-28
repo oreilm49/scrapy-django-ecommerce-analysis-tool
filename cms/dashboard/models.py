@@ -100,11 +100,18 @@ class CategoryTable(BaseModel):
         y_axis_attribute: Optional[AttributeType] = self.y_axis_attribute
         x_axis_values: List = self.x_axis_values
         y_axis_values: List = self.y_axis_values
-        products: List[CategoryTableProduct] = [CategoryTableProduct(
-            x_axis_grouper=products_grouper(product, x_axis_attribute, x_axis_values),
-            y_axis_grouper=products_grouper(product, y_axis_attribute, y_axis_values),
-            product=product
-        ) for product in self.get_products]
+        products: List[CategoryTableProduct] = []
+        for product in self.get_products:
+            x_axis_grouper = products_grouper(product, x_axis_attribute, x_axis_values)
+            y_axis_grouper = products_grouper(product, y_axis_attribute, y_axis_values)
+            if x_axis_grouper and y_axis_grouper:
+                products.append(
+                    CategoryTableProduct(
+                        x_axis_grouper=products_grouper(product, x_axis_attribute, x_axis_values),
+                        y_axis_grouper=products_grouper(product, y_axis_attribute, y_axis_values),
+                        product=product
+                    )
+                )
         products = sorted(products, key=lambda product: product.product.current_average_price_int)
         if not y_axis_attribute:
             return {None: products}
