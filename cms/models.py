@@ -212,7 +212,7 @@ class Product(BaseModel):
 
     @cached_property
     def top_attributes(self) -> Iterator[ProductQuerySet]:
-        for attribute_config in self.category.category_attribute_configs.order_by('order').iterator():
+        for attribute_config in self.category.category_attribute_configs.order_by('order').select_related('attribute_type').iterator():
             attribute_config: 'CategoryAttributeConfig'
             yield attribute_config.attribute_type.productattributes.filter(product__pk=self.pk).first()
 
