@@ -9,7 +9,7 @@ from django.utils.translation import gettext as _
 
 from cms.dashboard.constants import CategoryTableProduct, CategoryTableEmpty
 from cms.dashboard.reports import ProductCluster
-from cms.models import BaseModel, BaseQuerySet, Product, ProductQuerySet, ProductAttributeQuerySet, ProductAttribute
+from cms.models import BaseModel, BaseQuerySet, Product, ProductQuerySet, ProductAttribute, AttributeType
 from cms.utils import is_value_numeric, products_grouper
 
 
@@ -60,8 +60,11 @@ class CategoryTable(BaseModel):
     def get_products(self) -> 'ProductQuerySet':
         queryset = Product.objects.published()\
             .select_related("brand")\
-            .prefetch_related('websiteproductattributes', 'websiteproductattributes__attribute_type')\
             .filter(category_id=self.category_id, websiteproductattributes__data__value__isnull=False)
+        x_axis_attribute: Optional[AttributeType] = self.x_axis_attribute
+        y_axis_attribute: Optional[AttributeType] = self.y_axis_attribute
+        x_axis_values: List = self.x_axis_values
+        y_axis_values: List = self.y_axis_values
         if self.query:
             queryset = queryset.filter(model__contains=self.query)
         if self.websites.exists():
@@ -76,16 +79,16 @@ class CategoryTable(BaseModel):
             queryset = queryset.filter(brand__in=self.brands.all())
         if self.products.exists():
             queryset = queryset.filter(pk__in=self.products.all())
-        if self.x_axis_values and not is_value_numeric(self.x_axis_values[0]):
-            if self.x_axis_attribute.name == 'brand':
-                queryset = queryset.filter(brand__name__in=self.x_axis_values)
+        if x_axis_values and not is_value_numeric(x_axis_values[0]):
+            if x_axis_attribute.name == 'brand':
+                queryset = queryset.filter(brand__name__in=x_axis_values)
             else:
-                queryset.filter(pk__in=self.x_axis_attribute.productattributes.filter(data__value__in=self.x_axis_values))
-        if self.y_axis_values and not is_value_numeric(self.y_axis_values[0]):
-            if self.y_axis_attribute.name == 'brand':
-                queryset = queryset.filter(brand__name__in=self.y_axis_values)
+                queryset.filter(pk__in=x_axis_attribute.productattributes.filter(data__value__in=x_axis_values))
+        if y_axis_values and not is_value_numeric(y_axis_values[0]):
+            if y_axis_attribute.name == 'brand':
+                queryset = queryset.filter(brand__name__in=y_axis_values)
             else:
-                queryset.filter(pk__in=self.y_axis_attribute.productattributes.filter(data__value__in=self.y_axis_values))
+                queryset.filter(pk__in=y_axis_attribute.productattributes.filter(data__value__in=y_axis_values))
         return queryset.distinct()
 
     @cached_property
@@ -93,15 +96,19 @@ class CategoryTable(BaseModel):
         """
         Builds a dict of product lists, grouped by y_axis_grouper and ordered by price.
         """
+        x_axis_attribute: Optional[AttributeType] = self.x_axis_attribute
+        y_axis_attribute: Optional[AttributeType] = self.y_axis_attribute
+        x_axis_values: List = self.x_axis_values
+        y_axis_values: List = self.y_axis_values
         products: List[CategoryTableProduct] = [CategoryTableProduct(
-            x_axis_grouper=products_grouper(product, self.x_axis_attribute, self.x_axis_values),
-            y_axis_grouper=products_grouper(product, self.y_axis_attribute, self.y_axis_values),
+            x_axis_grouper=products_grouper(product, x_axis_attribute, x_axis_values),
+            y_axis_grouper=products_grouper(product, y_axis_attribute, y_axis_values),
             product=product
         ) for product in self.get_products]
         products = sorted(products, key=lambda product: product.product.current_average_price_int)
-        if not self.y_axis_attribute:
+        if not y_axis_attribute:
             return {None: products}
-        products_grid: Dict[str, List] = {y_axis_grouper: [] for y_axis_grouper in self.y_axis_values}
+        products_grid: Dict[str, List] = {y_axis_grouper: [] for y_axis_grouper in y_axis_values}
         col_index: int = 0
         col_min_val: int = 0
         col_grouper: Optional[str] = None
