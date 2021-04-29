@@ -44,11 +44,18 @@ class EprelCategoryInlineAdmin(admin.TabularInline):
     show_change_link = True
 
 
+class CategoryUrlInlineAdmin(admin.TabularInline):
+    model = Url
+    extra = 0
+    fields = 'url', 'url_type', 'website',
+    show_change_link = True
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = 'id', 'name', 'parent', 'alternate_names',
     list_filter = 'parent',
-    inlines = CategoryAttributeConfigInlineAdmin, EprelCategoryInlineAdmin,
+    inlines = CategoryAttributeConfigInlineAdmin, EprelCategoryInlineAdmin, CategoryUrlInlineAdmin,
 
 
 @admin.register(Unit)
