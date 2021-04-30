@@ -6,7 +6,7 @@
     </div>
     <div class="col-sm-12 col-md-7">
         <div class="float-right">
-        {% bootstrap_pagination page_obj size='small' %}
+        {% bootstrap_pagination page_obj size='small' extra=request.META.QUERY_STRING %}
         </div>
     </div>
 </div>
