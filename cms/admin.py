@@ -90,8 +90,8 @@ class ProductInlineAdmin(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = 'id', 'model', 'category', 'alternate_models',
-    list_filter = 'category',
+    list_display = 'id', 'model', 'category', 'brand', 'alternate_models',
+    list_filter = 'category', 'brand',
     list_per_page = 25
     inlines = ProductAttributeInlineAdmin, ProductImageInlineAdmin,
 
