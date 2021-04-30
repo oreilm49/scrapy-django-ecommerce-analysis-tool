@@ -127,6 +127,8 @@ class ProductsFilterForm(forms.Form):
     brands = forms.ModelMultipleChoiceField(label=_('Brands'), queryset=Brand.objects.published(), required=False)
 
     def search(self, queryset: ProductQuerySet) -> ProductQuerySet:
+        if self.cleaned_data.get('category'):
+            queryset = queryset.filter(category=self.cleaned_data['category'])
         if self.cleaned_data.get('q'):
             queryset = queryset.filter(Q(model__contains=self.cleaned_data['q']) |
                                        Q(alternate_models__contains=[self.cleaned_data['q']]) |
