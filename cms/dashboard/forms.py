@@ -79,6 +79,18 @@ class CategoryTableForm(forms.ModelForm):
                 raise ValidationError(_("'{attribute}' with value '{value}' does not exist.").format(attribute=attribute_type.name, value=value))
         return serialized_values_for_attribute_type(values, attribute_type)
 
+    def clean(self):
+        category = self.cleaned_data['category']
+        self.validate_attribute_type('x_axis_attribute', self.cleaned_data['x_axis_attribute'], category)
+        self.validate_attribute_type('y_axis_attribute', self.cleaned_data['y_axis_attribute'], category)
+        return self.cleaned_data
+
+    def validate_attribute_type(self, field, attribute_type: AttributeType, category: Category):
+        if attribute_type.category and attribute_type.category != category:
+            raise ValidationError({field: _("'{attribute}' from category '{attribute.category}' can't be used with '{category}'.").format(
+                attribute=attribute_type, category=category
+            )})
+
     class Media:
         js = 'js/select2.min.js', 'js/category_line_up.js',
         css = {
