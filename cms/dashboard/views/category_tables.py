@@ -193,7 +193,11 @@ class CategoryTableAttributeUpdate(CategoryTableMixin, SuccessMessageMixin, Upda
         return reverse('dashboard:category-table', kwargs={'pk': self.table.pk})
 
     def get_form(self, form_class=None):
-        return get_category_table_attribute_formset()(self.request.POST or None, queryset=CategoryTableAttribute.objects.published().filter(table=self.table))
+        return get_category_table_attribute_formset()(
+            self.request.POST or None,
+            queryset=CategoryTableAttribute.objects.published().filter(table=self.table),
+            form_kwargs={"category": self.table.category},
+        )
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(

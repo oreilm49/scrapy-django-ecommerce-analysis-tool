@@ -256,21 +256,22 @@ class Product(BaseModel):
 
 class AttributeTypeQuerySet(BaseQuerySet):
 
-    def custom_get_or_create(self, name: str, unit: Optional[Unit] = None) -> 'AttributeType':
-        attribute_type_check = self.filter(Q(name=name) | Q(alternate_names__contains=[name]))
+    def custom_get_or_create(self, name: str, category: Category, unit: Optional[Unit] = None) -> 'AttributeType':
+        attribute_type_check = self.filter(Q(name=name) | Q(alternate_names__contains=[name]), category=category)
         if attribute_type_check.exists():
             attribute_type: AttributeType = attribute_type_check.first()
             if not attribute_type.unit and unit:
                 attribute_type.unit = unit
                 attribute_type.save()
             return attribute_type
-        return AttributeType.objects.create(name=name, unit=unit)
+        return AttributeType.objects.create(name=name, unit=unit, category=category)
 
 
 class AttributeType(BaseModel):
-    name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH, unique=True)
+    name = models.CharField(verbose_name=_("Name"), max_length=MAX_LENGTH)
     alternate_names = ArrayField(verbose_name=_("Alternate names"), base_field=models.CharField(max_length=MAX_LENGTH, blank=True), null=True, blank=True, default=list)
     unit = models.ForeignKey(to=Unit, verbose_name=_("Data type"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The data type for this attribute"), related_name="attribute_types")
+    category = models.ForeignKey(to=Category, verbose_name=_("Category"), on_delete=SET_NULL, blank=True, null=True, help_text=_("The category for this attribute"), related_name="attribute_types")
 
     def __str__(self):
         return self.name
@@ -278,7 +279,7 @@ class AttributeType(BaseModel):
     objects = AttributeTypeQuerySet.as_manager()
 
     class Meta:
-        unique_together = ['name', 'unit']
+        unique_together = ['name', 'unit', 'category']
 
     @transaction.atomic
     def convert_unit(self, unit: Unit) -> 'AttributeType':

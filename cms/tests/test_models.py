@@ -147,22 +147,34 @@ class TestModels(TestCase):
             self.assertEqual(price_history[datetime.datetime.now().year], 125.0)
             self.assertEqual(price_history[last_year.year], 75)
 
-
     def test_custom_get_or_create__attribute_type(self):
         unit: Unit = mommy.make(Unit)
-        attribute_created: AttributeType = AttributeType.objects.custom_get_or_create("test_attribute", unit)
-        self.assertEqual(attribute_created.name, "test_attribute")
-        self.assertEqual(attribute_created.unit, unit)
+        category: Category = mommy.make(Category)
+        with self.subTest("attribute created"):
+            attribute_created: AttributeType = AttributeType.objects.custom_get_or_create("test_attribute", category, unit=unit)
+            self.assertEqual(attribute_created.name, "test_attribute")
+            self.assertEqual(attribute_created.unit, unit)
+            self.assertEqual(attribute_created.category, category)
 
-        attribute_retrieved: AttributeType = AttributeType.objects.custom_get_or_create("test_attribute", unit)
-        self.assertEqual(attribute_created, attribute_retrieved)
-        self.assertEqual(AttributeType.objects.count(), 1)
+        with self.subTest("attribute retrieved"):
+            attribute_retrieved: AttributeType = AttributeType.objects.custom_get_or_create("test_attribute", category, unit)
+            self.assertEqual(attribute_created, attribute_retrieved)
+            self.assertEqual(AttributeType.objects.count(), 1)
 
-        attribute_created.alternate_names.append("test_attribute_2")
-        attribute_created.save()
-        attribute_retrieved: AttributeType = AttributeType.objects.custom_get_or_create("test_attribute_2", unit)
-        self.assertEqual(attribute_created, attribute_retrieved)
-        self.assertEqual(AttributeType.objects.count(), 1)
+        with self.subTest("attribute created for second category"):
+            category2: Category = mommy.make(Category)
+            new_attribute_created: AttributeType = AttributeType.objects.custom_get_or_create("test_attribute", category2, unit=unit)
+            self.assertEqual(new_attribute_created.name, "test_attribute")
+            self.assertEqual(new_attribute_created.unit, unit)
+            self.assertEqual(new_attribute_created.category, category2)
+
+        with self.subTest("alternate names"):
+            self.assertEqual(AttributeType.objects.count(), 2)
+            attribute_created.alternate_names.append("test_attribute_2")
+            attribute_created.save()
+            attribute_retrieved: AttributeType = AttributeType.objects.custom_get_or_create("test_attribute_2", category, unit)
+            self.assertEqual(attribute_created, attribute_retrieved)
+            self.assertEqual(AttributeType.objects.count(), 2)
 
     def test_website_product_attributes__for_last_day(self):
         attrib_1: WebsiteProductAttribute = mommy.make(WebsiteProductAttribute, website__name="site", attribute_type__name="test")
