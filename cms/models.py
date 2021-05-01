@@ -256,15 +256,15 @@ class Product(BaseModel):
 
 class AttributeTypeQuerySet(BaseQuerySet):
 
-    def custom_get_or_create(self, name: str, unit: Optional[Unit] = None) -> 'AttributeType':
-        attribute_type_check = self.filter(Q(name=name) | Q(alternate_names__contains=[name]))
+    def custom_get_or_create(self, name: str, category: Category, unit: Optional[Unit] = None) -> 'AttributeType':
+        attribute_type_check = self.filter(Q(name=name) | Q(alternate_names__contains=[name]), category=category)
         if attribute_type_check.exists():
             attribute_type: AttributeType = attribute_type_check.first()
             if not attribute_type.unit and unit:
                 attribute_type.unit = unit
                 attribute_type.save()
             return attribute_type
-        return AttributeType.objects.create(name=name, unit=unit)
+        return AttributeType.objects.create(name=name, unit=unit, category=category)
 
 
 class AttributeType(BaseModel):
