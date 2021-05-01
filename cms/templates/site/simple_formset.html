@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block main_content %}
+    {% if formset.forms %}
     <form method="post">
         {% csrf_token %}
         {{ formset.management_form }}
@@ -21,8 +22,10 @@
                             {% endif %}
                         {% endfor %}
                     {% endif %}
+                {% endfor %}
             </thead>
             <tbody>
+                {% for form in formset.forms %}
                     <tr>
                         {% for field in form %}
                             <td style="{% if field.label == 'Id' %}display: none{% endif %}">{% if field.field.disabled %}{{ field.initial }}{% else %}{{ field }}{% endif %}</td>
@@ -33,6 +36,9 @@
         </table>
         {% bootstrap_button _('Save') button_type="submit" button_class='btn-success' %}
     </form>
+    {% else %}
+        <div class="container-fluid">{% trans "Formset is empty" %}</div>
+    {% endif %}
 {% endblock %}
 
 {% block extra_js %}
