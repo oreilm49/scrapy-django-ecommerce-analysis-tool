@@ -18,7 +18,7 @@ class SpecFinderSpider(BaseSpiderMixin, SitemapSpider):
     def __init__(self, *args, category_name: str, **kwargs):
         self.category: Category = Category.objects.get(name=category_name)
         self.results[self.category] = 0
-        self.sitemap_rules = [(rf'(.*){slugify(name).replace("_", "-")}(.*)', 'parse')
+        self.sitemap_rules = [(rf'(.*)\/{slugify(name).replace("_", "-")}\/(.*)', 'parse')
                               for name in self.category.searchable_names] + self.sitemap_rules
         super().__init__(*args, **kwargs)
         self.sitemap_urls = [f"http://{self.website.domain}/robots.txt"]
