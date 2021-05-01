@@ -206,6 +206,7 @@ class TestModels(TestCase):
 
         with self.subTest("code added, eprel category"):
             eprel_category: EprelCategory = EprelCategory.objects.create(category=category, name="washingmachines2019")
+            self.assertIsInstance(product.get_eprel_api_url(), dict)
             self.assertEqual("https://eprel.ec.europa.eu/api/products/washingmachines2019/298173", product.get_eprel_api_url())
             self.assertEqual(product.eprel_category, eprel_category)
 
