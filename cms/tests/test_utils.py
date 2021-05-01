@@ -53,3 +53,4 @@ class TestUtils(TestCase):
             self.assertIsInstance(eprel_cat_and_url, tuple)
             self.assertEqual(eprel_cat_and_url[0], eprel_cat)
             self.assertEqual(eprel_cat_and_url[1], "https://eprel.ec.europa.eu/api/products/washingmachines2019/258076")
+            self.assertIsInstance(eprel_cat_and_url[2], dict)
