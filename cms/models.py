@@ -231,16 +231,16 @@ class Product(BaseModel):
         df_grouper: Series = df['created'].dt.isocalendar().week if time_period == WEEKLY else getattr(df['created'].dt, time_period)
         return getattr(df.groupby(by=df_grouper), aggregation)()
 
-    def get_eprel_api_url(self) -> Optional[str]:
+    def get_eprel_api_url(self) -> Optional[Union[str, dict]]:
         if not self.eprel_code:
             return
         if self.eprel_category:
             return f"{EPREL_API_ROOT_URL}{self.eprel_category.name}/{self.eprel_code}"
-        eprel_category_url: Optional[Tuple[EprelCategory, str]] = get_eprel_api_url_and_category(self.eprel_code, self.category)
+        eprel_category_url: Optional[Tuple[EprelCategory, str, dict]] = get_eprel_api_url_and_category(self.eprel_code, self.category)
         if eprel_category_url:
             self.eprel_category = eprel_category_url[0]
             self.save()
-            return eprel_category_url[1]
+            return eprel_category_url[2]
 
     def update_brand(self, brand_name: str) -> 'Product':
         if self.brand:
