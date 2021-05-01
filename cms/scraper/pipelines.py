@@ -133,7 +133,6 @@ class SpecFinderPDFEnergyLabelPipeline:
             product: Product = Product.objects.custom_get_or_create(product_data['modelIdentifier'], category)
             if product.eprel_scraped:
                 return item
-            product: Product
             create_product_attributes(product, product_data)
             product.eprel_code = eprel_code
             product.eprel_scraped = True
