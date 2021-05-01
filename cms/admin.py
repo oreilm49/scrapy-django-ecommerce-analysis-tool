@@ -111,8 +111,8 @@ class WebsiteProductAttributeAdmin(admin.ModelAdmin):
 
 @admin.register(AttributeType)
 class AttributeTypeAdmin(admin.ModelAdmin):
-    list_display = 'id', 'name', 'alternate_names', 'unit',
-    list_filter = 'name', 'alternate_names', 'unit',
+    list_display = 'id', 'name', 'alternate_names', 'unit', 'category',
+    list_filter = 'name', 'alternate_names', 'unit', 'category',
     inlines = ProductAttributeInlineAdmin,
     form = AttributeTypeForm
 
