@@ -126,17 +126,11 @@ class SpecFinderPDFEnergyLabelPipeline:
             eprel_code: Optional[str] = extract_eprel_code_from_url(decoded_text)
             if not eprel_code or Product.objects.filter(eprel_code=eprel_code).exists():
                 return item
-            eprel_category_url: Optional[Tuple[EprelCategory, str]] = get_eprel_api_url_and_category(eprel_code, category)
+            eprel_category_url: Optional[Tuple[EprelCategory, str, dict]] = get_eprel_api_url_and_category(eprel_code, category)
             if not eprel_category_url:
                 return item
-            eprel_category, eprel_url = eprel_category_url
-            eprel_category: EprelCategory
-            eprel_url: str
-            response: Response = requests.get(eprel_url)
-            if not response.content:
-                return item
-            product_data: dict = response.json()
-            product = Product.objects.custom_get_or_create(product_data['modelIdentifier'], category)
+            eprel_category, eprel_url, product_data = eprel_category_url
+            product: Product = Product.objects.custom_get_or_create(product_data['modelIdentifier'], category)
             if product.eprel_scraped:
                 return item
             product: Product
