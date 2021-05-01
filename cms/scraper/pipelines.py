@@ -1,8 +1,6 @@
 from typing import Dict, Optional, Tuple
 
-import requests
 from django.db import transaction
-from requests import Response
 
 from cms.constants import PRICE, MAIN, THUMBNAIL, ENERGY_LABEL_IMAGE, ENERGY_LABEL_QR
 from cms.data_processing.image_processing import small_pdf_2_image, energy_label_cropped_2_qr, read_qr, \
