@@ -15,4 +15,10 @@
           {% blocktranslate %}Update Missing Attributes{% endblocktranslate %}
         </a>
     </li>
+    <li>
+        {% url 'admin:map_product_brands' as map_product_brands %}
+        <a href="{% add_preserved_filters map_product_brands is_popup to_field %}" class="addlink">
+          {% blocktranslate %}Update Missing Brands{% endblocktranslate %}
+        </a>
+    </li>
 {% endblock %}

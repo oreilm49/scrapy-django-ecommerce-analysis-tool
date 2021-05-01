@@ -5,7 +5,7 @@ from cms.forms import ProductAttributeForm, AttributeTypeForm
 from cms.models import Website, Url, Category, Selector, Unit, Product, ProductAttribute, WebsiteProductAttribute, \
     ProductImage, AttributeType, CategoryAttributeConfig, SpiderResult, EprelCategory, Brand
 from cms.views.admin import ProductMapView, AttributeTypeMapView, ProductAttributeBulkCreateView, \
-    AttributeTypeConversionView
+    AttributeTypeConversionView, ProductBrandBulkUpdateView
 
 
 class SelectorInlineAdmin(admin.TabularInline):
@@ -99,6 +99,7 @@ class ProductAdmin(admin.ModelAdmin):
         return [
             path('map_products/', self.admin_site.admin_view(ProductMapView.as_view()), name="map_products"),
             path('map_product_attributes/', self.admin_site.admin_view(ProductAttributeBulkCreateView.as_view()), name="map_product_attributes"),
+            path('map_product_brands/', self.admin_site.admin_view(ProductBrandBulkUpdateView.as_view()), name="map_product_brands"),
         ] + super().get_urls()
 
 

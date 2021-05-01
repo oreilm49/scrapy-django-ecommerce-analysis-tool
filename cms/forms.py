@@ -187,3 +187,19 @@ class AttributeTypeUnitConversionForm(forms.Form):
     @transaction.atomic
     def save(self):
         self.attribute_type.convert_unit(self.cleaned_data['unit'])
+
+
+class ProductBrandMapForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['model'].disabled = True
+        self.fields['alternate_models'].disabled = True
+
+    class Meta:
+        model = Product
+        fields = 'model', 'alternate_models', 'brand',
+
+
+def get_product_brand_formset():
+    return modelformset_factory(Product, form=ProductBrandMapForm, extra=0)

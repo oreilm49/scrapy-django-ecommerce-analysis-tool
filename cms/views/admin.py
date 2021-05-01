@@ -7,10 +7,10 @@ from django.db.models import QuerySet
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from django.views.generic import FormView, UpdateView
+from django.views.generic import FormView
 
 from cms.forms import ProductMergeForm, AttributeTypeMergeForm, get_product_attribute_formset, \
-    AttributeTypeUnitConversionForm
+    AttributeTypeUnitConversionForm, get_product_brand_formset
 from cms.models import CategoryAttributeConfig, Product, ProductAttribute, AttributeType
 
 
@@ -106,3 +106,26 @@ class AttributeTypeConversionView(SuccessMessageMixin, FormView):
             return render(request, self.template_name, {'form': form})
         form.save()
         return self.form_valid(form)
+
+
+class ProductBrandBulkUpdateView(SuccessMessageMixin, FormView):
+    template_name = 'site/simple_formset.html'
+    success_message = _('Products brands updated successfully')
+
+    def get_success_url(self):
+        return reverse('admin:map_product_brands')
+
+    def get_form(self, form_class=None):
+        return get_product_brand_formset()(self.request.POST or None, queryset=Product.objects.published().filter(brand__isnull=True))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(formset=self.get_form(), **kwargs)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        formset = self.get_form()
+        if not formset.is_valid():
+            messages.error(request, _('There was an error processing product brands'))
+            return render(request, self.template_name, {'formset': formset})
+        formset.save()
+        return self.form_valid(formset)
