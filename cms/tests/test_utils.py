@@ -43,6 +43,10 @@ class TestUtils(TestCase):
         with self.subTest("no eprel categories"):
             self.assertIsNone(get_eprel_api_url_and_category("test", category))
 
+        with self.subTest("wrong eprel category name"):
+            mommy.make(EprelCategory, name="washingmachines", category=category)
+            self.assertIsNone(get_eprel_api_url_and_category("258076", category))
+
         with self.subTest("eprel category exists"):
             eprel_cat: EprelCategory = mommy.make(EprelCategory, name="washingmachines2019", category=category)
             eprel_cat_and_url = get_eprel_api_url_and_category("258076", category)
