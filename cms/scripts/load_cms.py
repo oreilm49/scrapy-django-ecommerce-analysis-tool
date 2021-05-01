@@ -33,13 +33,16 @@ products = [
 
 def set_up_attributes():
     load_size_unit, _ = Unit.objects.get_or_create(name="kilogram", widget=get_dotted_path(FloatInput))
+    litres_unit, _ = Unit.objects.get_or_create(name="litres", widget=get_dotted_path(FloatInput))
     spin_unit, _ = Unit.objects.get_or_create(name="revolutions_per_minute", widget=get_dotted_path(FloatInput))
     energy_unit, _ = Unit.objects.get_or_create(name="kwh", widget=get_dotted_path(FloatInput))
     currency, _ = Unit.objects.get_or_create(name="€", alternate_names=["euro"], widget=get_dotted_path(FloatInput), repeat=HOURLY)
 
     washers = Category.objects.get(name="washing machines")
+    fridges = Category.objects.get(name="fridges")
     AttributeType.objects.get_or_create(name="brand")
     load_size, _ = AttributeType.objects.get_or_create(name="load size", category=washers, unit=load_size_unit)
+    capacity, _ = AttributeType.objects.get_or_create(name="capacity", category=fridges, unit=litres_unit)
     spin, _ = AttributeType.objects.get_or_create(name="spin speed", category=washers, unit=spin_unit)
     energy, _ = AttributeType.objects.get_or_create(name="energy usage", category=washers, unit=energy_unit)
     AttributeType.objects.get_or_create(name="price", unit=currency)
@@ -66,7 +69,9 @@ def set_up_websites():
     currency, _ = Unit.objects.get_or_create(name="€", alternate_names=["euro"], widget=get_dotted_path(FloatInput), repeat=HOURLY)
     harvey_norman, _ = Website.objects.get_or_create(name="harvey_norman", domain="harveynorman.ie", currency=currency)
     laundry, _ = Category.objects.get_or_create(name="laundry")
+    cooling, _ = Category.objects.get_or_create(name="cooling")
     washing_machines, _ = Category.objects.get_or_create(name="washing machines", parent=laundry, alternate_names=["washers", "front loaders"])
+    fridges, _ = Category.objects.get_or_create(name="fridges", parent=cooling)
     EprelCategory.objects.get_or_create(category=washing_machines, name="washingmachines2019")
     EprelCategory.objects.get_or_create(category=washing_machines, name="washingmachines")
     Url.objects.get_or_create(url="https://www.harveynorman.ie/home-appliances/appliances/washing-machines/", url_type=CATEGORY, website=harvey_norman, category=washing_machines)
