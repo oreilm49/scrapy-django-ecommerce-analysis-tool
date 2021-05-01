@@ -75,12 +75,12 @@ def filename_from_path(path: str) -> str:
     return path.split("/")[-1]
 
 
-def get_eprel_api_url_and_category(eprel_code: str, category: 'Category') -> Optional[Tuple['EprelCategory', str]]:
+def get_eprel_api_url_and_category(eprel_code: str, category: 'Category') -> Optional[Tuple['EprelCategory', str, dict]]:
     from cms.constants import EPREL_API_ROOT_URL
     for eprel_category in category.eprel_names.all():
         try:
             url = f"{EPREL_API_ROOT_URL}{eprel_category.name}/{eprel_code}"
-            requests.get(url).json()
-            return eprel_category, url
+            data = requests.get(url).json()
+            return eprel_category, url, data
         except JSONDecodeError:
             continue
