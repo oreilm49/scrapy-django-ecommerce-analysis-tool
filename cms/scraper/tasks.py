@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 import requests
 from celery import shared_task
@@ -31,11 +31,12 @@ def create_product_attributes(product: Product, data: dict) -> None:
 @shared_task
 def crawl_eprel_data():
     for product in Product.objects.published().filter(eprel_scraped=False, eprel_code__isnull=False):
-        url: Optional[str] = product.get_eprel_api_url()
-        response = requests.get(url)
-        create_product_attributes(product, response.json())
-        product.eprel_scraped = True
-        product.save()
+        url_or_data: Optional[Union[str, dict]] = product.get_eprel_api_url()
+        if url_or_data:
+            data: dict = requests.get(url_or_data).json() if isinstance(url_or_data, str) else url_or_data
+            create_product_attributes(product, data)
+            product.eprel_scraped = True
+            product.save()
 
 
 @shared_task
