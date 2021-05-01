@@ -237,9 +237,9 @@ class CategoryGapAnalysisFilterForm(forms.Form):
 
 class CategoryTableAttributeForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, category: Category, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['attribute'].queryset = AttributeType.objects.exclude(name='price').order_by('name')
+        self.fields['attribute'].queryset = AttributeType.objects.published().filter(category=category).exclude(name='price').order_by('name')
 
     class Meta:
         model = CategoryTableAttribute
