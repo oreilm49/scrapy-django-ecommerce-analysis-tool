@@ -53,6 +53,8 @@ class UnitManager:
     def get_processed_unit_and_value(self, value: str, unit: Optional[Unit] = None) -> Union[UnitValue, Value, RangeUnitValue]:
         try:
             if not contains_number(value):
+                if value in [True, False] and unit:
+                    return UnitValue(unit=unit, value=value)
                 if is_bool_value(value):
                     bool_unit, _ = Unit.objects.get_or_create(name="bool", widget=widget_from_type(True))
                     return UnitValue(unit=bool_unit, value=True)
